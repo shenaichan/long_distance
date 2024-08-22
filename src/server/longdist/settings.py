@@ -25,19 +25,29 @@ SECRET_KEY = 'django-insecure-8k3z#q9sd9xxq@h3(+fn+f-e(h#k20^2y$z+2$==)dl6jhf^ny
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["long-distance.onrender.com", "0.0.0.0"]
+ALLOWED_HOSTS = ["long-distance.onrender.com", "0.0.0.0", "127.0.0.1"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'longdist.apps.LongdistConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework"
 ]
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
