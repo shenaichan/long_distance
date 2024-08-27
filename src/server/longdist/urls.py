@@ -21,6 +21,46 @@ from longdist.models import Pin, Message, Relationship
 from rest_framework import routers, serializers, viewsets
 
 # Serializers define the API representation.
+'''
+useful for filtering on a queryset
+
+User.objects.all() <-- user is django object
+making a SQL query and returning a "queryset" object
+
+defining a subset of fields that it's returning
+
+don't need the rest for my view
+
+django rest framework thing haha
+
+return it as json
+
+without the serializer you would have to loop through the queryset itself
+
+print out what the object looks like before and after you run it through
+the serializer
+
+you can use it for validation of fields (inbound)
+
+some inbound and some outbound
+
+builtin validate function (look for this)
+
+CORS for validating frontend calls to my api
+
+django app is going to have http headers that it sets and checks that interact
+with headers set and checked by the client
+
+what domain it's on
+
+you can restrict it this way
+
+https://pypi.org/project/django-cors-headers/
+
+might want to move serializers to their own file
+
+look at django docs
+'''
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
