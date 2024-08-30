@@ -17,6 +17,58 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+def create_pin(request):
+    if request.method == "POST":
+        data = JSONParser().parse(request)
+
+def create_tentative_pin(request):
+    return
+
+def create_message(request):
+    return
+
+def create_response(request):
+    return
+
+def get_pin(request):
+    return
+
+def get_message_thread(request):
+    return
+
+def write_to(request):
+    return
+
+def check_message_approval(request):
+    return
+
+def check_response_approval(request):
+    return
+
+def check_pin_access(request):
+    return
+
+def claim_pin(request):
+    return
+
+def approve_pin(request):
+    return
+
+def disapprove_pin(request):
+    return
+
+def approve_message(request):
+    return
+
+def disapprove_message(request):
+    return
+
+def approve_response(request):
+    return
+
+def disapprove_response(request):
+    return
+
 ''' pseudocode
 
 class 
