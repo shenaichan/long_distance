@@ -21,7 +21,7 @@ class PinManager(models.Manager):
                           private_allow_mail_token=generate_private_token(),
                           written_to_json=False,
                           created_at=datetime.now(),
-                          approved_at=None, # question -- how to initialize this in a way that indicates it hasn't been approved
+                          approved_at=datetime.now(), # question -- how to initialize this in a way that indicates it hasn't been approved
                           checked_but_disapproved=False
                           )
         # pin.save()
@@ -63,6 +63,9 @@ class Pin(models.Model):
     def disapprove(self):
         self.checked_but_disapproved = True
         return 
+    
+    def __repr__(self):
+        return f"lat={self.latitude}, long={self.longitude}, place={self.place_name}, pk={self.public_share_token}"
 
 class Message(models.Model):
     content = models.TextField() # limit text input size on frontend
