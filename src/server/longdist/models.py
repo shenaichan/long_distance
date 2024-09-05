@@ -19,10 +19,10 @@ class PinManager(models.Manager):
                           public_share_token=generate_public_token(),
                           private_ownership_token=generate_private_token(),
                           private_allow_mail_token=generate_private_token(),
-                          written_to_json=False,
-                          created_at=datetime.now(),
-                          approved_at=datetime.now(), # question -- how to initialize this in a way that indicates it hasn't been approved
-                          checked_but_disapproved=False
+                          created_at=datetime.now(datetime.UTC),
+                          approved_at=datetime.now(datetime.UTC), # question -- how to initialize this in a way that indicates it hasn't been approved
+                          is_checked=False,
+                          is_approved=False
                           )
         # pin.save()
         return pin
@@ -30,21 +30,16 @@ class PinManager(models.Manager):
 
 class Pin(models.Model):
     public_share_token = models.CharField(max_length=24, primary_key=True)
-    private_ownership_token = models.CharField(max_length=24)
 
-    # question -- should I have the primary key be an int or the private_ownership_token
-    # might be easier for it to be the POT since that's likely what I'll be querying by most frequently
-    # but it might also be harder to filter other tables on since it'll be long
     latitude = models.FloatField()
     longitude = models.FloatField()
     place_name = models.CharField(max_length=255)
+    private_ownership_token = models.CharField(max_length=24)
     private_allow_mail_token = models.CharField(max_length=24)
-    written_to_json = models.BooleanField()
-    # relationships_started = models.ManyToManyField("self", on_delete=models.CASCADE, related_name="relationships_started")
-    # relationships_finished = models.ManyToManyField("self", on_delete=models.CASCADE, related_name="relationships_finished")
     created_at = models.DateTimeField()
     approved_at = models.DateTimeField()
-    checked_but_disapproved = models.BooleanField()
+    is_checked = models.BooleanField()
+    is_approved = models.BooleanField()
 
     objects = PinManager()
     
@@ -55,13 +50,15 @@ class Pin(models.Model):
         return Relationship.objects.filter(recipient=self)
     
     def approve(self):
-        self.approved_at = datetime.now()
+        self.approved_at = datetime.now(datetime.UTC)
         write_to_geojson(self)
-        self.written_to_json = True
+        self.is_checked = True
+        self.is_approved = True
         return
     
     def disapprove(self):
-        self.checked_but_disapproved = True
+        self.is_checked = True
+        self.is_approved = False # not really necessary since initialized to False, but good as a note
         return 
     
     def __repr__(self):
@@ -71,24 +68,26 @@ class Message(models.Model):
     content = models.TextField() # limit text input size on frontend
     created_at = models.DateTimeField()
     approved_at = models.DateTimeField()
-    checked_but_disapproved = models.BooleanField()
+    is_checked = models.BooleanField()
+    is_approved = models.BooleanField()
 
     def create_mesage(self, content):
         message = self.create(content=content,
-                              created_at=datetime.now(),
-                              approved_at=None)
+                              created_at=datetime.now(datetime.UTC),
+                              approved_at=datetime.now(datetime.UTC))
         return message
     
     def approve(self):
-        self.approved_at = datetime.now()
+        self.approved_at = datetime.now(datetime.UTC)
+        self.is_checked = True
+        self.is_approved = True
         return
     
     def disapprove(self):
-        self.checked_but_disapproved = True
+        self.is_checked = True
+        self.is_approved = True
         return
     
-    def is_approved(self):
-        return bool(self.approved_at)
     
 class RelationshipManager(models.Manager):
     def create_relationship(self, sender, recipient, message):
@@ -135,8 +134,8 @@ class Relationship(models.Model):
         return 
     
     def is_approved(self):
-        return self.message.is_approved()
+        return self.message.is_approved
     
     def response_is_approved(self):
-        return self.response.is_approved()
+        return self.response.is_approved
 
