@@ -13,13 +13,26 @@ class MessageSchema(Schema):
     recipient:str
     message:str
 
+def print_queryset(queryset):
+    for entry in queryset:
+        print(entry)
+        print("\n")
+    return
+
 @api.post("/create_pin")
 def create_pin(request, data: PinSchema):
-    pin = Pin.objects.create_pin(latitude=data.latitude,
-                                 longitude=data.longitude,
-                                 place_name=data.place_name)
+    pin = Pin.objects.create(latitude=data.latitude,
+                             longitude=data.longitude,
+                             place_name=data.place_name)
+
+    print_queryset(Pin.objects.all())
+
+    pin.approve()
+
     pin.save()
-    print(Pin.objects.all())
+
+    print_queryset(Pin.objects.all())
+
     return 
 
 @api.post("/create_relationship_and_message")

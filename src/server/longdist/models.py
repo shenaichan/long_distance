@@ -1,6 +1,8 @@
 from django.db import models
-from datetime import datetime
+from datetime import datetime, UTC
 import secrets
+from django.utils import timezone
+from pprint import pformat
 
 def generate_public_token():
     return secrets.token_urlsafe(16)
@@ -11,37 +13,50 @@ def generate_private_token():
 def write_to_geojson(pin):
     return True
 
-class PinManager(models.Manager):
-    def create_pin(self, latitude, longitude, place_name):
-        pin = self.create(latitude=latitude,
-                          longitude=longitude,
-                          place_name=place_name,
-                          public_share_token=generate_public_token(),
-                          private_ownership_token=generate_private_token(),
-                          private_allow_mail_token=generate_private_token(),
-                          created_at=datetime.now(datetime.UTC),
-                          approved_at=datetime.now(datetime.UTC), # question -- how to initialize this in a way that indicates it hasn't been approved
-                          is_checked=False,
-                          is_approved=False
-                          )
-        # pin.save()
-        return pin
+# class PinManager(models.Manager):
+#     def create_pin(self, latitude, longitude, place_name):
+#         pin = self.create(latitude=latitude,
+#                           longitude=longitude,
+#                           place_name=place_name,
+#                           public_share_token=generate_public_token(),
+#                           private_ownership_token=generate_private_token(),
+#                           private_allow_mail_token=generate_private_token(),
+#                           created_at=datetime.now(UTC),
+#                           approved_at=datetime.now(UTC), # question -- how to initialize this in a way that indicates it hasn't been approved
+#                           is_checked=False,
+#                           is_approved=False, 
+#                           is_claimed=False
+#                           )
+#         # pin.save()
+#         return pin
+
+class ReprMixin:
+    def __str__(self):
+
+        class_name = self.__class__.__name__
+        fields = self._meta.get_fields()
+        field_dict = {field.name: getattr(self, field.name) for field in fields}
+        pretty_field_dict = pformat(field_dict)
+
+        return f"{class_name}({pretty_field_dict})"
 
 
-class Pin(models.Model):
-    public_share_token = models.CharField(max_length=24, primary_key=True)
+# @dataclass(init=False, repr=True)
+class Pin(ReprMixin, models.Model):
+    public_share_token = models.CharField(max_length=24, primary_key=True, default=generate_public_token)
 
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    place_name = models.CharField(max_length=255)
-    private_ownership_token = models.CharField(max_length=24)
-    private_allow_mail_token = models.CharField(max_length=24)
-    created_at = models.DateTimeField()
-    approved_at = models.DateTimeField()
-    is_checked = models.BooleanField()
-    is_approved = models.BooleanField()
+    latitude = models.FloatField(default=0)
+    longitude = models.FloatField(default=0)
+    place_name = models.CharField(max_length=255, default="unnamed")
+    private_ownership_token = models.CharField(max_length=24, default=generate_private_token)
+    private_allow_mail_token = models.CharField(max_length=24, default=generate_private_token)
+    created_at = models.DateTimeField(default=timezone.now)
+    approved_at = models.DateTimeField(default=timezone.now)
+    is_checked = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)
+    is_claimed = models.BooleanField(default=False)
 
-    objects = PinManager()
+    # objects = PinManager()
     
     def get_relationships_started(self):
         return Relationship.objects.filter(sender=self)
@@ -50,7 +65,7 @@ class Pin(models.Model):
         return Relationship.objects.filter(recipient=self)
     
     def approve(self):
-        self.approved_at = datetime.now(datetime.UTC)
+        self.approved_at = datetime.now(UTC)
         write_to_geojson(self)
         self.is_checked = True
         self.is_approved = True
@@ -61,8 +76,12 @@ class Pin(models.Model):
         self.is_approved = False # not really necessary since initialized to False, but good as a note
         return 
     
-    def __repr__(self):
-        return f"lat={self.latitude}, long={self.longitude}, place={self.place_name}, pk={self.public_share_token}"
+    def claim(self):
+        self.is_claimed = True
+        return
+    
+    # def __repr__(self):
+    #     return f"lat={self.latitude}, long={self.longitude}, place={self.place_name}, pk={self.public_share_token}"
 
 class Message(models.Model):
     content = models.TextField() # limit text input size on frontend
@@ -73,12 +92,12 @@ class Message(models.Model):
 
     def create_mesage(self, content):
         message = self.create(content=content,
-                              created_at=datetime.now(datetime.UTC),
-                              approved_at=datetime.now(datetime.UTC))
+                              created_at=datetime.now(UTC),
+                              approved_at=datetime.now(UTC))
         return message
     
     def approve(self):
-        self.approved_at = datetime.now(datetime.UTC)
+        self.approved_at = datetime.now(UTC)
         self.is_checked = True
         self.is_approved = True
         return
