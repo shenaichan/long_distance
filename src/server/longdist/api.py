@@ -25,22 +25,35 @@ def create_pin(request, data: PinSchema):
                              longitude=data.longitude,
                              place_name=data.place_name)
 
-    print_queryset(Pin.objects.all())
+    # print_queryset(Pin.objects.all())
 
     pin.approve()
 
     pin.save()
 
-    print_queryset(Pin.objects.all())
+    # print_queryset(Pin.objects.all())
 
     return 
 
 @api.post("/create_relationship_and_message")
 def create_relationship_and_message(request, data: MessageSchema):
-    relationship = Relationship.objects.create_relationship(sender=data.sender,
-                                                            recipient=data.recipient,
-                                                            message=data.message)
-    relationship.save()
+    sender = Pin.objects.latest('created_at')
+    recipient = Pin.objects.latest('created_at')
+    print(sender)
+    input()
+
+    message = Message.objects.create(content=data.message)
+    print(message)
+    input()
+    relationship = Relationship.objects.create(sender=sender,
+                                               recipient=recipient,
+                                               message=message)
+    print_queryset(Relationship.objects.all())
+    input()
+    message.approve()
+    message.save()
+    print_queryset(Relationship.objects.all())
+    input()
     return
 
 @api.put("/create_and_add_response")
