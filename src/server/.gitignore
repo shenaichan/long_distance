@@ -1,2 +1,2 @@
-longdist/migrations/*
+longdist/migrations/
 db.sqlite3
