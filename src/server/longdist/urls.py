@@ -21,6 +21,6 @@ from longdist.api import api
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path('', api.urls),
+    path('api/', api.urls),
     path('admin/', admin.site.urls)
 ]

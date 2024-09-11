@@ -15,3 +15,6 @@ python3 manage.py makemigrations longdist
 
 echo "Migrating longdist databases"
 python3 manage.py migrate
+
+echo "Creating superuser"
+python3 manage.py createsuperuser --noinput

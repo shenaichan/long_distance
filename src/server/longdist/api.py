@@ -1,5 +1,8 @@
 from ninja import NinjaAPI, Schema
 from longdist.models import Pin, Message, Relationship
+from pprint import pprint
+from django.db import transaction
+from typing import List
 
 api = NinjaAPI()
 
@@ -9,13 +12,17 @@ class PinSchema(Schema):
     place_name:str = None
 
 class MessageSchema(Schema):
-    sender:str
-    recipient:str
+    sender:int
+    recipient:int
     message:str
+
+class RelationshipsPerPinSchema(Schema):
+    outgoing:list
+    incoming:list
 
 def print_queryset(queryset):
     for entry in queryset:
-        print(entry)
+        pprint(entry)
         print("\n")
     return
 
@@ -24,68 +31,42 @@ def create_pin(request, data: PinSchema):
     pin = Pin.objects.create(latitude=data.latitude,
                              longitude=data.longitude,
                              place_name=data.place_name)
+    return 
 
-    # print_queryset(Pin.objects.all())
-
-    pin.approve()
-
-    pin.save()
-
-    # print_queryset(Pin.objects.all())
-
+@api.post("/create_approve_claim_pin")
+def create_approve_claim_pin(request, data: PinSchema):
+    with transaction.atomic():
+        pin = Pin.objects.create(latitude=data.latitude,
+                                longitude=data.longitude,
+                                place_name=data.place_name)
+        pin.approve()
+        pin.claim()
     return 
 
 @api.post("/create_relationship_and_message")
 def create_relationship_and_message(request, data: MessageSchema):
-    sender = Pin.objects.latest('created_at')
-    recipient = Pin.objects.latest('created_at')
-    print(sender)
-    input()
-
-    message = Message.objects.create(content=data.message)
-    print(message)
-    input()
-    relationship = Relationship.objects.create(sender=sender,
-                                               recipient=recipient,
-                                               message=message)
-    print_queryset(Relationship.objects.all())
-    input()
-    message.approve()
-    message.save()
-    print_queryset(Relationship.objects.all())
-    input()
+    with transaction.atomic():
+        message = Message.objects.create(content=data.message)
+        sender = Pin.objects.get(id=data.sender)
+        recipient = Pin.objects.get(id=data.recipient)
+        Relationship.objects.create(sender=sender,
+                                    recipient=recipient,
+                                    message=message)
     return
 
-@api.put("/create_and_add_response")
+@api.patch("/create_and_add_response")
 def create_and_add_response(request, data: MessageSchema):
-    '''
-    try:
-        # Use Django's transaction management to ensure atomicity
-        with transaction.atomic():
-            # Create a new user
-            user = User.objects.create(name=payload.name, email=payload.email)
-
-            # Assign a role to the newly created user
-            Role.objects.create(name=payload.role, user=user)
-
-        # Return a success response
-        return 200, {
-            "id": user.id,
-            "name": user.name,
-            "email": user.email,
-            "roles": [role.name for role in user.roles.all()]
-        }
-
-    except Exception as e:
-        # Handle exceptions and return a failure response
-        return 400, {"error": str(e)}
-    '''
+    with transaction.atomic():
+        response = Message.objects.create(content=data.message)
+        relationship = Relationship.objects.filter(sender=data.sender, recipient=data.recipient).first()
+        relationship.add_response(response)
     return
 
 @api.get("/get_pin_info")
 def get_pin(request):
     return
 
+@api.get("/get_message_thread")
 def get_message_thread(request):
     return
 
@@ -102,28 +83,4 @@ def check_pin_access(request):
     return
 
 def claim_pin(request):
-    return
-
-@api.patch("/approve")
-def approve_pin(request):
-    return
-
-@api.patch("/disapprove")
-def disapprove_pin(request):
-    return
-
-@api.patch("/approve")
-def approve_message(request):
-    return
-
-@api.patch("/disapprove")
-def disapprove_message(request):
-    return
-
-@api.patch("/approve")
-def approve_response(request):
-    return
-
-@api.patch("/disapprove")
-def disapprove_response(request):
     return
