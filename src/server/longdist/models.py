@@ -29,10 +29,10 @@ class Pin(models.Model):
     is_claimed = models.BooleanField(default=False)
 
     def get_relationships_started(self):
-        return Relationship.objects.filter(sender=self)
+        return [relationship.recipient for relationship in Relationship.objects.filter(sender=self)]
     
     def get_relationships_finished(self):
-        return Relationship.objects.filter(recipient=self)
+        return [relationship.sender for relationship in Relationship.objects.filter(recipient=self)]
     
     def approve(self):
         self.approved_at = datetime.now(UTC)

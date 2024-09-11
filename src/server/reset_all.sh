@@ -18,3 +18,6 @@ python3 manage.py migrate
 
 echo "Creating superuser"
 python3 manage.py createsuperuser --noinput
+
+echo "Starting server"
+python3 manage.py runserver

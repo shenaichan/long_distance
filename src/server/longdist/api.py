@@ -6,19 +6,21 @@ from typing import List
 
 api = NinjaAPI()
 
-class PinSchema(Schema):
+class PinIn(Schema):
     latitude:float
     longitude:float
     place_name:str = None
 
-class MessageSchema(Schema):
+class MessageIn(Schema):
     sender:int
     recipient:int
     message:str
 
-class RelationshipsPerPinSchema(Schema):
-    outgoing:list
-    incoming:list
+class PinOut(Schema):
+    latitude:float
+    longitude:float
+    place_name:str
+    public_share_token:str
 
 def print_queryset(queryset):
     for entry in queryset:
@@ -27,14 +29,14 @@ def print_queryset(queryset):
     return
 
 @api.post("/create_pin")
-def create_pin(request, data: PinSchema):
+def create_pin(request, data: PinIn):
     pin = Pin.objects.create(latitude=data.latitude,
                              longitude=data.longitude,
                              place_name=data.place_name)
     return 
 
 @api.post("/create_approve_claim_pin")
-def create_approve_claim_pin(request, data: PinSchema):
+def create_approve_claim_pin(request, data: PinIn):
     with transaction.atomic():
         pin = Pin.objects.create(latitude=data.latitude,
                                 longitude=data.longitude,
@@ -44,7 +46,7 @@ def create_approve_claim_pin(request, data: PinSchema):
     return 
 
 @api.post("/create_relationship_and_message")
-def create_relationship_and_message(request, data: MessageSchema):
+def create_relationship_and_message(request, data: MessageIn):
     with transaction.atomic():
         message = Message.objects.create(content=data.message)
         sender = Pin.objects.get(id=data.sender)
@@ -55,16 +57,22 @@ def create_relationship_and_message(request, data: MessageSchema):
     return
 
 @api.patch("/create_and_add_response")
-def create_and_add_response(request, data: MessageSchema):
+def create_and_add_response(request, data: MessageIn):
     with transaction.atomic():
         response = Message.objects.create(content=data.message)
         relationship = Relationship.objects.filter(sender=data.sender, recipient=data.recipient).first()
         relationship.add_response(response)
     return
 
-@api.get("/get_pin_info")
-def get_pin(request):
-    return
+@api.get("/get_relationships_started", response=List[PinOut])
+def get_relationships_started(request, public_token: str):
+    pin = Pin.objects.filter(public_share_token=public_token).first()
+    return pin.get_relationships_started()
+
+@api.get("/get_relationships_finished", response=List[PinOut])
+def get_relationships_finished(request, public_token: str):
+    pin = Pin.objects.filter(public_share_token=public_token).first()
+    return pin.get_relationships_finished()
 
 @api.get("/get_message_thread")
 def get_message_thread(request):
