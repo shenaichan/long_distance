@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^3.4.4",
     "dotenv": "^16.4.5",
     "immer": "^10.1.1",
     "mapbox-gl": "^3.6.0",

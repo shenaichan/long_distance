@@ -3,8 +3,11 @@ import { useState } from 'react';
 
 import { Map } from "components/map/Map";
 
+import longdist from "assets/longdist_long.mp3";
+
 function App() {
   const [count, setCount] = useState(0)
+  // const music = new Audio(longdist);
 
   return (
     <>
@@ -15,6 +18,10 @@ function App() {
         <header>
           <h1> notes from afar </h1>
           <div className={css.controls}>
+          <audio controls loop>
+            <source src={longdist} type="audio/mpeg" />
+          Your browser does not support the audio element.
+          </audio>
             <p> my pins </p>
             <p> my favorites </p>
             <p> about </p>

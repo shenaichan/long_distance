@@ -46,6 +46,10 @@ p {
   /* margin-left: auto; */
 }
 
+audio {
+  pointer-events: all;
+}
+
 .create {
   font-variation-settings: "wght" 700;
   border: 2px solid var(--accent-dark-green);
