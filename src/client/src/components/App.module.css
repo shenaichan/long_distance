@@ -41,7 +41,6 @@ p {
   color: var(--accent-dark-green);
   line-height: 1.5;
   margin: auto 0px;
-  /* margin: 20px 0px 0px 0px; */
   padding: 0px 15px;
   pointer-events: all;
   /* margin-left: auto; */
@@ -64,10 +63,26 @@ audio {
 }
 
 main {
-  display: flex;
-  flex-flow: column;
+  position: absolute;
+  display:flex;
+  /* flex-flow: row; */
   /* justify-content: space-between; */
-  height: 100vh;
+  overflow: hidden;
+  width: 100vw;
+  min-height: 100vh;
+  place-items: center;
+}
+
+.test {
+  position: absolute;
+  display:flex;
+  /* flex-flow: row; */
+  /* justify-content: space-between; */
+  overflow: hidden;
+  width: 100vw;
+  min-height: 100vh;
+  place-items: center;
+  pointer-events: none;
 }
 
 header {
@@ -77,10 +92,6 @@ header {
   display: inline-flex;
   pointer-events: none;  
   flex-flow: row;
-  /* justify-content:space-around; */
-  /* border: 2px solid var(--accent-dark-green);
-  background-color: white;
-  border-radius: 10px; */
 }
 
 .headerConnector {

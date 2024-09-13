@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-pdf/renderer": "^3.4.4",
+    "98.css": "^0.1.20",
     "dotenv": "^16.4.5",
     "immer": "^10.1.1",
     "mapbox-gl": "^3.6.0",

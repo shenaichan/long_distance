@@ -9,3 +9,15 @@
     border-radius: 10px;
     visibility: hidden;
 }
+
+.test {
+    position: absolute;
+    display:flex;
+    /* flex-flow: row; */
+    /* justify-content: space-between; */
+    overflow: hidden;
+    width: 100vw;
+    min-height: 100vh;
+    place-items: center;
+    pointer-events: none;
+  }

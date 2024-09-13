@@ -15,28 +15,29 @@ function App() {
 
       <Map />
 
-      <main>
-        <header>
+      {/* <main> */}
+      <div className={css.test}><Popup /></div>
+        {/* <header>
           <h1> notes from afar </h1>
           <div className={css.headerConnector}></div>
           <div className={css.controls}>
-          {/* <audio controls loop>
+          <audio controls loop>
             <source src={longdist} type="audio/mpeg" />
           Your browser does not support the audio element.
-          </audio> */}
+          </audio>
             <p> my pins </p>
             <p> my favorites </p>
             <p> about </p>
           </div>
-        </header>
-        <Popup />
-        <footer>
+        </header> */}
+        
+        {/* <footer>
           <h2> 567,937 miles of love </h2>
           <div className={css.controls}>
             <p className={css.create}> + CREATE PIN </p>
           </div>
-        </footer>
-      </main>
+        </footer> */}
+      {/* </main> */}
         
     </>
   )
