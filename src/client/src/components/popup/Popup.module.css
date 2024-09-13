@@ -1,0 +1,11 @@
+.popup {
+    display: block;
+    z-index: 1;
+    width: 640px;
+    height: 480px;
+    border: 2px solid var(--accent-dark-green);
+    background-color: white;
+    margin: auto;
+    border-radius: 10px;
+    visibility: hidden;
+}

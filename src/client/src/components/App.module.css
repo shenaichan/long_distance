@@ -40,7 +40,8 @@ p {
   font-size: 30px;
   color: var(--accent-dark-green);
   line-height: 1.5;
-  margin: 20px 0px 0px 0px;
+  margin: auto 0px;
+  /* margin: 20px 0px 0px 0px; */
   padding: 0px 15px;
   pointer-events: all;
   /* margin-left: auto; */
@@ -74,9 +75,21 @@ header {
   padding:  15px 20px;
   z-index: 1;
   display: inline-flex;
-  pointer-events: none;
-  /* justify-content: space-between; */
-  
+  pointer-events: none;  
+  flex-flow: row;
+  /* justify-content:space-around; */
+  /* border: 2px solid var(--accent-dark-green);
+  background-color: white;
+  border-radius: 10px; */
+}
+
+.headerConnector {
+  position: relative;
+  display: inline;
+  flex-grow: 1;
+  height: 0px;
+  border: 1px solid var(--accent-dark-green);
+  margin: auto 0px auto 15px;
 }
 
 /* use flexbox */
@@ -86,7 +99,7 @@ footer {
   padding: 20px;
   z-index: 1;
   display: inline-flex;
-  margin-top: auto;
+  /* margin-top: auto; */
   pointer-events: none;
 }
 
