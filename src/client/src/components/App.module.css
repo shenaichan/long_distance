@@ -1,42 +1,96 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@font-face {
+  font-family: Erode;
+  src: url("src/assets/Erode/Erode-Variable.ttf") format("truetype");
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+@font-face {
+  font-family: Erode;
+  src: url("src/assets/Erode/Erode-VariableItalic.ttf") format("truetype");
+  font-style: italic;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@font-face {
+  font-family: Sentient;
+  src: url("src/assets/Sentient/Sentient-Variable.ttf") format("truetype");
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+@font-face {
+  font-family: Sentient;
+  src: url("src/assets/Sentient/Sentient-VariableItalic.ttf") format("truetype");
+  font-style: italic;
 }
 
-.card {
-  padding: 2em;
+:root {
+  --accent-dark-green: #054718;
 }
 
-.read-the-docs {
-  color: #888;
+h1 {
+  font-family: Sentient;
+  font-style: italic;
+  font-variation-settings: "wght" 700;
+  font-size: 70px;
+  color: var(--accent-dark-green);
+  line-height: 1;
+}
+
+p {
+  font-family: Erode;
+  font-style: italic;
+  font-variation-settings: "wght" 500;
+  font-size: 30px;
+  color: var(--accent-dark-green);
+  line-height: 1.5;
+  margin: 20px 0px 0px 0px;
+  padding: 0px 15px;
+  pointer-events: all;
+  /* margin-left: auto; */
+}
+
+.create {
+  font-variation-settings: "wght" 700;
+  border: 2px solid var(--accent-dark-green);
+  background-color: white;
+  border-radius: 10px;
+}
+
+.controls {
+  margin-left: auto;
+  display: inline-flex;
+}
+
+main {
+  display: flex;
+  flex-flow: column;
+  /* justify-content: space-between; */
+  height: 100vh;
+}
+
+header {
+  position: relative;
+  padding:  15px 20px;
+  z-index: 1;
+  display: inline-flex;
+  pointer-events: none;
+  /* justify-content: space-between; */
+  
+}
+
+/* use flexbox */
+
+footer {
+  position: relative;
+  padding: 20px;
+  z-index: 1;
+  display: inline-flex;
+  margin-top: auto;
+  pointer-events: none;
+}
+
+h2 {
+  font-family: Sentient;
+  font-style: italic;
+  font-variation-settings: "wght" 500;
+  font-size: 60px;
+  color: var(--accent-dark-green);
+  line-height: 1;
 }

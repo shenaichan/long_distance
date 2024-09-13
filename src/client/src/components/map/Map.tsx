@@ -8,7 +8,7 @@
 
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-
+// import "components/map/style.json";
 // interface MovingObject {
 //   id: number;
 //   name: string;
@@ -17,6 +17,7 @@ import mapboxgl from "mapbox-gl";
 
 export function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
+  // const map = useRef<Map>(null);
 
 //   const movingObjects: MovingObject[] = [
 //     // Define your moving objects here
@@ -28,7 +29,7 @@ export function Map() {
     if (mapContainer.current) {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/mapbox/light-v11",
+        style: "mapbox://styles/shenaichan/cm0zvdfvd02b001pqepr2beqo/draft",
         center: [-74.0060152, 40.7127281],
         zoom: 5,
         maxZoom: 15,
@@ -38,6 +39,14 @@ export function Map() {
       map.addControl(new mapboxgl.NavigationControl(), "top-left");
 
       // Add your custom markers and lines here
+      // map.addLayer({
+      //   id: 'add-erode-font',
+      //   type: 'symbol',
+      //   layout: {
+      //     'text-field': ['get', 'name'],
+      //     'text-font': ['Erode']
+      //   }
+      // });
 
       // Clean up on unmount
       return () => map.remove();
@@ -47,7 +56,7 @@ export function Map() {
   return (
     <div
       ref={mapContainer}
-      style={{ position: "absolute", top: 0, bottom: 0, width: "100%" }}
+      style={{ position: "fixed", top: 0, width: "100%", height: "100%", zIndex: 0 }}
     />
   );
 };
