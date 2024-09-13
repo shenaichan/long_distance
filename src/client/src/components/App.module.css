@@ -73,16 +73,27 @@ main {
   place-items: center;
 }
 
-.test {
+.information {
   position: absolute;
-  display:flex;
-  /* flex-flow: row; */
-  /* justify-content: space-between; */
+  display: flex;
+  flex-flow: row;
   overflow: hidden;
   width: 100vw;
-  min-height: 100vh;
-  place-items: center;
+  height: 100vh;
   pointer-events: none;
+  z-index: 1;
+}
+
+.left {
+  position: relative;
+  display: block;
+  margin-right: auto;
+}
+
+.right {
+  position: relative;
+  display: block;
+  margin-left: auto;
 }
 
 header {

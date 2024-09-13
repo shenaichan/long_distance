@@ -6,6 +6,7 @@ import erode from "assets/Erode/Erode-Variable.ttf";
 
 function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
+  const clusterColor: string = '#a097f0';
 
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -40,11 +41,11 @@ function Map() {
             'circle-color': [
               'step',
               ['get', 'point_count'],
-              '#51bbd6',
+              clusterColor,
               100,
-              '#f1f075',
+              clusterColor,
               750,
-              '#f28cb1'
+              clusterColor
             ],
             'circle-radius': [
               'step',
@@ -65,7 +66,7 @@ function Map() {
           filter: ['has', 'point_count'],
           layout: {
             'text-field': ['get', 'point_count_abbreviated'],
-            'text-font': ['Spectral Regular', 'Arial Unicode MS Bold'],
+            'text-font': ['Roboto Mono Regular', 'Arial Unicode MS Bold'],
             'text-size': 12
           }
         });
@@ -76,7 +77,7 @@ function Map() {
           source: 'earthquakes',
           filter: ['!', ['has', 'point_count']],
           paint: {
-            'circle-color': '#11b4da',
+            'circle-color': clusterColor,
             'circle-radius': 10,
             'circle-stroke-width': 1,
             'circle-stroke-color': '#fff'

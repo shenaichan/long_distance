@@ -1,23 +1,7 @@
 .popup {
-    display: block;
+    margin: "auto";
+    pointer-events: "all"; 
+    width: "300px";
     z-index: 1;
-    width: 640px;
-    height: 480px;
-    border: 2px solid var(--accent-dark-green);
-    background-color: white;
-    margin: auto;
-    border-radius: 10px;
-    visibility: hidden;
+    background-color: #efefef;
 }
-
-.test {
-    position: absolute;
-    display:flex;
-    /* flex-flow: row; */
-    /* justify-content: space-between; */
-    overflow: hidden;
-    width: 100vw;
-    min-height: 100vh;
-    place-items: center;
-    pointer-events: none;
-  }
