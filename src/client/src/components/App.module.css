@@ -33,7 +33,7 @@ h1 {
   line-height: 1;
 }
 
-p {
+/* p {
   font-family: Erode;
   font-style: italic;
   font-variation-settings: "wght" 500;
@@ -43,8 +43,8 @@ p {
   margin: auto 0px;
   padding: 0px 15px;
   pointer-events: all;
-  /* margin-left: auto; */
-}
+  margin-left: auto;
+} */
 
 audio {
   pointer-events: all;

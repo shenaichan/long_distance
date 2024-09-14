@@ -16,7 +16,7 @@ function Map() {
         container: mapContainer.current,
         style: "mapbox://styles/shenaichan/cm0zvdfvd02b001pqepr2beqo/draft",
         center: [-74.0060152, 40.7127281],
-        zoom: 5,
+        zoom: 2,
         maxZoom: 15,
       });
 
@@ -55,7 +55,9 @@ function Map() {
               30,
               750,
               40
-            ]
+            ],
+            'circle-stroke-width': 1,
+            'circle-stroke-color': '#fff'
           }
         });
   
@@ -68,6 +70,9 @@ function Map() {
             'text-field': ['get', 'point_count_abbreviated'],
             'text-font': ['Roboto Mono Regular', 'Arial Unicode MS Bold'],
             'text-size': 12
+          },
+          paint: {
+            "text-color": "#000020"
           }
         });
   

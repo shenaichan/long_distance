@@ -1,8 +1,10 @@
 import "98.css";
 import css from "components/popup/Popup.module.css";
+import {ReactNode} from 'react';
 
+type popupProps = {title: string, content: ReactNode}
 
-function Popup() {
+function Popup({title, content}: popupProps) {
 
     return (
         <div className="window" 
@@ -10,11 +12,11 @@ function Popup() {
                      pointerEvents: "all", 
                      width: "400px",
                      zIndex: 1,
-                     backgroundColor: "#efefef"}}>
+                     backgroundColor: "#efffef"}}>
             <div className="title-bar">
                 <div className="title-bar-text"
                      style={{fontSize: "16px"}}>
-                    Welcome to Notes From Afar!
+                    {title}
                 </div>
                 <div className="title-bar-controls">
                     <button aria-label="Minimize"></button>
@@ -24,7 +26,7 @@ function Popup() {
             </div>
             <div className="window-body"
                  style={{fontSize: "12px", fontFamily: "monospace"}}>
-                As of today, 2024-09-13, there are <b>495,213</b> miles of love in the world.
+                {content}
             </div>
         </div>
         

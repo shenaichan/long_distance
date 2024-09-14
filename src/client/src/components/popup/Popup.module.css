@@ -5,3 +5,10 @@
     z-index: 1;
     background-color: #efefef;
 }
+
+.myButton {
+    text-align: "center"; 
+    display: "block";
+    margin: 0 auto;
+    background-color: "#c8e8e8"
+}
