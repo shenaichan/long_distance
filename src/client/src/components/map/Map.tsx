@@ -6,7 +6,8 @@ import erode from "assets/Erode/Erode-Variable.ttf";
 
 function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const clusterColor: string = '#a097f0';
+  const smallClusterColor: string = '#1084d0';
+  const bigClusterColor: string = '#000080';
 
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -39,13 +40,13 @@ function Map() {
           filter: ['has', 'point_count'],
           paint: {
             'circle-color': [
-              'step',
+              'interpolate',
+              ['linear'],
               ['get', 'point_count'],
-              clusterColor,
               100,
-              clusterColor,
+              smallClusterColor,
               750,
-              clusterColor
+              bigClusterColor
             ],
             'circle-radius': [
               'step',
@@ -72,7 +73,7 @@ function Map() {
             'text-size': 12
           },
           paint: {
-            "text-color": "#000020"
+            "text-color": "#ffffff"
           }
         });
   
@@ -82,7 +83,7 @@ function Map() {
           source: 'earthquakes',
           filter: ['!', ['has', 'point_count']],
           paint: {
-            'circle-color': clusterColor,
+            'circle-color': smallClusterColor,
             'circle-radius': 10,
             'circle-stroke-width': 1,
             'circle-stroke-color': '#fff'

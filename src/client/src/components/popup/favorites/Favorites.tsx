@@ -8,7 +8,8 @@ function Favorites() {
             <button style={{textAlign: "center", 
                             display: "block", 
                             margin: "0 auto", 
-                            backgroundColor: "#c8e8e8"}}>
+                            backgroundColor: "#c8e8e8",
+                            fontSize: "14px"}}>
                 Show me a random note
             </button>
         </>
