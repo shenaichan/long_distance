@@ -25,7 +25,7 @@ function Popup({title, content}: popupProps) {
                 </div>
             </div>
             <div className="window-body"
-                 style={{fontSize: "12px", fontFamily: "monospace"}}>
+                 style={{fontSize: "12px", fontFamily: "arial"}}>
                 {content}
             </div>
         </div>

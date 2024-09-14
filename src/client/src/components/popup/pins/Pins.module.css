@@ -1,0 +1,36 @@
+#bro::before {
+    background-color: #fff;
+    border: 1px solid grey;
+    display: block;
+    float: left;
+    align-items: center;
+    height: auto;
+    line-height: 10px;
+    margin: 4px 5px 0px 0px;
+    padding-left: 0px;
+    text-align: center;
+    width: 10px;
+}
+
+.box {
+    border: 1px solid #000;
+    height: 100px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.container ul.box .li::before {
+    top: 10px;
+}
+
+/* #bro[open] {
+    content: "-";
+} */
+/* {
+    display: block,
+    float: left,
+    lineHeight: 10px,
+    margin: "4px 5px 0px 0px",
+    textAlign: center,
+    width: "10px"
+} */

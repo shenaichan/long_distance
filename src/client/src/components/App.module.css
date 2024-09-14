@@ -20,6 +20,16 @@
   font-style: italic;
 }
 
+@font-face {
+  font-family: DMMono;
+  src: url("src/assets/DM-Mono/DMMono-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: RobotoMono;
+  src: url("src/assets/Roboto/RobotoMono-VariableFont_wght.ttf") format("truetype");
+}
+
 :root {
   --accent-dark-green: #054718;
 }
@@ -33,18 +43,18 @@ h1 {
   line-height: 1;
 }
 
-/* p {
-  font-family: Erode;
-  font-style: italic;
-  font-variation-settings: "wght" 500;
-  font-size: 30px;
-  color: var(--accent-dark-green);
-  line-height: 1.5;
-  margin: auto 0px;
-  padding: 0px 15px;
-  pointer-events: all;
-  margin-left: auto;
-} */
+p, li {
+  font-family: arial;
+  /* font-style: italic; */
+  /* font-variation-settings: "wght" 600; */
+  font-size: 14px;
+  /* color: var(--accent-dark-green); */
+  /* line-height: 1.5; */
+  /* margin: auto 0px; */
+  /* padding: 0px 15px; */
+  /* pointer-events: all; */
+  /* margin-left: auto; */
+}
 
 audio {
   pointer-events: all;

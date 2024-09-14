@@ -31,7 +31,7 @@ function Info() {
             </menu>
             <div className="window" role="tabpanel" style={{
                      backgroundColor: "#fff"}}>
-                <div className="window-body" style={{fontSize: "12px", fontFamily: "monospace"}}>
+                <div className="window-body">
                 <p>
                     Notes From Afar is a site where you can leave anonymous messages about your long distance friendships, relationships, and family. It also functions as a communally constructed digital archive and ode to long distance love.
                 </p>
@@ -43,35 +43,14 @@ function Info() {
             </div>
             <br />
 
-
-            {/* <div className="tab">
-                <button className="tablinks" onClick={openTab('London')}>London</button>
-                <button className="tablinks" onClick={openTab('Paris')}>Paris</button>
-                <button className="tablinks" onClick={openTab('Tokyo')}>Tokyo</button>
-                </div>
-
-                <div id="London" className="tabcontent">
-                <h3>London</h3>
-                <p>London is the capital city of England.</p>
-                </div>
-
-                <div id="Paris" className="tabcontent">
-                <h3>Paris</h3>
-                <p>Paris is the capital of France.</p>
-                </div>
-
-                <div id="Tokyo" className="tabcontent">
-                <h3>Tokyo</h3>
-                <p>Tokyo is the capital of Japan.</p>
-                </div> */}
             <div className="field-row" style={{width: "auto", margin: "10px"}}>
-                <label htmlFor="range25" style={{fontSize: "12px", fontFamily: "monospace"}}>Sound:</label>
+                <label htmlFor="range25"><p>Sound:</p></label>
                 {/* <label htmlFor="range26" style={{fontSize: "12px", fontFamily: "monospace"}}>Mute</label> */}
                 <input id="range26" type="range" min="1" max="11" value="5" />
                 {/* <label htmlFor="range27" style={{fontSize: "12px", fontFamily: "monospace"}}>High</label> */}
             </div>
             <div className="field-row" style={{width: "auto", margin: "10px"}}>
-                <label htmlFor="range25" style={{fontSize: "12px", fontFamily: "monospace"}}>Spin:</label>
+                <label htmlFor="range25"><p>Spin:</p></label>
                 {/* <label htmlFor="range26" style={{fontSize: "12px", fontFamily: "monospace"}}>Mute</label> */}
                 <input id="range26" type="range" min="1" max="11" value="6" />
                 {/* <label htmlFor="range27" style={{fontSize: "12px", fontFamily: "monospace"}}>High</label> */}

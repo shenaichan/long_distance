@@ -17,7 +17,7 @@ function Map() {
         style: "mapbox://styles/shenaichan/cm0zvdfvd02b001pqepr2beqo/draft",
         center: [-74.0060152, 40.7127281],
         zoom: 2,
-        maxZoom: 15,
+        maxZoom: 17,
       });
 
       // Add zoom controls
