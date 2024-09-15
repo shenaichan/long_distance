@@ -11,7 +11,7 @@ function Message() {
                 To: <b><em>Austin, TX, USA</em></b>
             </p>
             <br />
-            <div className={`window ${css.textEntryBox}`} contentEditable="true">
+            <div className={`window ${css.textEntryBox}`}>
                 <div className={css.typewriter}> 
                     <p>
                         when I see you again, we should...

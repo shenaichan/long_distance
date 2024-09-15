@@ -37,11 +37,11 @@ function Info() {
 
             <div className={`field-row ${css.slider}`}>
                 <label htmlFor="soundRange"><p>Sound:</p></label>
-                <input id="soundRange" type="range" min="1" max="11" value="5" />
+                <input id="soundRange" type="range" min="0" max="10" value="5" />
             </div>
             <div className={`field-row ${css.slider}`}>
                 <label htmlFor="spinRange"><p>Spin:</p></label>
-                <input id="spinRange" type="range" min="1" max="11" value="6" />
+                <input id="spinRange" type="range" min="0" max="10" value="5" />
             </div>
             <br />
             <p style={{textAlign: "center"}}>Made with &lt;3 by <a href="https://shenaichan.github.io/" target="_blank" rel="noopener noreferrer">Shenai Chan</a> at the <a href="https://www.recurse.com/" target="_blank" rel="noopener noreferrer">Recurse Center</a></p>
