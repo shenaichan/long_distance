@@ -28,12 +28,12 @@ def print_queryset(queryset):
         print("\n")
     return
 
-@api.post("/create_pin")
+@api.post("/create_pin", response=PinOut)
 def create_pin(request, data: PinIn):
     pin = Pin.objects.create(latitude=data.latitude,
                              longitude=data.longitude,
                              place_name=data.place_name)
-    return 
+    return pin
 
 @api.post("/create_approve_claim_pin")
 def create_approve_claim_pin(request, data: PinIn):
