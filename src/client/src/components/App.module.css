@@ -1,26 +1,4 @@
 @font-face {
-  font-family: Erode;
-  src: url("src/assets/Erode/Erode-Variable.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: Erode;
-  src: url("src/assets/Erode/Erode-VariableItalic.ttf") format("truetype");
-  font-style: italic;
-}
-
-@font-face {
-  font-family: Sentient;
-  src: url("src/assets/Sentient/Sentient-Variable.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: Sentient;
-  src: url("src/assets/Sentient/Sentient-VariableItalic.ttf") format("truetype");
-  font-style: italic;
-}
-
-@font-face {
   font-family: DMMono;
   src: url("src/assets/DM-Mono/DMMono-Regular.ttf") format("truetype");
 }
@@ -28,59 +6,6 @@
 @font-face {
   font-family: RobotoMono;
   src: url("src/assets/Roboto/RobotoMono-VariableFont_wght.ttf") format("truetype");
-}
-
-:root {
-  --accent-dark-green: #054718;
-}
-
-/* h1 {
-  font-family: Sentient;
-  font-style: italic;
-  font-variation-settings: "wght" 700;
-  font-size: 70px;
-  color: var(--accent-dark-green);
-  line-height: 1;
-} */
-
-p, li {
-  font-family: arial;
-  /* font-style: italic; */
-  /* font-variation-settings: "wght" 600; */
-  font-size: 14px;
-  /* color: var(--accent-dark-green); */
-  /* line-height: 1.5; */
-  /* margin: auto 0px; */
-  /* padding: 0px 15px; */
-  /* pointer-events: all; */
-  /* margin-left: auto; */
-}
-
-audio {
-  pointer-events: all;
-}
-
-.create {
-  font-variation-settings: "wght" 700;
-  border: 2px solid var(--accent-dark-green);
-  background-color: white;
-  border-radius: 10px;
-}
-
-.controls {
-  margin-left: auto;
-  display: inline-flex;
-}
-
-main {
-  position: absolute;
-  display:flex;
-  /* flex-flow: row; */
-  /* justify-content: space-between; */
-  overflow: hidden;
-  width: 100vw;
-  min-height: 100vh;
-  place-items: center;
 }
 
 .information {
@@ -110,69 +35,4 @@ main {
   position: relative;
   display: block;
   margin-left: auto;
-}
-
-header {
-  position: relative;
-  padding:  15px 20px;
-  z-index: 1;
-  display: inline-flex;
-  pointer-events: none;  
-  flex-flow: row;
-}
-
-.headerConnector {
-  position: relative;
-  display: inline;
-  flex-grow: 1;
-  height: 0px;
-  border: 1px solid var(--accent-dark-green);
-  margin: auto 0px auto 15px;
-}
-
-/* use flexbox */
-
-footer {
-  position: relative;
-  padding: 20px;
-  z-index: 1;
-  display: inline-flex;
-  /* margin-top: auto; */
-  pointer-events: none;
-}
-
-h2 {
-  font-family: Sentient;
-  font-style: italic;
-  font-variation-settings: "wght" 500;
-  font-size: 60px;
-  color: var(--accent-dark-green);
-  line-height: 1;
-}
-
-.typewriter p {
-  overflow: hidden; /* Ensures the content is not revealed until the animation */
-  border-right: .15em solid rgb(0, 0, 0); /* The typwriter cursor */
-  white-space: nowrap; 
-  /* Keeps the content on a single line */
-  /* margin: 0 auto;  */
-  /* Gives that scrolling effect as the typing happens */
-  /* letter-spacing: .15em;  */
-  /* Adjust as needed */
-  animation: 
-    typing 3.5s steps(40, end),
-    blink-caret .75s step-end infinite;
-  max-width: fit-content;
-}
-
-/* The typing effect */
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
-}
-
-/* The typewriter cursor effect */
-@keyframes blink-caret {
-  from, to { border-color: transparent }
-  50% { border-color: rgb(0, 0, 0); }
 }

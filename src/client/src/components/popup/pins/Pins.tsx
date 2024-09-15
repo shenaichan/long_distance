@@ -7,11 +7,7 @@ function Pins() {
                 You don't have any pins yet! Why don't you make one?
             </p>
             <br />
-            <button style={{textAlign: "center", 
-                            display: "block", 
-                            margin: "0 auto", 
-                            backgroundColor: "#c8e8e8",
-                            fontSize: "14px"}}>
+            <button>
                 Make a pin
             </button>
             <br />
@@ -19,8 +15,7 @@ function Pins() {
             <ul className="tree-view">
                 <li>
                     <details>
-                    {/* <div className={css.container}> */}
-                    <summary id={css.bro}>Sunnyvale, CA, USA</summary>
+                    <summary className={css.dropdown}>Sunnyvale, CA, USA</summary>
                     <ul className={css.box}>
                         <li>
                             from Austin, TX, USA
@@ -46,8 +41,7 @@ function Pins() {
                         <li>
                             to Brooklyn, NY, USA
                         </li>
-                    </ul>
-                    {/* </div> */}
+                </ul>
                     </details>
                 </li>
             </ul>

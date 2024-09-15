@@ -1,4 +1,4 @@
-#bro::before {
+.dropdown::before {
     background-color: #fff;
     border: 1px solid grey;
     display: block;
@@ -19,18 +19,6 @@
     overflow-x: hidden;
 }
 
-.container ul.box .li::before {
+li::before {
     top: 10px;
 }
-
-/* #bro[open] {
-    content: "-";
-} */
-/* {
-    display: block,
-    float: left,
-    lineHeight: 10px,
-    margin: "4px 5px 0px 0px",
-    textAlign: center,
-    width: "10px"
-} */

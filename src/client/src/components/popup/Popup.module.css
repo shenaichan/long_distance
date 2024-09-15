@@ -1,14 +1,62 @@
 .popup {
-    margin: "auto";
-    pointer-events: "all"; 
-    width: "300px";
-    z-index: 1;
-    background-color: #efefef;
+    margin: 20px;
+    pointer-events: all;
+    width: 400px;
+    background-color: #efffef;
 }
 
-.myButton {
-    text-align: "center"; 
-    display: "block";
+p, li, button {
+    font-family: arial;
+    font-size: 14px;
+}
+
+[aria-label="Minimize"] {
+    background-image: none;
+    background: c8e8e8;
+}
+
+[aria-label="Maximize"] {
+    background-image: none;
+    background: c8e8e8;
+}
+
+.minimize {
+    width: 14px;
+    height: 0px;
+    border: 1px solid black;
+    display: block;
+    position: relative;
+    margin: 10px auto auto auto;
+}
+
+.maximize {
+    width: 14px;
+    height: 14px;
+    border: solid black;
+    border-width: 2px 1px 1px 1px;
+    display: block;
+    position: relative;
+    margin: auto auto auto auto;
+}
+
+.controls {
+    width: 22px;
+    height: 22px;
+}
+
+.windowTitle {
+    font-size: 16px;
+}
+
+.windowBody {
+    font-size: 12px;
+    font-family: arial;
+    padding: 5px;
+}
+
+button {
+    text-align: center;
+    display: block;
     margin: 0 auto;
-    background-color: "#c8e8e8"
+    background-color: #c8e8e8;
 }

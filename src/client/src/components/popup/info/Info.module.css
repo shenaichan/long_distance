@@ -1,0 +1,18 @@
+.info {
+    background-color: #fff;
+    padding: 7px;
+}
+
+.tabs {
+    margin-left: -3px;
+    background-color: #fff;
+}
+
+.slider {
+    width: auto;
+    margin: 10px;
+}
+
+label {
+    margin-right: 7px;
+}
