@@ -1,8 +1,8 @@
 // import css from "components/map/Map.module.css";
-
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import erode from "assets/Erode/Erode-Variable.ttf";
+import { getApprovedPins } from "api/api";
+import { FeatureCollection } from "geojson";
 
 function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -16,18 +16,17 @@ function Map() {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
         style: "mapbox://styles/shenaichan/cm0zvdfvd02b001pqepr2beqo/draft",
-        center: [-74.0060152, 40.7127281],
+        center: [-73.98505827443357, 40.69136141121903],
         zoom: 2,
         maxZoom: 17,
       });
 
-      // Add zoom controls
-      map.addControl(new mapboxgl.NavigationControl(), "top-left");
 
-      map.on('load', () => {
+      map.on('load', async () => {
+        const pins: FeatureCollection =  await getApprovedPins();
         map.addSource('earthquakes', {
           type: 'geojson',
-          data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson',
+          data: pins,
           cluster: true,
           clusterMaxZoom: 14,
           clusterRadius: 50

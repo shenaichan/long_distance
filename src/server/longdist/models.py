@@ -10,10 +10,6 @@ def generate_public_token():
 def generate_private_token():
     return secrets.token_urlsafe(32)[:64]
 
-def write_to_geojson(pin):
-    return True
-
-
 class Pin(models.Model):
     public_share_token = models.CharField(max_length=32, default=generate_public_token)
 
@@ -36,7 +32,6 @@ class Pin(models.Model):
     
     def approve(self):
         self.approved_at = datetime.now(UTC)
-        write_to_geojson(self)
         self.is_checked = True
         self.is_approved = True
         self.save()

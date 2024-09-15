@@ -6,6 +6,23 @@ from typing import List
 
 api = NinjaAPI()
 
+class Geometry(Schema):
+    type: str
+    coordinates: List[float]
+
+class Properties(Schema):
+    place_name: str
+    public_share_token: str
+
+class Feature(Schema):
+    type: str
+    geometry: Geometry
+    properties: Properties
+
+class FeatureCollection(Schema):
+    type: str
+    features: List[Feature]
+
 class PinIn(Schema):
     latitude:float
     longitude:float
@@ -27,6 +44,20 @@ def print_queryset(queryset):
         pprint(entry)
         print("\n")
     return
+
+@api.get("get_approved_pins", response=FeatureCollection)
+def get_approved_pins(request):
+    pins = Pin.objects.filter(is_approved=True)
+    features = [Feature(
+                    type="Feature",
+                    geometry=Geometry(
+                        type="Point", 
+                        coordinates=[pin.longitude, pin.latitude]),
+                    properties=Properties(
+                        place_name=pin.place_name,
+                        public_share_token=pin.public_share_token)) 
+                for pin in pins]
+    return FeatureCollection(type="FeatureCollection", features=features)
 
 @api.post("/create_pin", response=PinOut)
 def create_pin(request, data: PinIn):

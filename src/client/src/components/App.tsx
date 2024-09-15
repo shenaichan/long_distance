@@ -45,7 +45,7 @@ function App() {
         content={<Message />}
         zIndex={stack.indexOf("message") + 1}
         top="calc(50vh - 300px)"
-        left="calc(50vw - 200px - 20px)"
+        left="calc(50vw - 200px)"
       />
       <Popup 
         name="pins"
@@ -54,7 +54,7 @@ function App() {
         content={ <Pins /> }
         zIndex={stack.indexOf("pins") + 1}
         top="20px"
-        left="calc(100vw - 400px - 40px)"
+        left="calc(100vw - 400px - 20px)"
       />
       <Popup 
         name="favorites"
@@ -63,7 +63,7 @@ function App() {
         content={ <Favorites /> }
         zIndex={stack.indexOf("favorites") + 1}
         top="50vh"
-        left="calc(100vw - 400px - 40px)"
+        left="calc(100vw - 400px - 20px)"
       />
                 
     </>

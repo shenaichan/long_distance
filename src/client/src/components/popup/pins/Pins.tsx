@@ -1,24 +1,7 @@
 import css from "components/popup/pins/Pins.module.css";
+import { createPin, createApproveClaimPin } from "api/api";
 
 function Pins() {
-
-    function makePin() {
-        console.log("made a pin");
-        fetch('http://127.0.0.1:8000/api/create_pin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // 'Authorization': `Token ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({
-                latitude: 37.3688,
-                longitude: -122.0748,
-                place_name: "Sunnyvale, CA, USA",
-            }),
-        })
-            .then(response => response.json())
-            .then(result => console.log(result));
-    }
 
     return (
         <>
@@ -26,7 +9,7 @@ function Pins() {
                 You don't have any pins yet! Why don't you make one?
             </p>
             <br />
-            <button onClick={makePin}>
+            <button onClick={() => createApproveClaimPin({latitude: 37.3688, longitude: -122.0748, place_name: "Sunnyvale, CA, USA"})}>
                 Make a pin
             </button>
             <br />
