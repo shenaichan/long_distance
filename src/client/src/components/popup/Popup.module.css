@@ -20,17 +20,18 @@ p, li, button {
     font-size: 14px;
 }
 
-[aria-label="Minimize"] {
+.toggleMinimize {
     background-image: none;
     background: c8e8e8;
+    margin: 0;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0;
 }
 
-[aria-label="Maximize"] {
-    background-image: none;
-    background: c8e8e8;
-}
-
-.minimize {
+.minimizeIcon {
     width: 14px;
     height: 0px;
     border: 1px solid black;
@@ -39,7 +40,7 @@ p, li, button {
     margin: 10px auto auto auto;
 }
 
-.maximize {
+.maximizeIcon {
     width: 14px;
     height: 14px;
     border: solid black;
@@ -47,26 +48,6 @@ p, li, button {
     display: block;
     position: relative;
     margin: auto;
-}
-
-.maximized {
-    position: relative;
-    margin: 20px;
-    top: 0;
-    left: 0;
-    width: calc(100vw - 40px);
-    height: calc(100vh - 40px);
-    z-index: 1000;
-}
-
-.minimized {
-    resize: none;
-    min-height: 0;
-}
-
-.controls {
-    width: 22px;
-    height: 22px;
 }
 
 .titleText {

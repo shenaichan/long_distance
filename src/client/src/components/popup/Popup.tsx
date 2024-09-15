@@ -1,5 +1,5 @@
 import css from "components/popup/Popup.module.css";
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { popupKind } from "types";
 import Draggable from 'react-draggable';
 
@@ -15,17 +15,35 @@ type popupProps = {
 
 function Popup({title, content, reStack, name, zIndex, top, left}: popupProps) {
 
+    const [isMinimized, setIsMinimized] = useState(false);
+
     return (
         <Draggable handle={`.${css.handle}`} onMouseDown={() => {reStack(name)}}>
-            <div className={`window ${css.popup}`} style={{zIndex: zIndex, top: top, left: left}}>
+            <div className={`window ${css.popup}`} 
+                style={{
+                    zIndex: zIndex, 
+                    top: top, 
+                    left: left, 
+                    height: isMinimized ? "36px" : "auto", 
+                    resize: isMinimized ? "none" : "both"}}>
                 <div className={`title-bar ${css.handle}`}>
                     <div className={`title-bar-text ${css.titleText}`}>
                         {title}
                     </div>
+                    <button className={css.toggleMinimize} onClick={() => setIsMinimized(!isMinimized)}>
+                        {isMinimized ? 
+                            <div className={css.maximizeIcon}></div> : 
+                            <div className={css.minimizeIcon}></div>}
+                    </button>
                 </div>
-                <div className={`window-body ${css.windowBody}`}>
-                    {content}
-                </div>
+                {
+                    isMinimized ?
+                        null :
+                        <div className={`window-body ${css.windowBody}`}>
+                            {content}
+                        </div>
+                }
+                
             </div>
         </Draggable>
     );
