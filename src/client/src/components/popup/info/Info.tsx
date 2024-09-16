@@ -1,6 +1,11 @@
 import css from "components/popup/info/Info.module.css"
 
-function Info() {
+type InfoProps = {
+    spinLevel: number;
+    setSpinLevel: (spinLevel: number) => void;
+}
+
+function Info({spinLevel, setSpinLevel}: InfoProps) {
 
     return (
         <>
@@ -41,7 +46,13 @@ function Info() {
             </div>
             <div className={`field-row ${css.slider}`}>
                 <label htmlFor="spinRange"><p>Spin:</p></label>
-                <input id="spinRange" type="range" min="0" max="10" value="5" />
+                <input id="spinRange" 
+                    type="range" 
+                    min="0" 
+                    max="10" 
+                    value={spinLevel}
+                    onChange={(e) => setSpinLevel(parseInt(e.target.value))}
+                />
             </div>
             <br />
             <p style={{textAlign: "center"}}>Made with &lt;3 by <a href="https://shenaichan.github.io/" target="_blank" rel="noopener noreferrer">Shenai Chan</a> at the <a href="https://www.recurse.com/" target="_blank" rel="noopener noreferrer">Recurse Center</a></p>
