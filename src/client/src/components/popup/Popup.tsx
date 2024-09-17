@@ -10,10 +10,11 @@ type popupProps = {
     name: popupKind, 
     zIndex: number,
     top: string,
-    left: string
+    left: string,
+    creationFlow: boolean
 }
 
-function Popup({title, content, reStack, name, zIndex, top, left}: popupProps) {
+function Popup({title, content, reStack, name, zIndex, top, left, creationFlow}: popupProps) {
 
     const [isMinimized, setIsMinimized] = useState(false);
 
@@ -25,16 +26,21 @@ function Popup({title, content, reStack, name, zIndex, top, left}: popupProps) {
                     top: top, 
                     left: left, 
                     height: isMinimized ? "36px" : "auto", 
-                    resize: isMinimized ? "none" : "both"}}>
-                <div className={`title-bar ${css.handle}`}>
+                    resize: (isMinimized || creationFlow) ? "none" : "both"}}>
+                <div className={creationFlow ? "title-bar" : `title-bar ${css.handle}`}>
                     <div className={`title-bar-text ${css.titleText}`}>
                         {title}
                     </div>
-                    <button className={css.toggleMinimize} onClick={() => setIsMinimized(!isMinimized)}>
-                        {isMinimized ? 
-                            <div className={css.maximizeIcon}></div> : 
-                            <div className={css.minimizeIcon}></div>}
-                    </button>
+                    {
+                        creationFlow ?
+                        null :
+                            <button className={css.toggleMinimize} onClick={() => setIsMinimized(!isMinimized)}>
+                                {isMinimized ? 
+                                    <div className={css.maximizeIcon}></div> : 
+                                    <div className={css.minimizeIcon}></div>}
+                            </button>
+
+                    }
                 </div>
                 {
                     isMinimized ?

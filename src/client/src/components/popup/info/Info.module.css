@@ -1,6 +1,9 @@
 .info {
     background-color: #fff;
     padding: 7px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .tabs {
@@ -15,4 +18,9 @@
 
 label {
     margin-right: 7px;
+}
+
+ol {
+    margin-left: 0px;
+    padding-left: 20px;
 }

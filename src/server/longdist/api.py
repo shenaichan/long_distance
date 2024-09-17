@@ -45,6 +45,11 @@ def print_queryset(queryset):
         print("\n")
     return
 
+@api.get("get_num_km", response=int)
+def get_num_km(request):
+    relationships = Relationship.objects.filter(is_approved=True)
+    return sum(r.distance for r in relationships)
+
 @api.get("get_approved_pins", response=FeatureCollection)
 def get_approved_pins(request):
     pins = Pin.objects.filter(is_approved=True)
@@ -82,9 +87,10 @@ def create_relationship_and_message(request, data: MessageIn):
         message = Message.objects.create(content=data.message)
         sender = Pin.objects.get(id=data.sender)
         recipient = Pin.objects.get(id=data.recipient)
-        Relationship.objects.create(sender=sender,
+        relationship = Relationship.objects.create(sender=sender,
                                     recipient=recipient,
                                     message=message)
+        relationship.calculate_distance()
     return
 
 @api.patch("/create_and_add_response")

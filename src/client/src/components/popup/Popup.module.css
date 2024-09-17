@@ -1,14 +1,14 @@
 .popup {
     position: fixed;
     pointer-events: all;
-    width: 400px;
     background-color: #efffef;
     resize: both;
     overflow: auto;
-    min-width: 350px;
     min-height: 36px;
     top: 100px;
     left: 100px;
+    min-width: 350px;
+    width: 400px;
 }
 
 .handle {

@@ -1,40 +1,101 @@
 import css from "components/popup/info/Info.module.css"
 
+import About from "components/popup/info/tabs/About"
+import Privacy from "components/popup/info/tabs/Privacy"
+import Terms from "components/popup/info/tabs/Terms"
+import FAQs from "components/popup/info/tabs/FAQs"
+import Moderation from "components/popup/info/tabs/Moderation"
+import Donate from "components/popup/info/tabs/Donate"
+import Contact from "components/popup/info/tabs/Contact"
+import Acknowledgements from "components/popup/info/tabs/Acknowledgements"
+
+import { getNumKM } from "api/api"
+
+import { useState, useEffect } from "react";
+
 type InfoProps = {
     spinLevel: number;
     setSpinLevel: (spinLevel: number) => void;
+    soundLevel: number;
+    setSoundLevel: (soundLevel: number) => void;
+    audioRef: React.RefObject<HTMLAudioElement>;
 }
 
-function Info({spinLevel, setSpinLevel}: InfoProps) {
+function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef}: InfoProps) {
+    const [tab, setTab] = useState("About");
+    const [numKM, setNumKM] = useState(0);
+    const [dateTime, _] = useState(new Date().toLocaleString());
+
+    useEffect(() => {
+        getNumKM().then((numKM) => {
+            setNumKM(numKM);
+        });
+    }, []);
 
     return (
         <>
             <p>
-                As of today, 2024-09-13, there are <b>495,213</b> miles of love in the world.
+                As of <b>{dateTime}</b>, there are <b>{numKM * 0.621371}</b> miles / <b>{numKM}</b> kilometers of love in the world.
             </p>
             <br />
-
-                <menu role="tablist" className={`multirows ${css.tabs}`} >
-                    <li role="tab" id="about"><a><b>About</b></a></li>
-                    <li role="tab" id="privacy"><a>Privacy Policy</a></li>
-                    <li role="tab" id="terms"><a>Terms of Use</a></li>
-                    <li role="tab" id="faqs"><a>FAQs</a></li>
-                </menu>
-                <menu role="tablist" className={`multirows ${css.tabs}`}>
-                    <li role="tab" id="moderation"><a>Moderation</a></li>
-                    <li role="tab" id="donate"><a>Donate</a></li>
-                    <li role="tab" id="contact"><a>Contact</a></li>
-                    <li role="tab" id="acknowledgements"><a>Acknowledgements</a></li>
-                </menu>
+                <div style={{cursor: "pointer"}}>
+                    <menu role="tablist" className={`multirows ${css.tabs}`} >
+                        <li role="tab" onClick={() => setTab("About")}>
+                            <p style={{fontWeight: tab === "About" ? "bold" : "normal"}}>
+                                About
+                            </p>
+                        </li>
+                        <li role="tab" onClick={() => setTab("Privacy Policy")}>
+                            <p style={{fontWeight: tab === "Privacy Policy" ? "bold" : "normal"}}>
+                                Privacy Policy
+                            </p>
+                        </li>
+                        <li role="tab" onClick={() => setTab("Terms of Use")}>
+                            <p style={{fontWeight: tab === "Terms of Use" ? "bold" : "normal"}}>
+                                Terms of Use
+                            </p>
+                        </li>
+                        <li role="tab" onClick={() => setTab("FAQs")}>
+                            <p style={{fontWeight: tab === "FAQs" ? "bold" : "normal"}}>
+                                FAQs
+                            </p>
+                        </li>
+                    </menu>
+                    <menu role="tablist" className={`multirows ${css.tabs}`}>
+                        <li role="tab" onClick={() => setTab("Moderation")}>
+                            <p style={{fontWeight: tab === "Moderation" ? "bold" : "normal"}}>
+                                Moderation
+                            </p>
+                        </li>
+                        <li role="tab" onClick={() => setTab("Donate")}>
+                            <p style={{fontWeight: tab === "Donate" ? "bold" : "normal"}}>
+                                Donate
+                            </p>
+                        </li>
+                        <li role="tab" onClick={() => setTab("Contact")}>
+                            <p style={{fontWeight: tab === "Contact" ? "bold" : "normal"}}>
+                                Contact
+                            </p>
+                        </li>
+                        <li role="tab" onClick={() => setTab("Acknowledgements")}>
+                            <p style={{fontWeight: tab === "Acknowledgements" ? "bold" : "normal"}}>
+                                Acknowledgements
+                            </p>
+                        </li>
+                    </menu>
+                </div>
                 <div className={`window ${css.info}`} role="tabpanel">
                     <div className="window-body">
-                    <p>
-                        Notes From Afar is a site where you can leave anonymous messages about your long distance friendships, relationships, and family. It also functions as a communally constructed digital archive and ode to long distance love.
-                    </p>
-                    <br />
-                    <p>
-                        Because it's the 2020's, and it's easier than ever to love people who live far away from you, but, as we all know, it's still incredibly difficult. So let's talk about it.
-                    </p> 
+                        <h1 style={{fontSize: "16px"}}>{tab}</h1>
+
+                        {tab === "About" && <About />}
+                        {tab === "Privacy Policy" && <Privacy />}
+                        {tab === "Terms of Use" && <Terms />}
+                        {tab === "FAQs" && <FAQs />}
+                        {tab === "Moderation" && <Moderation />}
+                        {tab === "Donate" && <Donate />}
+                        {tab === "Contact" && <Contact />}
+                        {tab === "Acknowledgements" && <Acknowledgements />}
                 </div>
 
             </div>
@@ -42,7 +103,14 @@ function Info({spinLevel, setSpinLevel}: InfoProps) {
 
             <div className={`field-row ${css.slider}`}>
                 <label htmlFor="soundRange"><p>Sound:</p></label>
-                <input id="soundRange" type="range" min="0" max="10" value="5" />
+                <input id="soundRange" 
+                    type="range" 
+                    min="0" 
+                    max="10" 
+                    value={soundLevel}
+                    onChange={(e) => setSoundLevel(parseInt(e.target.value))}
+                    onMouseDown={() => audioRef.current?.play()}
+                />
             </div>
             <div className={`field-row ${css.slider}`}>
                 <label htmlFor="spinRange"><p>Spin:</p></label>

@@ -17,6 +17,22 @@ type PinIn = {
     public_share_token:string
 }
 
+export async function getNumKM() {
+    return fetch('http://127.0.0.1:8000/api/get_num_km', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': `Token ${localStorage.getItem('token')}`       
+        },
+    })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            return result as number;
+        });
+}
+
+
 export async function createPin(pin: PinOut) {
     fetch('http://127.0.0.1:8000/api/create_pin', {
         method: 'POST',
@@ -59,3 +75,21 @@ export async function getApprovedPins(): Promise<FeatureCollection> {
             return result as FeatureCollection;
         });
 }
+
+
+export async function reverseGeocode(latitude: number, longitude: number): Promise<string> {
+    const accessToken = import.meta.env.VITE_MAPBOX_KEY;
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${accessToken}&limit=1`;
+
+    return fetch(url)
+        .then(response => response.json())
+        .then(result => {
+            const placeName = result.features[0].place_name;
+            return placeName;   
+        })
+        .catch(error => {
+            console.error('Error with reverse geocoding:', error); 
+            return "nowhere in particular";
+        });
+}
+

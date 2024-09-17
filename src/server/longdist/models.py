@@ -3,12 +3,26 @@ from datetime import datetime, UTC
 import secrets
 from django.utils import timezone
 from pprint import pformat
+from math import radians, cos, sin, sqrt, atan2
 
 def generate_public_token():
     return secrets.token_urlsafe(16)[:32]
 
 def generate_private_token():
     return secrets.token_urlsafe(32)[:64]
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371 # Earth's radius in kilometers
+    # Convert latitude and longitude from degrees to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    # Haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = R * c
+    return distance
 
 class Pin(models.Model):
     public_share_token = models.CharField(max_length=32, default=generate_public_token)
@@ -82,7 +96,9 @@ class Relationship(models.Model):
     private_allow_response_token = models.CharField(max_length=64, default=generate_private_token)
     message = models.OneToOneField(Message, on_delete=models.CASCADE, related_name="sender_message")
     response = models.OneToOneField(Message, on_delete=models.CASCADE, related_name="recipient_message", null=True)
-    
+    distance = models.FloatField(null=True)
+    is_approved = models.BooleanField(default=False)
+
     def __str__(self):
         return f"from {self.sender} to {self.recipient}: {self.message} | from {self.recipient} to {self.sender}: {self.response}"
     
@@ -91,9 +107,17 @@ class Relationship(models.Model):
         self.save()
         return
     
-    # def is_approved(self):
-    #     return self.message.is_approved
+    def approve(self):
+        self.is_approved = True
+        self.save()
+        return
     
-    # def response_is_approved(self):
-    #     return self.response.is_approved
+    def response_is_approved(self):
+        return self.response.is_approved
+    
+    def calculate_distance(self):
+        self.distance = haversine(self.sender.latitude, self.sender.longitude, self.recipient.latitude, self.recipient.longitude)
+        self.save()
+        return
+    
 

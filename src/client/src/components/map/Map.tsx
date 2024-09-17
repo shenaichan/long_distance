@@ -2,14 +2,16 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { getApprovedPins } from "api/api";
 import { FeatureCollection } from "geojson";
+import { reverseGeocode } from "api/api";
 
 type MapProps = {
   setPinLocation: (location: [number, number]) => void;
   setMouseLocation: (location: [number, number]) => void;
   spinLevel: number;
+  setPlaceName: (placeName: string) => void;
 };
 
-function Map({ setPinLocation, setMouseLocation, spinLevel }: MapProps) {
+function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const smallClusterColor: string = '#1084d0';
@@ -83,7 +85,10 @@ function Map({ setPinLocation, setMouseLocation, spinLevel }: MapProps) {
 
     map.current.on('load', async () => {
       const pins: FeatureCollection = await getApprovedPins();
-      map.current?.addSource('earthquakes', {
+
+      if (!map.current) return;
+
+      map.current.addSource('earthquakes', {
         type: 'geojson',
         data: pins,
         cluster: true,
@@ -91,7 +96,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel }: MapProps) {
         clusterRadius: 50
       });
 
-      map.current?.addLayer({
+      map.current.addLayer({
         id: 'clusters',
         type: 'circle',
         source: 'earthquakes',
@@ -120,7 +125,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel }: MapProps) {
         }
       });
 
-      map.current?.addLayer({
+      map.current.addLayer({
         id: 'cluster-count',
         type: 'symbol',
         source: 'earthquakes',
@@ -135,7 +140,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel }: MapProps) {
         }
       });
 
-      map.current?.addLayer({
+      map.current.addLayer({
         id: 'unclustered-point',
         type: 'circle',
         source: 'earthquakes',
@@ -148,62 +153,60 @@ function Map({ setPinLocation, setMouseLocation, spinLevel }: MapProps) {
         }
       });
 
-      // inspect a cluster on click
-      map.current?.on('click', 'clusters', (e) => {
-        const features = map.current?.queryRenderedFeatures(e.point, {
-          layers: ['clusters']
-        });
-        if (map.current && features && features[0].properties) {
-          const clusterId = features[0].properties.cluster_id;
-          const source: mapboxgl.GeoJSONSource = map.current.getSource('earthquakes') as mapboxgl.GeoJSONSource
+      // // inspect a cluster on click
+      // map.current.on('click', 'clusters', (e) => {
+      //   const features = map.current?.queryRenderedFeatures(e.point, {
+      //     layers: ['clusters']
+      //   });
+      //   if (map.current && features && features[0].properties) {
+      //     const clusterId = features[0].properties.cluster_id;
+      //     const source: mapboxgl.GeoJSONSource = map.current.getSource('earthquakes') as mapboxgl.GeoJSONSource
 
-          source
-            .getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
-              if (err) return;
-              if (features[0].geometry.type == "Point") {
-                map.current?.easeTo({
-                  center: [features[0].geometry.coordinates[0], features[0].geometry.coordinates[1]],
-                  zoom: zoom
-                });
-              }
-            });
-        }
+      //     source
+      //       .getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
+      //         if (err) return;
+      //         if (features[0].geometry.type == "Point") {
+      //           map.current?.easeTo({
+      //             center: [features[0].geometry.coordinates[0], features[0].geometry.coordinates[1]],
+      //             zoom: zoom
+      //           });
+      //         }
+      //       });
+      //   }
+      // });
+
+      // // When a click event occurs on a feature in
+      // // the unclustered-point layer, open a popup at
+      // // the location of the feature, with
+      // // description HTML from its properties.
+      // map.current.on('click', 'unclustered-point', (e) => {
+      //   if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
+      //     const coordinates = e.features[0].geometry.coordinates.slice();
+      //     const mag = e.features[0].properties.mag;
+      //     const tsunami = e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
+
+      //     // Ensure that if the map is zoomed out such that
+      //     // multiple copies of the feature are visible, the
+      //     // popup appears over the copy being pointed to.
+      //     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      //       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      //     }
+
+      //     new mapboxgl.Popup()
+      //       .setLngLat([coordinates[0], coordinates[1]])
+      //       .setHTML(`magnitude: ${mag}<br>Was there a tsunami?: ${tsunami}`)
+      //       .addTo(map.current!);
+      //   }
+      // });
+
+      map.current.on('mouseenter', 'clusters', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = 'pointer';
       });
 
-      // When a click event occurs on a feature in
-      // the unclustered-point layer, open a popup at
-      // the location of the feature, with
-      // description HTML from its properties.
-      map.current?.on('click', 'unclustered-point', (e) => {
-        if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
-          const coordinates = e.features[0].geometry.coordinates.slice();
-          const mag = e.features[0].properties.mag;
-          const tsunami = e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
-
-          // Ensure that if the map is zoomed out such that
-          // multiple copies of the feature are visible, the
-          // popup appears over the copy being pointed to.
-          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-          }
-
-          new mapboxgl.Popup()
-            .setLngLat([coordinates[0], coordinates[1]])
-            .setHTML(`magnitude: ${mag}<br>Was there a tsunami?: ${tsunami}`)
-            .addTo(map.current!);
-        }
-      });
-
-      map.current?.on('mouseenter', 'clusters', () => {
-        if (map.current) {
-          map.current.getCanvas().style.cursor = 'pointer';
-        }
-      });
-
-      map.current?.on('mouseleave', 'clusters', () => {
-        if (map.current) {
-          map.current.getCanvas().style.cursor = '';
-        }
+      map.current.on('mouseleave', 'clusters', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = '';
       });
 
     });
@@ -229,6 +232,9 @@ function Map({ setPinLocation, setMouseLocation, spinLevel }: MapProps) {
       var coordinates = e.lngLat;
       setPinLocation([coordinates.lng, coordinates.lat]);
       setMouseLocation([e.point.x, e.point.y]);
+      reverseGeocode(coordinates.lat, coordinates.lng).then(placeName => {
+        setPlaceName(placeName);
+      });
     });
 
     // Clean up on unmount

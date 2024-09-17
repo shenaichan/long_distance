@@ -6,11 +6,11 @@ import Info from "components/popup/info/Info"
 import Pins from "components/popup/pins/Pins"
 import Favorites from "components/popup/favorites/Favorites"
 import Message from "components/popup/message/Message"
-import Confirm from "components/popup/confirm/Confirm"
+import Create from "components/popup/create/Create"
 import longdist from "assets/longdist_long.mp3";
 import { popupKind } from "types";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function App() {
 
@@ -18,6 +18,9 @@ function App() {
   const [pinLocation, setPinLocation] = useState<[number, number]>([-200, -100]);
   const [mouseLocation, setMouseLocation] = useState<[number, number]>([-1, -1]);
   const [spinLevel, setSpinLevel] = useState<number>(0);
+  const [soundLevel, setSoundLevel] = useState<number>(0);
+  const [placeName, setPlaceName] = useState<string>("");
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   function reStack(popup: popupKind) {
     let newStack = [...stack]
@@ -27,20 +30,46 @@ function App() {
     setStack(newStack);
   }
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = soundLevel / 10;
+    }
+  }, [soundLevel]);
+
   return (
     <div>
 
-      
+      <audio ref={audioRef} 
+        src={longdist} 
+        loop
+        style={{display: "none"}}
+      />
+
       <Map 
         setPinLocation={setPinLocation}
         setMouseLocation={setMouseLocation}
         spinLevel={spinLevel}
+        setPlaceName={setPlaceName}
       />
 
-      <Confirm 
-        location={mouseLocation}
-        setMouseLocation={setMouseLocation}
-      />
+      {
+        (mouseLocation[0] != -1 && mouseLocation[1] != -1) ?
+        <Popup
+          name="creation"
+          reStack={reStack}
+          title="Confirm location?"
+          content={<Create 
+            setMouseLocation={setMouseLocation}
+            placeName={placeName}
+          />}
+          zIndex={stack.indexOf("creation") + 1}
+          top={`${mouseLocation[1]}px`}
+          left={`${mouseLocation[0]}px`}
+          creationFlow={true}
+        />
+        : null
+      }
+
       
       
       <Popup 
@@ -50,10 +79,14 @@ function App() {
         content={<Info 
           spinLevel={spinLevel}
           setSpinLevel={setSpinLevel}
+          soundLevel={soundLevel}
+          setSoundLevel={setSoundLevel}
+          audioRef={audioRef}
         />}
         zIndex={stack.indexOf("info") + 1}
         top="20px"
         left="20px"
+        creationFlow={false}
       />
       {/* <Popup 
         name="message"
@@ -72,6 +105,7 @@ function App() {
         zIndex={stack.indexOf("pins") + 1}
         top="20px"
         left="calc(100vw - 400px - 20px)"
+        creationFlow={false}
       />
       <Popup 
         name="favorites"
@@ -81,6 +115,7 @@ function App() {
         zIndex={stack.indexOf("favorites") + 1}
         top="50vh"
         left="calc(100vw - 400px - 20px)"
+        creationFlow={false}
       />
 
     </div>

@@ -9,6 +9,7 @@ def approve_message(modeladmin, request, queryset):
         q.approve()
         relationship = Relationship.objects.filter(message=q).first()
         relationship.recipient.approve()
+        relationship.approve()
 
 @admin.action(description="Mark selected messages as disapproved")
 def check_message(modeladmin, request, queryset):
