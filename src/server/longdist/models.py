@@ -71,6 +71,7 @@ class Message(models.Model):
     approved_at = models.DateTimeField(null=True)
     is_checked = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
+    email = models.EmailField(null=True)
 
     def approve(self):
         self.approved_at = datetime.now(UTC)

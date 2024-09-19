@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import { getApprovedPins } from "api/api";
 import { FeatureCollection } from "geojson";
-import { reverseGeocode } from "api/api";
+import { getApprovedPins,reverseGeocode, PinInPrivate, PinInPublic } from "api/api";
 import { coordinates, mouseLocation, creationState, NO_COORDINATES } from "components/App";
+import map_pin from "assets/map_pin.png";
 
 type MapProps = {
   setPinLocation: (location: coordinates) => void;
@@ -12,10 +12,12 @@ type MapProps = {
   setPlaceName: (placeName: string) => void;
   currState: creationState;
   setCurrState: (state: creationState) => void;
-  highlightedPin: coordinates;
+  highlightedPin: PinInPrivate | PinInPublic | null;
+  setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void;
+  pins: PinInPrivate[];
 };
 
-function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currState, setCurrState, highlightedPin }: MapProps) {
+function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currState, setCurrState, highlightedPin, setHighlightedPin, pins }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const smallClusterColor: string = '#1084d0';
@@ -30,6 +32,24 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
 
   let userInteracting = false;
   let spinEnabled = true;
+
+  function openPinMenu(feature: GeoJSON.Feature) {
+    setCurrState("pinMenu");
+    if (feature.geometry.type === "Point" && feature.properties) {
+      const pin = pins.find(pin => pin.id === feature.properties!.id);
+      if (pin) {
+        setHighlightedPin(pin);
+      }
+      else {
+        setHighlightedPin({id: feature.properties.id, 
+          latitude: feature.geometry.coordinates[1], 
+          longitude: feature.geometry.coordinates[0], 
+          place_name: feature.properties.place_name, 
+          public_share_token: feature.properties.public_share_token});
+      }
+    }
+
+  }
 
   function spinGlobe() {
     if (!map.current) return;
@@ -75,6 +95,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
   }, [spinLevel]);
 
   useEffect(() => {
+    if (!highlightedPin) return;
     if (highlightedPin.longitude !== NO_COORDINATES.longitude && highlightedPin.latitude !== NO_COORDINATES.latitude) {
       map.current?.flyTo({
         center: [highlightedPin.longitude, highlightedPin.latitude],
@@ -88,7 +109,14 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
   useEffect(() => {
     currStateRef.current = currState;
     if (!map.current) return;
+    if (!mapContainer.current) return;
     if (currState === "none" || currState === "pinCreation" || currState === "destinationCreation") {
+      if (currState === "pinCreation" || currState === "destinationCreation") {
+        mapContainer.current.style.cursor = `url(${map_pin}) 16 32, auto`;
+      }
+      else {
+        mapContainer.current.style.cursor = "default";
+      }
       map.current.scrollZoom.enable();
       map.current.boxZoom.enable();
       map.current.dragPan.enable();
@@ -98,6 +126,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
       map.current.touchZoomRotate.enableRotation();
     }
     else {
+      mapContainer.current.style.cursor = "default";
       map.current.scrollZoom.disable();
       map.current.boxZoom.disable();
       map.current.dragPan.disable();
@@ -131,6 +160,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
       map.current.addSource('pins', {
         type: 'geojson',
         data: pins,
+        // data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson',
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50
@@ -220,10 +250,12 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
       // the location of the feature, with
       // description HTML from its properties.
       map.current.on('click', 'unclustered-point', (e) => {
+        if (currStateRef.current === "pinCreation" || currStateRef.current === "destinationCreation") return;
         if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
           console.log(e.features[0].properties);
           const coordinates = e.features[0].geometry.coordinates.slice();
-          const place_name = e.features[0].properties.place_name;
+          // const place_name = e.features[0].properties.place_name;
+          const public_share_token = e.features[0].properties.public_share_token;
           // const tsunami = e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
 
           // Ensure that if the map is zoomed out such that
@@ -233,19 +265,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
           }
 
-          const popup = new mapboxgl.Popup({
-            closeButton: true,
-            closeOnClick: false
-          })
-            .setLngLat([coordinates[0], coordinates[1]])
-            .setHTML(`<p>${place_name}</p>`)
-            .addTo(map.current!);
-      
-          // Remove aria-hidden attribute from close button
-          const closeButton = popup.getElement()?.querySelector('.mapboxgl-popup-close-button');
-          if (closeButton) {
-            closeButton.removeAttribute('aria-hidden');
-          }
+          openPinMenu(e.features[0]);
         }
       });
 

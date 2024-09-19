@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["long-distance.onrender.com", "0.0.0.0", "127.0.0.1"]
 
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # Application definition
 

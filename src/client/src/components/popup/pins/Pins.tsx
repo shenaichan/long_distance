@@ -2,15 +2,15 @@ import css from "components/popup/pins/Pins.module.css";
 import { createPin, createApproveClaimPin } from "api/api";
 import { useState, useEffect } from "react";
 import { coordinates, NO_COORDINATES, creationState } from "components/App";
-import { PinIn } from "api/api";
+import { PinInPrivate, PinInPublic } from "api/api";
 
 type PinsProps = {
     placeName: string;
     currState: creationState;
     setCurrState: (state: creationState) => void;
-    pins: PinIn[];
-    setPins: (pins: PinIn[]) => void;
-    setHighlightedPin: (pin: coordinates) => void;
+    pins: PinInPrivate[];
+    setPins: (pins: PinInPrivate[]) => void;
+    setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void;
 }
 
 function Pins({placeName, currState, setCurrState, pins, setPins, setHighlightedPin}: PinsProps) {
@@ -78,7 +78,8 @@ function Pins({placeName, currState, setCurrState, pins, setPins, setHighlighted
                         {pins.map((pin) => (
                             <li key={pin.id} 
                                 onClick={() => {
-                                    setHighlightedPin({longitude: pin.longitude, latitude: pin.latitude});      
+                                    setHighlightedPin(pin);   
+                                    setCurrState("pinMenu");
                                 }} 
                                 style={{cursor: "pointer"}}
                             >

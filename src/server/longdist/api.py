@@ -11,6 +11,7 @@ class Geometry(Schema):
     coordinates: List[float]
 
 class Properties(Schema):
+    id: int
     place_name: str
     public_share_token: str
 
@@ -33,7 +34,7 @@ class MessageIn(Schema):
     recipient:int
     message:str
 
-class PinOut(Schema):
+class PinOutPrivate(Schema):
     id:int
     latitude:float
     longitude:float
@@ -41,6 +42,13 @@ class PinOut(Schema):
     public_share_token:str
     private_ownership_token:str
     private_allow_mail_token:str
+
+class PinOutPublic(Schema):
+    id:int
+    latitude:float
+    longitude:float
+    place_name:str
+    public_share_token:str
 
 def print_queryset(queryset):
     for entry in queryset:
@@ -62,19 +70,20 @@ def get_approved_pins(request):
                         type="Point", 
                         coordinates=[pin.longitude, pin.latitude]),
                     properties=Properties(
+                        id=pin.id,
                         place_name=pin.place_name,
                         public_share_token=pin.public_share_token)) 
                 for pin in pins]
     return FeatureCollection(type="FeatureCollection", features=features)
 
-@api.post("/create_pin", response=PinOut)
+@api.post("/create_pin", response=PinOutPrivate)
 def create_pin(request, data: PinIn):
     pin = Pin.objects.create(latitude=data.latitude,
                              longitude=data.longitude,
                              place_name=data.place_name)
     return pin
 
-@api.post("/create_approve_claim_pin", response=PinOut)
+@api.post("/create_approve_claim_pin", response=PinOutPrivate)
 def create_approve_claim_pin(request, data: PinIn):
     with transaction.atomic():
         pin = Pin.objects.create(latitude=data.latitude,
@@ -96,6 +105,13 @@ def create_relationship_and_message(request, data: MessageIn):
         relationship.calculate_distance()
     return
 
+@api.patch("/add_email_to_message")
+def add_email_to_message(request, data: MessageIn):
+    # message = Message.objects.get(id=data.message)
+    # message.email = data.email
+    # message.save()
+    return
+
 @api.patch("/create_and_add_response")
 def create_and_add_response(request, data: MessageIn):
     with transaction.atomic():
@@ -104,12 +120,12 @@ def create_and_add_response(request, data: MessageIn):
         relationship.add_response(response)
     return
 
-@api.get("/get_relationships_started", response=List[PinOut])
+@api.get("/get_relationships_started", response=List[PinOutPublic])
 def get_relationships_started(request, public_token: str):
     pin = Pin.objects.filter(public_share_token=public_token).first()
     return pin.get_relationships_started()
 
-@api.get("/get_relationships_finished", response=List[PinOut])
+@api.get("/get_relationships_finished", response=List[PinOutPublic])
 def get_relationships_finished(request, public_token: str):
     pin = Pin.objects.filter(public_share_token=public_token).first()
     return pin.get_relationships_finished()

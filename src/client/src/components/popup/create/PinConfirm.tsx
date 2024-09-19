@@ -1,7 +1,7 @@
 import { creationState, coordinates } from "components/App";
 import { createPin, createApproveClaimPin } from "api/api";
 import css from "components/popup/create/PinMenu.module.css";
-import { PinIn } from "api/api";
+import { PinInPrivate } from "api/api";
 
 type PinConfirmProps = {       
     placeName: string;
@@ -13,16 +13,17 @@ type PinConfirmProps = {
     setDestinationPlaceName: (placeName: string) => void;
     setSenderID: (id: number) => void;
     setRecipientID: (id: number) => void;
-    pins: PinIn[];
-    setPins: (pins: PinIn[]) => void;
+    pins: PinInPrivate[];
+    setPins: (pins: PinInPrivate[]) => void;
+    setHighlightedPin: (pin: PinInPrivate | null) => void;
 }
 
 function PinConfirm({placeName, setCurrState, currState, pinLocation, isSource, 
     setSourcePlaceName, setDestinationPlaceName, setSenderID, setRecipientID, 
-    pins, setPins}: PinConfirmProps) {
+    pins, setPins, setHighlightedPin}: PinConfirmProps) {
 
         // Function to add a new pin
-    function addPinToStorage(newPin: PinIn) {
+    function addPinToStorage(newPin: PinInPrivate) {
         const updatedPins = [...pins, newPin];
         setPins(updatedPins);
         localStorage.setItem("pins", JSON.stringify(updatedPins));
@@ -35,6 +36,7 @@ function PinConfirm({placeName, setCurrState, currState, pinLocation, isSource,
             setSourcePlaceName(placeName);
             setCurrState("pinMenu");
             addPinToStorage(pin);
+            setHighlightedPin(pin);
         }
         else {
             let pin = await createPin({latitude: pinLocation.latitude, longitude: pinLocation.longitude, place_name: placeName});

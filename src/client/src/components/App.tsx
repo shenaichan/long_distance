@@ -9,7 +9,8 @@ import MessageConfirm from "components/popup/create/MessageConfirm"
 import longdist from "assets/longdist_long.mp3";
 import Message from "components/popup/create/Message"
 import DestinationMenu from "components/popup/create/DestinationMenu"
-import { PinIn } from "api/api";
+import DestinationSelect from "components/popup/create/DestinationSelect"
+import { PinInPrivate, PinInPublic } from "api/api";
 
 import { useState, useEffect, useRef, ReactNode } from "react";
 
@@ -39,7 +40,7 @@ function App() {
   const [stack, setStack] = useState<popupKind[]>(["info", "pins", "favorites"]);
   const [pinLocation, setPinLocation] = useState<coordinates>(NO_COORDINATES);
   const [mouseLocation, setMouseLocation] = useState<mouseLocation>(NO_MOUSE_LOCATION);
-  const [spinLevel, setSpinLevel] = useState<number>(0);
+  const [spinLevel, setSpinLevel] = useState<number>(5);
   const [soundLevel, setSoundLevel] = useState<number>(0);
   const [placeName, setPlaceName] = useState<string>("");
   const [currState, setCurrState] = useState<creationState>("none");
@@ -48,8 +49,8 @@ function App() {
   const [senderID, setSenderID] = useState<number>(-1);
   const [recipientID, setRecipientID] = useState<number>(-1);
   const [hasReadRules, setHasReadRules] = useState<boolean>(false);
-  const [pins, setPins] = useState<PinIn[]>([]);
-  const [highlightedPin, setHighlightedPin] = useState<coordinates>(NO_COORDINATES);
+  const [pins, setPins] = useState<PinInPrivate[]>([]);
+  const [highlightedPin, setHighlightedPin] = useState<PinInPrivate | PinInPublic | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   function reStack(popup: popupKind) {
@@ -60,9 +61,9 @@ function App() {
     setStack(newStack);
   }
 
-  useEffect(() => {
-    localStorage.clear()
-  }, []);
+  // useEffect(() => {
+  //   localStorage.clear()
+  // }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -87,6 +88,8 @@ function App() {
         currState={currState}
         setCurrState={setCurrState}
         highlightedPin={highlightedPin}
+        setHighlightedPin={setHighlightedPin}
+        pins={pins}
       />
 
       {
@@ -107,6 +110,7 @@ function App() {
             setRecipientID={setRecipientID}
             pins={pins}
             setPins={setPins}
+            setHighlightedPin={setHighlightedPin}
           />}
           zIndex={stack.length + 1}
           top={`${mouseLocation.y}px`}
@@ -125,11 +129,15 @@ function App() {
           title="Pin menu"
           content={<PinMenu 
             setCurrState={setCurrState}
+            highlightedPin={highlightedPin}
+            setHighlightedPin={setHighlightedPin}
+            setSenderID={setSenderID}
+            setSourcePlaceName={setSourcePlaceName}
             // pinLocation={pinLocation}
           />}
           zIndex={stack.length + 1}
-          top={`${mouseLocation.y}px`}
-          left={`${mouseLocation.x}px`}
+          top={"50vh"}
+          left={"50vw"}
           creationFlow={false}
         />
         : null
@@ -147,6 +155,22 @@ function App() {
           zIndex={stack.length + 1}
           top={`${mouseLocation.y}px`}
           left={`${mouseLocation.x}px`}
+          creationFlow={false}
+        />
+        : null
+      }
+
+      {
+        (currState === "destinationSelection") ?
+        <Popup
+          name="create"
+          reStack={reStack}
+          title="Enter your friend's inbox key"
+          content={<DestinationSelect 
+          />}
+          zIndex={stack.length + 1}
+          top={"50vh"}
+          left={"50vw"}
           creationFlow={false}
         />
         : null

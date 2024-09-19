@@ -10,7 +10,7 @@ type MessageOut = {
     message:string
 }
 
-export type PinIn = {
+export type PinInPrivate = {
     id: number;
     latitude: number;
     longitude: number;
@@ -18,6 +18,44 @@ export type PinIn = {
     public_share_token: string;
     private_ownership_token: string;
     private_allow_mail_token: string;
+}
+
+export type PinInPublic = {
+    id: number;
+    latitude: number;
+    longitude: number;
+    place_name: string;
+    public_share_token: string;
+}
+
+export async function getRelationshipsStarted(public_token: string) {
+    return fetch(`http://127.0.0.1:8000/api/get_relationships_started?public_token=${public_token}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': `Token ${localStorage.getItem('token')}`
+        }
+    })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            return result as PinInPublic[];
+        });
+}
+
+export async function getRelationshipsFinished(public_token: string) {
+    return fetch(`http://127.0.0.1:8000/api/get_relationships_finished?public_token=${public_token}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': `Token ${localStorage.getItem('token')}`
+        }
+    })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            return result as PinInPublic[];
+        });
 }
 
 export async function getNumKM() {
@@ -61,7 +99,7 @@ export async function createPin(pin: PinOut) {
         .then(response => response.json())
         .then(result => {
             console.log(result);
-            return result as PinIn;
+            return result as PinInPrivate;
         });
 }
 
@@ -77,7 +115,7 @@ export async function createApproveClaimPin(pin: PinOut) {
         .then(response => response.json())
         .then(result => {
             console.log(result);
-            return result as PinIn;
+            return result as PinInPrivate;
         });
 }
 
