@@ -19,9 +19,11 @@ type InfoProps = {
     soundLevel: number;
     setSoundLevel: (soundLevel: number) => void;
     audioRef: React.RefObject<HTMLAudioElement>;
+    hasReadRules: boolean;
+    setHasReadRules: (hasReadRules: boolean) => void;
 }
 
-function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef}: InfoProps) {
+function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef, hasReadRules, setHasReadRules}: InfoProps) {
     const [tab, setTab] = useState("About");
     const [numKM, setNumKM] = useState(0);
     const [dateTime, _] = useState(new Date().toLocaleString());
@@ -35,7 +37,7 @@ function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef}: In
     return (
         <>
             <p>
-                As of <b>{dateTime}</b>, there are <b>{numKM * 0.621371}</b> miles / <b>{numKM}</b> kilometers of love in the world.
+                As of <b>{dateTime}</b>, there are <b>{(numKM * 0.621371).toFixed(3)}</b> miles / <b>{numKM.toFixed(3)}</b> kilometers of love in the world.
             </p>
             <br />
                 <div style={{cursor: "pointer"}}>
@@ -92,7 +94,7 @@ function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef}: In
                         {tab === "Privacy Policy" && <Privacy />}
                         {tab === "Terms of Use" && <Terms />}
                         {tab === "FAQs" && <FAQs />}
-                        {tab === "Moderation" && <Moderation />}
+                        {tab === "Moderation" && <Moderation hasReadRules={hasReadRules} setHasReadRules={setHasReadRules} />}
                         {tab === "Donate" && <Donate />}
                         {tab === "Contact" && <Contact />}
                         {tab === "Acknowledgements" && <Acknowledgements />}

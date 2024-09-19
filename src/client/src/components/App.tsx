@@ -1,25 +1,55 @@
-import css from "components/App.module.css";
-
 import Map from "components/map/Map";
 import Popup from "components/popup/Popup";
 import Info from "components/popup/info/Info"
 import Pins from "components/popup/pins/Pins"
 import Favorites from "components/popup/favorites/Favorites"
-import Message from "components/popup/message/Message"
-import Create from "components/popup/create/Create"
+import PinConfirm from "components/popup/create/PinConfirm"
+import PinMenu from "components/popup/create/PinMenu"
+import MessageConfirm from "components/popup/create/MessageConfirm"
 import longdist from "assets/longdist_long.mp3";
-import { popupKind } from "types";
+import Message from "components/popup/create/Message"
+import DestinationMenu from "components/popup/create/DestinationMenu"
+import { PinIn } from "api/api";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
+
+export type popupProps = {title: string, content: ReactNode};
+export type popupKind = "info" | "pins" | "favorites" | "create";
+
+export type coordinates = {longitude: number, latitude: number};
+export const NO_COORDINATES: coordinates = { longitude: -200, latitude: -100 };
+
+export type mouseLocation = {x: number, y: number};
+export const NO_MOUSE_LOCATION: mouseLocation = { x: -1, y: -1 };
+
+export type creationState = 
+    "pinCreation" 
+  | "pinConfirmation" 
+  | "pinMenu" 
+  | "destinationMenu" 
+  | "destinationCreation"
+  | "destinationConfirmation"
+  | "destinationSelection"
+  | "messageCreation" 
+  | "messageConfirmation" 
+  | "none";
 
 function App() {
 
-  const [stack, setStack] = useState<popupKind[]>(["info", "message", "pins", "favorites"]);
-  const [pinLocation, setPinLocation] = useState<[number, number]>([-200, -100]);
-  const [mouseLocation, setMouseLocation] = useState<[number, number]>([-1, -1]);
+  const [stack, setStack] = useState<popupKind[]>(["info", "pins", "favorites"]);
+  const [pinLocation, setPinLocation] = useState<coordinates>(NO_COORDINATES);
+  const [mouseLocation, setMouseLocation] = useState<mouseLocation>(NO_MOUSE_LOCATION);
   const [spinLevel, setSpinLevel] = useState<number>(0);
   const [soundLevel, setSoundLevel] = useState<number>(0);
   const [placeName, setPlaceName] = useState<string>("");
+  const [currState, setCurrState] = useState<creationState>("none");
+  const [sourcePlaceName, setSourcePlaceName] = useState<string>("");
+  const [destinationPlaceName, setDestinationPlaceName] = useState<string>("");
+  const [senderID, setSenderID] = useState<number>(-1);
+  const [recipientID, setRecipientID] = useState<number>(-1);
+  const [hasReadRules, setHasReadRules] = useState<boolean>(false);
+  const [pins, setPins] = useState<PinIn[]>([]);
+  const [highlightedPin, setHighlightedPin] = useState<coordinates>(NO_COORDINATES);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   function reStack(popup: popupKind) {
@@ -29,6 +59,10 @@ function App() {
     newStack.push(popup);
     setStack(newStack);
   }
+
+  useEffect(() => {
+    localStorage.clear()
+  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -50,27 +84,113 @@ function App() {
         setMouseLocation={setMouseLocation}
         spinLevel={spinLevel}
         setPlaceName={setPlaceName}
+        currState={currState}
+        setCurrState={setCurrState}
+        highlightedPin={highlightedPin}
       />
 
       {
-        (mouseLocation[0] != -1 && mouseLocation[1] != -1) ?
+        (currState === "pinConfirmation" || currState === "destinationConfirmation") ?
         <Popup
-          name="creation"
+          name="create"
           reStack={reStack}
           title="Confirm location?"
-          content={<Create 
-            setMouseLocation={setMouseLocation}
+          content={<PinConfirm 
             placeName={placeName}
+            setCurrState={setCurrState}
+            currState={currState}
+            pinLocation={pinLocation}
+            isSource={currState === "pinConfirmation"}
+            setSourcePlaceName={setSourcePlaceName}
+            setDestinationPlaceName={setDestinationPlaceName}
+            setSenderID={setSenderID}
+            setRecipientID={setRecipientID}
+            pins={pins}
+            setPins={setPins}
           />}
-          zIndex={stack.indexOf("creation") + 1}
-          top={`${mouseLocation[1]}px`}
-          left={`${mouseLocation[0]}px`}
-          creationFlow={true}
+          zIndex={stack.length + 1}
+          top={`${mouseLocation.y}px`}
+          left={`${mouseLocation.x}px`}
+          creationFlow={false}
         />
         : null
       }
 
-      
+
+      {
+        (currState === "pinMenu") ?
+        <Popup
+          name="create"
+          reStack={reStack}
+          title="Pin menu"
+          content={<PinMenu 
+            setCurrState={setCurrState}
+            // pinLocation={pinLocation}
+          />}
+          zIndex={stack.length + 1}
+          top={`${mouseLocation.y}px`}
+          left={`${mouseLocation.x}px`}
+          creationFlow={false}
+        />
+        : null
+      }
+
+      {
+        (currState === "destinationMenu") ?
+        <Popup
+          name="create"
+          reStack={reStack}
+          title="Where are you sending this note?"
+          content={<DestinationMenu 
+            setCurrState={setCurrState}
+          />}
+          zIndex={stack.length + 1}
+          top={`${mouseLocation.y}px`}
+          left={`${mouseLocation.x}px`}
+          creationFlow={false}
+        />
+        : null
+      }
+
+
+      {
+        (currState === "messageCreation") ?
+        <Popup
+          name="create"
+          reStack={reStack}
+          title="Add note"
+          content={<Message 
+            sourcePlaceName={sourcePlaceName}
+            destinationPlaceName={destinationPlaceName}
+            setCurrState={setCurrState}
+            senderID={senderID}
+            recipientID={recipientID}
+            hasReadRules={hasReadRules}
+          />} 
+          zIndex={stack.length + 1}
+          top={`${mouseLocation.y}px`}
+          left={`${mouseLocation.x}px`}
+          creationFlow={false}
+        />
+        : null
+      }
+
+      {
+        (currState === "messageConfirmation") ?
+        <Popup
+          name="create"
+          reStack={reStack}
+          title="Thank you for submitting a note!"
+          content={<MessageConfirm 
+            setCurrState={setCurrState}
+          />} 
+          zIndex={stack.length + 1}
+          top={`${mouseLocation.y}px`}
+          left={`${mouseLocation.x}px`}
+          creationFlow={false}
+        />
+        : null
+      }
       
       <Popup 
         name="info"
@@ -82,26 +202,26 @@ function App() {
           soundLevel={soundLevel}
           setSoundLevel={setSoundLevel}
           audioRef={audioRef}
+          hasReadRules={hasReadRules}
+          setHasReadRules={setHasReadRules}
         />}
         zIndex={stack.indexOf("info") + 1}
         top="20px"
         left="20px"
         creationFlow={false}
       />
-      {/* <Popup 
-        name="message"
-        reStack={reStack}
-        title="Leave a message"
-        content={<Message />}
-        zIndex={stack.indexOf("message") + 1}
-        top="calc(50vh - 300px)"
-        left="calc(50vw - 200px)"
-      /> */}
       <Popup 
         name="pins"
         reStack={reStack}
         title="My pins"
-        content={ <Pins pinLocation={pinLocation} /> }
+        content={ <Pins 
+          placeName={placeName} 
+          setCurrState={setCurrState}
+          currState={currState}
+          pins={pins}
+          setPins={setPins}
+          setHighlightedPin={setHighlightedPin}
+        /> }
         zIndex={stack.indexOf("pins") + 1}
         top="20px"
         left="calc(100vw - 400px - 20px)"

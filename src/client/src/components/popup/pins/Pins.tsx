@@ -1,64 +1,94 @@
 import css from "components/popup/pins/Pins.module.css";
 import { createPin, createApproveClaimPin } from "api/api";
 import { useState, useEffect } from "react";
+import { coordinates, NO_COORDINATES, creationState } from "components/App";
+import { PinIn } from "api/api";
 
 type PinsProps = {
-    pinLocation: [number, number];
+    placeName: string;
+    currState: creationState;
+    setCurrState: (state: creationState) => void;
+    pins: PinIn[];
+    setPins: (pins: PinIn[]) => void;
+    setHighlightedPin: (pin: coordinates) => void;
 }
 
-function Pins({pinLocation}: PinsProps) {
+function Pins({placeName, currState, setCurrState, pins, setPins, setHighlightedPin}: PinsProps) {
 
-    const guideText = ["You don't have any pins yet! Why don't you make one?", 
-        "Great, let's get started! This pin will represent you. You can place it \
-        anywhere you have a memory of being in a long distance relationship, \
-        whether it's where you currently live, or a place you've been in the past. \
-        Why don't you navigate to a place you'd like to put your pin, and click there on the map?", 
-        "Awesome! You've made a pin at " + pinLocation[0] + ", " + pinLocation[1] + "."];
-    
-    const guideButtonText = ["Make a pin", "", "Done"];
-    
-    const [guideIndex, setGuideIndex] = useState(0);
+    const [guideText, setGuideText] = useState("You don't have any pins yet! Why don't you make one?"); 
+    const [guideButtonText, setGuideButtonText] = useState("Make a pin!");
 
     useEffect(() => {
-        if (pinLocation[0] != -200 && pinLocation[1] != -100) {
-            setGuideIndex(guideIndex + 1);
+        // Load pins from localStorage when component mounts
+        const storedPins = localStorage.getItem("pins");
+        if (storedPins) {
+            setPins(JSON.parse(storedPins));
         }
-    }, [pinLocation]);
+    }, []);
+
+    useEffect(() => {
+        if (currState !== "pinCreation" && currState !== "pinConfirmation") {
+            if (pins.length > 0) {
+                setGuideText("You've made " + pins.length + "/10 pins!");
+                setGuideButtonText("Make another pin!");
+            }
+            else {
+                setGuideText("You don't have any pins yet! Why don't you make one?");
+                setGuideButtonText("Make a pin!");
+            }
+           
+        }
+    }, [currState, pins]);
+
+    function toggleCreatePin() {
+        if (currState !== "pinCreation" && currState !== "pinConfirmation") {
+            setCurrState("pinCreation");
+            setGuideButtonText("Cancel pin creation...");
+        } else {
+            setCurrState("none");
+            if (localStorage.getItem("pins")) {
+                setGuideButtonText("Make another pin!");
+            }
+            else {
+                setGuideButtonText("Make a pin!");
+            }
+        }
+    }
 
     return (
         <>
             <p>
-                {guideText[guideIndex]}
+                {guideText}
             </p>
-            
-            {
-                guideButtonText[guideIndex] === "" ?
-                null :  
+
                 <div>
                     <br />
-                 <button onClick={() => setGuideIndex(guideIndex + 1)}>
-                        {guideButtonText[guideIndex]}
+                 <button onClick={toggleCreatePin}>
+                        {guideButtonText}
                     </button>
                 </div> 
+
+
+            
+            {
+                pins.length > 0 ?
+                <>
+                    <br />
+                    <ul className="tree-view">
+                        {pins.map((pin) => (
+                            <li key={pin.id} 
+                                onClick={() => {
+                                    setHighlightedPin({longitude: pin.longitude, latitude: pin.latitude});      
+                                }} 
+                                style={{cursor: "pointer"}}
+                            >
+                                {pin.place_name}
+                            </li>
+                        ))}
+                    </ul>
+                </>
+                : null
             }
-
-            {/* <br /> */}
-
-            {/* <ul className="tree-view">
-                <li>
-                    <details>
-                    <summary className={css.dropdown}>Sunnyvale, CA, USA</summary>
-                    <ul className={css.box}>
-                        <li>
-                            from Austin, TX, USA
-                        </li>
-                        <li>
-                            to Brooklyn, NY, USA
-                        </li>
-                </ul>
-                    </details>
-                </li>
-            </ul> */}
         </>
     );
 }

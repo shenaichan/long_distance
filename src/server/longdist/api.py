@@ -34,10 +34,13 @@ class MessageIn(Schema):
     message:str
 
 class PinOut(Schema):
+    id:int
     latitude:float
     longitude:float
     place_name:str
     public_share_token:str
+    private_ownership_token:str
+    private_allow_mail_token:str
 
 def print_queryset(queryset):
     for entry in queryset:
@@ -45,7 +48,7 @@ def print_queryset(queryset):
         print("\n")
     return
 
-@api.get("get_num_km", response=int)
+@api.get("get_num_km", response=float)
 def get_num_km(request):
     relationships = Relationship.objects.filter(is_approved=True)
     return sum(r.distance for r in relationships)
@@ -71,7 +74,7 @@ def create_pin(request, data: PinIn):
                              place_name=data.place_name)
     return pin
 
-@api.post("/create_approve_claim_pin")
+@api.post("/create_approve_claim_pin", response=PinOut)
 def create_approve_claim_pin(request, data: PinIn):
     with transaction.atomic():
         pin = Pin.objects.create(latitude=data.latitude,
@@ -79,7 +82,7 @@ def create_approve_claim_pin(request, data: PinIn):
                                 place_name=data.place_name)
         pin.approve()
         pin.claim()
-    return 
+    return pin
 
 @api.post("/create_relationship_and_message")
 def create_relationship_and_message(request, data: MessageIn):

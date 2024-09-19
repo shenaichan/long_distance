@@ -3,20 +3,26 @@ import mapboxgl from "mapbox-gl";
 import { getApprovedPins } from "api/api";
 import { FeatureCollection } from "geojson";
 import { reverseGeocode } from "api/api";
+import { coordinates, mouseLocation, creationState, NO_COORDINATES } from "components/App";
 
 type MapProps = {
-  setPinLocation: (location: [number, number]) => void;
-  setMouseLocation: (location: [number, number]) => void;
+  setPinLocation: (location: coordinates) => void;
+  setMouseLocation: (location: mouseLocation) => void;
   spinLevel: number;
   setPlaceName: (placeName: string) => void;
+  currState: creationState;
+  setCurrState: (state: creationState) => void;
+  highlightedPin: coordinates;
 };
 
-function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapProps) {
+function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currState, setCurrState, highlightedPin }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const smallClusterColor: string = '#1084d0';
   const bigClusterColor: string = '#000080';
   const spinLevelRef = useRef(spinLevel);
+  const currStateRef = useRef(currState);
+  const maxZoom = 17;
   // Above zoom level 5, do not rotate.
   const maxSpinZoom = 5;
   // Rotate at intermediate speeds between zoom levels 3 and 5.
@@ -69,6 +75,40 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapP
   }, [spinLevel]);
 
   useEffect(() => {
+    if (highlightedPin.longitude !== NO_COORDINATES.longitude && highlightedPin.latitude !== NO_COORDINATES.latitude) {
+      map.current?.flyTo({
+        center: [highlightedPin.longitude, highlightedPin.latitude],
+        zoom: maxZoom,
+        essential: true,
+        duration: 1500 + (maxZoom - map.current.getZoom()) * 250
+      });
+    }
+  }, [highlightedPin]);
+
+  useEffect(() => {
+    currStateRef.current = currState;
+    if (!map.current) return;
+    if (currState === "none" || currState === "pinCreation" || currState === "destinationCreation") {
+      map.current.scrollZoom.enable();
+      map.current.boxZoom.enable();
+      map.current.dragPan.enable();
+      map.current.doubleClickZoom.enable();
+      map.current.touchZoomRotate.enable();
+      map.current.dragRotate.enable();
+      map.current.touchZoomRotate.enableRotation();
+    }
+    else {
+      map.current.scrollZoom.disable();
+      map.current.boxZoom.disable();
+      map.current.dragPan.disable();
+      map.current.doubleClickZoom.disable();
+      map.current.touchZoomRotate.disable();
+      map.current.dragRotate.disable();
+      map.current.touchZoomRotate.disableRotation();
+    }
+  }, [currState]);
+
+  useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
 
     if (!mapContainer.current) return;
@@ -78,7 +118,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapP
       style: "mapbox://styles/shenaichan/cm0zvdfvd02b001pqepr2beqo/draft",
       center: [-73.98505827443357, 40.69136141121903],
       zoom: 2,
-      maxZoom: 17,
+      maxZoom: maxZoom,
     });
 
     if (!map.current) return;
@@ -88,7 +128,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapP
 
       if (!map.current) return;
 
-      map.current.addSource('earthquakes', {
+      map.current.addSource('pins', {
         type: 'geojson',
         data: pins,
         cluster: true,
@@ -99,7 +139,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapP
       map.current.addLayer({
         id: 'clusters',
         type: 'circle',
-        source: 'earthquakes',
+        source: 'pins',
         filter: ['has', 'point_count'],
         paint: {
           'circle-color': [
@@ -128,7 +168,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapP
       map.current.addLayer({
         id: 'cluster-count',
         type: 'symbol',
-        source: 'earthquakes',
+        source: 'pins',
         filter: ['has', 'point_count'],
         layout: {
           'text-field': ['get', 'point_count_abbreviated'],
@@ -143,7 +183,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapP
       map.current.addLayer({
         id: 'unclustered-point',
         type: 'circle',
-        source: 'earthquakes',
+        source: 'pins',
         filter: ['!', ['has', 'point_count']],
         paint: {
           'circle-color': smallClusterColor,
@@ -175,29 +215,39 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapP
       //   }
       // });
 
-      // // When a click event occurs on a feature in
-      // // the unclustered-point layer, open a popup at
-      // // the location of the feature, with
-      // // description HTML from its properties.
-      // map.current.on('click', 'unclustered-point', (e) => {
-      //   if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
-      //     const coordinates = e.features[0].geometry.coordinates.slice();
-      //     const mag = e.features[0].properties.mag;
-      //     const tsunami = e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
+      // When a click event occurs on a feature in
+      // the unclustered-point layer, open a popup at
+      // the location of the feature, with
+      // description HTML from its properties.
+      map.current.on('click', 'unclustered-point', (e) => {
+        if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
+          console.log(e.features[0].properties);
+          const coordinates = e.features[0].geometry.coordinates.slice();
+          const place_name = e.features[0].properties.place_name;
+          // const tsunami = e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
 
-      //     // Ensure that if the map is zoomed out such that
-      //     // multiple copies of the feature are visible, the
-      //     // popup appears over the copy being pointed to.
-      //     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-      //       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      //     }
+          // Ensure that if the map is zoomed out such that
+          // multiple copies of the feature are visible, the
+          // popup appears over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
 
-      //     new mapboxgl.Popup()
-      //       .setLngLat([coordinates[0], coordinates[1]])
-      //       .setHTML(`magnitude: ${mag}<br>Was there a tsunami?: ${tsunami}`)
-      //       .addTo(map.current!);
-      //   }
-      // });
+          const popup = new mapboxgl.Popup({
+            closeButton: true,
+            closeOnClick: false
+          })
+            .setLngLat([coordinates[0], coordinates[1]])
+            .setHTML(`<p>${place_name}</p>`)
+            .addTo(map.current!);
+      
+          // Remove aria-hidden attribute from close button
+          const closeButton = popup.getElement()?.querySelector('.mapboxgl-popup-close-button');
+          if (closeButton) {
+            closeButton.removeAttribute('aria-hidden');
+          }
+        }
+      });
 
       map.current.on('mouseenter', 'clusters', () => {
         if (!map.current) return;
@@ -229,12 +279,27 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName }: MapP
     spinGlobe();
 
     map.current.on('click', function (e) {
-      var coordinates = e.lngLat;
-      setPinLocation([coordinates.lng, coordinates.lat]);
-      setMouseLocation([e.point.x, e.point.y]);
-      reverseGeocode(coordinates.lat, coordinates.lng).then(placeName => {
-        setPlaceName(placeName);
-      });
+      if (!map.current) return;
+      if ((currStateRef.current === "pinCreation" || currStateRef.current === "destinationCreation") && map.current.getZoom() > 5) {
+        var coordinates = e.lngLat;
+        setPinLocation({longitude: coordinates.lng, latitude: coordinates.lat});
+        map.current.flyTo({
+          center: [coordinates.lng, coordinates.lat],
+          zoom: maxZoom,
+          essential: true,
+          duration: 1500 + (maxZoom - map.current.getZoom()) * 250
+        });
+        setMouseLocation({x: window.innerWidth / 2, y: window.innerHeight / 2});
+        if (currStateRef.current === "pinCreation") {
+          setCurrState("pinConfirmation");
+        }
+        else {
+          setCurrState("destinationConfirmation");
+        }
+        reverseGeocode(coordinates.lat, coordinates.lng).then(placeName => {
+          setPlaceName(placeName);
+        });
+      }
     });
 
     // Clean up on unmount

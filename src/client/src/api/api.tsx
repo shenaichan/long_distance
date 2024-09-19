@@ -10,11 +10,14 @@ type MessageOut = {
     message:string
 }
 
-type PinIn = {
-    latitude:number
-    longitude:number
-    place_name:string
-    public_share_token:string
+export type PinIn = {
+    id: number;
+    latitude: number;
+    longitude: number;
+    place_name: string;
+    public_share_token: string;
+    private_ownership_token: string;
+    private_allow_mail_token: string;
 }
 
 export async function getNumKM() {
@@ -32,22 +35,22 @@ export async function getNumKM() {
         });
 }
 
-
-export async function createPin(pin: PinOut) {
-    fetch('http://127.0.0.1:8000/api/create_pin', {
+export async function createRelationshipAndMessage(message: MessageOut) {
+    fetch('http://127.0.0.1:8000/api/create_relationship_and_message', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             // 'Authorization': `Token ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(pin),
+        body: JSON.stringify(message),
     })
         .then(response => response.json())
         .then(result => console.log(result));
 }
 
-export async function createApproveClaimPin(pin: PinOut) {
-    fetch('http://127.0.0.1:8000/api/create_approve_claim_pin', {
+
+export async function createPin(pin: PinOut) {
+    return fetch('http://127.0.0.1:8000/api/create_pin', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -56,7 +59,26 @@ export async function createApproveClaimPin(pin: PinOut) {
         body: JSON.stringify(pin),
     })
         .then(response => response.json())
-        .then(result => console.log(result));
+        .then(result => {
+            console.log(result);
+            return result as PinIn;
+        });
+}
+
+export async function createApproveClaimPin(pin: PinOut) {
+    return fetch('http://127.0.0.1:8000/api/create_approve_claim_pin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': `Token ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(pin),
+    })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            return result as PinIn;
+        });
 }
 
 import { FeatureCollection } from 'geojson';
@@ -85,7 +107,7 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
         .then(response => response.json())
         .then(result => {
             const placeName = result.features[0].place_name;
-            return placeName;   
+            return placeName as string;   
         })
         .catch(error => {
             console.error('Error with reverse geocoding:', error); 

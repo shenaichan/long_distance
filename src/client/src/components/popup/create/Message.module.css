@@ -1,0 +1,40 @@
+.textEntryBox {
+    background-color: white;
+    font-size: 14px;
+    width: auto;
+    height: 300px;
+    font-style: italic;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 5px;
+}
+
+.typewriter p {
+  overflow: hidden; /* Ensures the content is not revealed until the animation */
+  border-right: .15em solid rgb(0, 0, 0); /* The typwriter cursor */
+  white-space: nowrap; 
+  animation: 
+    typing 3s steps(40, end),
+    blink-caret .75s step-end infinite;
+  animation-iteration-count: 1, infinite; /* Typing once, blinking infinitely */
+  animation-fill-mode: forwards, none; /* Keep final state for typing */
+  max-width: fit-content;
+  color: gray;
+}
+
+/* The typing effect */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+/* The typewriter cursor effect */
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: rgb(0, 0, 0); }
+}
+
+.restartTypewriter {
+  animation: none;
+  width: 0;
+}

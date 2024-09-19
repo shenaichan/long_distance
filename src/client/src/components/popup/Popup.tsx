@@ -1,6 +1,6 @@
 import css from "components/popup/Popup.module.css";
 import { ReactNode, useState } from 'react';
-import { popupKind } from "types";
+import { popupKind } from "components/App";
 import Draggable from 'react-draggable';
 
 type popupProps = {

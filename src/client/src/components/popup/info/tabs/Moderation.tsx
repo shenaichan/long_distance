@@ -1,4 +1,9 @@
-function Moderation() {
+type ModerationProps = {
+    hasReadRules: boolean;
+    setHasReadRules: (hasReadRules: boolean) => void;
+}
+
+function Moderation({ hasReadRules, setHasReadRules }: ModerationProps) {
     return (
         <div>
             <p>
@@ -31,6 +36,13 @@ function Moderation() {
                     discuss these topics, you can use a different site.
                 </li>
                 <li>
+                    Do not submit anything that compromises your or anyone else's anonymity. 
+                    For example, I will not approve messages containing
+                    last names, phone numbers, email addresses, 
+                    social media handles, or exact addresses.
+                    For your own safety, do not place pins directly on your home or work.
+                </li>
+                <li>
                     Understand that I am one person who has created this site
                     as a passion project, and I reserve the right to manage its contents,
                     as well as take it down if maintenance becomes untenable.
@@ -40,6 +52,26 @@ function Moderation() {
             <p>
                 All that said, have fun sharing your affections on the internet :)
             </p>
+            <br />
+            <div>
+                {/* <input type="checkbox" id="moderationRulesCheckbox" 
+                    onChange={(e) => {
+                        if (e.target.checked) {
+                            // setHasReadRules(true);
+                            e.target.disabled = true;
+                        }
+                    }}
+                />
+                <label htmlFor="moderationRulesCheckbox"><p>I have read and understood the moderation rules.</p></label> */}
+                <button
+                    onClick={() => {
+                        setHasReadRules(true);
+
+                    }}
+                    disabled={hasReadRules}
+                >I have read and understood the moderation rules.</button>
+                <br/>
+            </div>
             
         </div>
     );
