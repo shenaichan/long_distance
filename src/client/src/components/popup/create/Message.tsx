@@ -68,7 +68,7 @@ function Message({sourcePlaceName, destinationPlaceName, setCurrState, senderID,
                 }
             });
 
-        }, 4000); // Change text every 3 seconds
+        }, 4000); // Change text every 4 seconds
 
         return () => clearInterval(intervalId);
     }, []);
