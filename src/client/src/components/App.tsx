@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom"
 import Map from "components/map/Map";
 import Popup from "components/popup/Popup";
 import Info from "components/popup/info/Info"
@@ -10,7 +11,7 @@ import longdist from "assets/longdist_long.mp3";
 import Message from "components/popup/create/Message"
 import DestinationMenu from "components/popup/create/DestinationMenu"
 import DestinationSelect from "components/popup/create/DestinationSelect"
-import { PinInPrivate, PinInPublic } from "api/api";
+import { PinInPrivate, PinInPublic, getPinByPublicToken } from "api/api";
 
 import { useState, useEffect, useRef, ReactNode } from "react";
 
@@ -53,6 +54,9 @@ function App() {
   const [highlightedPin, setHighlightedPin] = useState<PinInPrivate | PinInPublic | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const { public_share_token } = useParams();
+  console.log("PUBLIC_SHARE_TOKEN", public_share_token );
+
   function reStack(popup: popupKind) {
     let newStack = [...stack]
     let index = newStack.indexOf(popup); 
@@ -60,6 +64,30 @@ function App() {
     newStack.push(popup);
     setStack(newStack);
   }
+
+  useEffect(() => {
+    if (public_share_token) {
+      setCurrState("pinMenu");
+
+      const storedPins = localStorage.getItem("pins");
+      if (storedPins){
+        const sharePin = (JSON.parse(storedPins) as PinInPrivate[])
+        const myPin = sharePin.filter(pin => pin.public_share_token === public_share_token)[0]
+        if (myPin){ 
+          setHighlightedPin(myPin)
+          return
+        }
+      }
+
+      const fetchPin = async (public_share_token: string) => {
+        const myPin = await getPinByPublicToken(public_share_token);
+        setHighlightedPin(myPin); 
+      }
+      
+      fetchPin(public_share_token);
+      
+    }
+  }, []);
 
   // useEffect(() => {
   //   localStorage.clear()

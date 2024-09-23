@@ -28,6 +28,21 @@ export type PinInPublic = {
     public_share_token: string;
 }
 
+export async function getPinByPublicToken(public_token: string) {
+    return fetch(`http://127.0.0.1:8000/api/get_pin_by_public_token?public_token=${public_token}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            // 'Authorization': `Token ${localStorage.getItem('token')}`
+        }
+    })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            return result as PinInPublic;
+        });
+}
+
 export async function getRelationshipsStarted(public_token: string) {
     return fetch(`http://127.0.0.1:8000/api/get_relationships_started?public_token=${public_token}`, {
         method: 'GET',
