@@ -34,6 +34,9 @@ class MessageIn(Schema):
     recipient:int
     message:str
 
+class MessageOut(Schema):
+    content:str
+
 class PinOutPrivate(Schema):
     id:int
     latitude:float
@@ -120,23 +123,39 @@ def add_email_to_message(request, data: MessageIn):
 def create_and_add_response(request, data: MessageIn):
     with transaction.atomic():
         response = Message.objects.create(content=data.message)
-        relationship = Relationship.objects.filter(sender=data.sender, recipient=data.recipient).first()
+        relationship = Relationship.objects.get(sender=data.sender, recipient=data.recipient)
         relationship.add_response(response)
     return
 
 @api.get("/get_relationships_started", response=List[PinOutPublic])
 def get_relationships_started(request, public_token: str):
-    pin = Pin.objects.filter(public_share_token=public_token).first()
+    pin = Pin.objects.get(public_share_token=public_token)
     return pin.get_relationships_started()
 
 @api.get("/get_relationships_finished", response=List[PinOutPublic])
 def get_relationships_finished(request, public_token: str):
-    pin = Pin.objects.filter(public_share_token=public_token).first()
+    pin = Pin.objects.get(public_share_token=public_token)
     return pin.get_relationships_finished()
 
-@api.get("/get_message_thread")
-def get_message_thread(request):
-    return
+@api.get("/get_message_thread", response=List[MessageOut])
+def get_message_thread(request, sender_id: int, recipient_id: int):
+    message = Relationship.objects.select_related("message").get(sender=sender_id, recipient=recipient_id)
+    response = Relationship.objects.select_related("response").get(sender=sender_id, recipient=recipient_id)
+    thread = []
+    if (response.response):
+        thread = [message.message, response.response]
+    else:
+        thread = [message.message]
+    print(thread)
+    '''
+    get relationship from relationships table given these two IDs
+    ^ query to the model
+    want to return message contents only
+    want to specifically return contents?
+    have to jump into message object for this
+    specify return type
+    '''
+    return thread
 
 def write_to(request):
     return

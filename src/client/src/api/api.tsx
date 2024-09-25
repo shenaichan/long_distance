@@ -10,6 +10,10 @@ type MessageOut = {
     message:string
 }
 
+type MessageIn = {
+    content:string
+}
+
 export type PinInPrivate = {
     id: number;
     latitude: number;
@@ -26,6 +30,20 @@ export type PinInPublic = {
     longitude: number;
     place_name: string;
     public_share_token: string;
+}
+
+export async function getMessageThread(sender_id: number, recipient_id: number) {
+    return await fetch(`http://127.0.0.1:8000/api/get_message_thread?sender_id=${sender_id}&recipient_id=${recipient_id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            return result as MessageIn[];
+        });
 }
 
 export async function getPinByPublicToken(public_token: string) {

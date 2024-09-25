@@ -1,6 +1,6 @@
 import { creationState } from "components/App";
 import css from "components/popup/create/PinMenu.module.css";
-import { PinInPrivate, PinInPublic, getRelationshipsStarted, getRelationshipsFinished } from "api/api";
+import { PinInPrivate, PinInPublic, getRelationshipsStarted, getRelationshipsFinished, getMessageThread } from "api/api";
 import { useEffect, useState } from "react";
 
 type PinMenuProps = {
@@ -14,6 +14,10 @@ type PinMenuProps = {
 function PinMenu({setCurrState, highlightedPin, setHighlightedPin, setSenderID, setSourcePlaceName}: PinMenuProps) {
     const [started, setStarted] = useState<PinInPublic[]>([]);
     const [finished, setFinished] = useState<PinInPublic[]>([]);
+
+    function getMessages(sender_id: number, recipient_id: number) {
+        getMessageThread(sender_id, recipient_id);
+    }
 
     function addNote() {
         setCurrState("destinationMenu");
@@ -70,7 +74,9 @@ function PinMenu({setCurrState, highlightedPin, setHighlightedPin, setSenderID, 
                 <p style={{fontWeight: "bold"}}>Sent</p>
                 <ul>
                     {started.map(pin => (
-                        <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
+                        // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
+                        <li key={pin.id} onClick={() => {if (!highlightedPin) return;
+                            getMessages(highlightedPin.id, pin.id);}}>{pin.place_name}</li>
                     ))}
                 </ul>
             </div>
@@ -78,7 +84,9 @@ function PinMenu({setCurrState, highlightedPin, setHighlightedPin, setSenderID, 
                 <p style={{fontWeight: "bold"}}>Received</p>   
                 <ul>
                     {finished.map(pin => (
-                        <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
+                        // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
+                        <li key={pin.id} onClick={() => {if (!highlightedPin) return;
+                            getMessages(pin.id, highlightedPin.id);}}>{pin.place_name}</li>
                     ))}
                 </ul>
             </div>
