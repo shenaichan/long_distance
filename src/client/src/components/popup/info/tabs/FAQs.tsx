@@ -8,6 +8,19 @@ function FAQs() {
                 miles/kilometers of love in the world.
             </p>
             <br />
+            <p><b>Why does my message require approval?</b></p>
+            <p>
+                Notes From Afar whitelists the ten thousand most common words in the
+                English language. Any message containing a word not in this list
+                requires manual approval to go up on the site. This ameliorates
+                moderation load for me while also allowing most users to post messages
+                in real time. I recognize that this has limitations, notably bias towards
+                English speakers, but I feel that given my limited time and labor,
+                combined with my desire to foster a digital space free from
+                hate speech or offensive content, this is 
+                an appropriate, though imperfect, solution.
+            </p>
+            <br />
             <p><b>How was Notes From Afar created?</b></p>
             <p>
                 Notes From Afar uses a TypeScript & React frontend combined with a

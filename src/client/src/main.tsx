@@ -4,13 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import App from 'components/App.tsx'
 import 'index.css'
 
-/**
- * want a link to a singular pin
- * - setCurrState to pinMenu
- * - setHighlightedPin to the pin associated with the public token
- * - pin/{public_token}
- * want a link to a message "thread" -- either one or two messages
- */
+
 
 const router = createBrowserRouter([
   {
@@ -23,10 +17,8 @@ const router = createBrowserRouter([
   }
 ])
 
+
+
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <RouterProvider router={router}/>
-    {/* <App />  */}
-    {/* need to parameterize App, using useParams */}
-  </StrictMode>,
+  <RouterProvider router={router}/>
 )

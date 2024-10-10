@@ -81,7 +81,7 @@ function Pins({placeName, currState, setCurrState, pins, setPins, setHighlighted
                                     setHighlightedPin(pin);   
                                     setCurrState("pinMenu");
                                 }} 
-                                style={{cursor: "pointer"}}
+                                style={{cursor: "pointer", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis"}}
                             >
                                 {pin.place_name}
                             </li>
