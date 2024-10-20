@@ -5,6 +5,7 @@ import Info from "components/popup/info/Info"
 import Pins from "components/popup/pins/Pins"
 import Write from "components/popup/write/Write"
 import Favorites from "components/popup/favorites/Favorites"
+import Inventory from "components/popup/inventory/Inventory"
 import PinConfirm from "components/popup/create/PinConfirm"
 import PinMenu from "components/popup/create/PinMenu"
 import MessageConfirm from "components/popup/create/MessageConfirm"
@@ -17,7 +18,7 @@ import { PinInPrivate, PinInPublic, getPinByPublicToken } from "api/api";
 import { useState, useEffect, useRef, ReactNode } from "react";
 
 export type popupProps = {title: string, content: ReactNode};
-export type popupKind = "info" | "pins" | "favorites" | "create" | "write";
+export type popupKind = "info" | "pins" | "favorites" | "create" | "write" | "inventory";
 
 export type coordinates = {longitude: number, latitude: number};
 export const NO_COORDINATES: coordinates = { longitude: -200, latitude: -100 };
@@ -39,7 +40,7 @@ export type creationState =
 
 function App() {
 
-  const [stack, setStack] = useState<popupKind[]>(["info", "write", "favorites"]);
+  const [stack, setStack] = useState<popupKind[]>(["info", "write", "inventory"]);
   const [pinLocation, setPinLocation] = useState<coordinates>(NO_COORDINATES);
   const [mouseLocation, setMouseLocation] = useState<mouseLocation>(NO_MOUSE_LOCATION);
   const [spinLevel, setSpinLevel] = useState<number>(5);
@@ -299,12 +300,23 @@ function App() {
         creationFlow={false}
       />
 
-      <Popup 
+      {/* <Popup 
         name="favorites"
         reStack={reStack}
         title="My favorites"
         content={ <Favorites /> }
         zIndex={stack.indexOf("favorites") + 1}
+        top="50vh"
+        left="calc(100vw - 400px - 20px)"
+        creationFlow={false}
+      /> */}
+
+      <Popup 
+        name="inventory"
+        reStack={reStack}
+        title="My inventory"
+        content={ <Inventory /> }
+        zIndex={stack.indexOf("inventory") + 1}
         top="50vh"
         left="calc(100vw - 400px - 20px)"
         creationFlow={false}

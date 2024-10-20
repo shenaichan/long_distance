@@ -224,26 +224,26 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
       });
 
       // // inspect a cluster on click
-      // map.current.on('click', 'clusters', (e) => {
-      //   const features = map.current?.queryRenderedFeatures(e.point, {
-      //     layers: ['clusters']
-      //   });
-      //   if (map.current && features && features[0].properties) {
-      //     const clusterId = features[0].properties.cluster_id;
-      //     const source: mapboxgl.GeoJSONSource = map.current.getSource('earthquakes') as mapboxgl.GeoJSONSource
+      map.current.on('click', 'clusters', (e) => {
+        const features = map.current?.queryRenderedFeatures(e.point, {
+          layers: ['clusters']
+        });
+        if (map.current && features && features[0].properties) {
+          const clusterId = features[0].properties.cluster_id;
+          const source: mapboxgl.GeoJSONSource = map.current.getSource('pins') as mapboxgl.GeoJSONSource
 
-      //     source
-      //       .getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
-      //         if (err) return;
-      //         if (features[0].geometry.type == "Point") {
-      //           map.current?.easeTo({
-      //             center: [features[0].geometry.coordinates[0], features[0].geometry.coordinates[1]],
-      //             zoom: zoom
-      //           });
-      //         }
-      //       });
-      //   }
-      // });
+          source
+            .getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
+              if (err) return;
+              if (features[0].geometry.type == "Point") {
+                map.current?.easeTo({
+                  center: [features[0].geometry.coordinates[0], features[0].geometry.coordinates[1]],
+                  zoom: zoom
+                });
+              }
+            });
+        }
+      });
 
       // When a click event occurs on a feature in
       // the unclustered-point layer, open a popup at
@@ -252,11 +252,8 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
       map.current.on('click', 'unclustered-point', (e) => {
         if (currStateRef.current === "pinCreation" || currStateRef.current === "destinationCreation") return;
         if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
-          console.log(e.features[0].properties);
+          console.log(e.features[0].geometry.coordinates.slice());
           const coordinates = e.features[0].geometry.coordinates.slice();
-          // const place_name = e.features[0].properties.place_name;
-          const public_share_token = e.features[0].properties.public_share_token;
-          // const tsunami = e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
 
           // Ensure that if the map is zoomed out such that
           // multiple copies of the feature are visible, the

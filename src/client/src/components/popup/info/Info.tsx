@@ -125,6 +125,9 @@ function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef, has
                 />
             </div>
             <br />
+
+            <button>Show me a random note</button>
+            <br/>
             <p style={{textAlign: "center"}}>Made with &lt;3 by <a href="https://shenaichan.github.io/" target="_blank" rel="noopener noreferrer">Shenai Chan</a> at the <a href="https://www.recurse.com/" target="_blank" rel="noopener noreferrer">Recurse Center</a></p>
         </>
     );
