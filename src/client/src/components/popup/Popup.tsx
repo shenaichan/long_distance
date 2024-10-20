@@ -42,13 +42,11 @@ function Popup({title, content, reStack, name, zIndex, top, left, creationFlow}:
 
                     }
                 </div>
-                {
-                    isMinimized ?
-                        null :
-                        <div className={`window-body ${css.windowBody}`}>
-                            {content}
-                        </div>
-                }
+            
+                <div className={`window-body ${css.windowBody}`}
+                    style={{"display": isMinimized ? "none" : "block"}}>
+                    {content}
+                </div>
                 
             </div>
         </Draggable>
