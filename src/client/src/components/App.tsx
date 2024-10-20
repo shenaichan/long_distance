@@ -3,6 +3,7 @@ import Map from "components/map/Map";
 import Popup from "components/popup/Popup";
 import Info from "components/popup/info/Info"
 import Pins from "components/popup/pins/Pins"
+import Write from "components/popup/write/Write"
 import Favorites from "components/popup/favorites/Favorites"
 import PinConfirm from "components/popup/create/PinConfirm"
 import PinMenu from "components/popup/create/PinMenu"
@@ -16,7 +17,7 @@ import { PinInPrivate, PinInPublic, getPinByPublicToken } from "api/api";
 import { useState, useEffect, useRef, ReactNode } from "react";
 
 export type popupProps = {title: string, content: ReactNode};
-export type popupKind = "info" | "pins" | "favorites" | "create";
+export type popupKind = "info" | "pins" | "favorites" | "create" | "write";
 
 export type coordinates = {longitude: number, latitude: number};
 export const NO_COORDINATES: coordinates = { longitude: -200, latitude: -100 };
@@ -38,7 +39,7 @@ export type creationState =
 
 function App() {
 
-  const [stack, setStack] = useState<popupKind[]>(["info", "pins", "favorites"]);
+  const [stack, setStack] = useState<popupKind[]>(["info", "write", "favorites"]);
   const [pinLocation, setPinLocation] = useState<coordinates>(NO_COORDINATES);
   const [mouseLocation, setMouseLocation] = useState<mouseLocation>(NO_MOUSE_LOCATION);
   const [spinLevel, setSpinLevel] = useState<number>(5);
@@ -262,7 +263,7 @@ function App() {
         left="20px"
         creationFlow={false}
       />
-      <Popup 
+      {/* <Popup 
         name="pins"
         reStack={reStack}
         title="My pins"
@@ -278,7 +279,26 @@ function App() {
         top="20px"
         left="calc(100vw - 400px - 20px)"
         creationFlow={false}
+      /> */}
+
+      <Popup 
+        name="write"
+        reStack={reStack}
+        title="Write a note"
+        content={ <Write 
+          sourcePlaceName={sourcePlaceName}
+          destinationPlaceName={destinationPlaceName}
+          setCurrState={setCurrState}
+          senderID={senderID}
+          recipientID={recipientID}
+          hasReadRules={hasReadRules}
+        /> }
+        zIndex={stack.indexOf("write") + 1}
+        top="20px"
+        left="calc(100vw - 400px - 20px)"
+        creationFlow={false}
       />
+
       <Popup 
         name="favorites"
         reStack={reStack}
