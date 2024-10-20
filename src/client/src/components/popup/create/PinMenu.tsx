@@ -76,7 +76,8 @@ function PinMenu({setCurrState, highlightedPin, setHighlightedPin, setSenderID, 
                     {started.map(pin => (
                         // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
                         <li key={pin.id} onClick={() => {if (!highlightedPin) return;
-                            getMessages(highlightedPin.id, pin.id);}}>{pin.place_name}</li>
+                            getMessages(highlightedPin.id, pin.id); 
+                            setHighlightedPin(pin);}}>{pin.place_name}</li>
                     ))}
                 </ul>
             </div>
@@ -86,7 +87,8 @@ function PinMenu({setCurrState, highlightedPin, setHighlightedPin, setSenderID, 
                     {finished.map(pin => (
                         // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
                         <li key={pin.id} onClick={() => {if (!highlightedPin) return;
-                            getMessages(pin.id, highlightedPin.id);}}>{pin.place_name}</li>
+                            getMessages(pin.id, highlightedPin.id);
+                            setHighlightedPin(pin);}}>{pin.place_name}</li>
                     ))}
                 </ul>
             </div>
