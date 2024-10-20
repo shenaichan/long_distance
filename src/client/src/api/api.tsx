@@ -32,157 +32,158 @@ export type PinInPublic = {
     public_share_token: string;
 }
 
+
+
+const BASE_URL = "http://127.0.0.1:8000/api/"
+
+
+
 export async function getMessageThread(sender_id: number, recipient_id: number) {
-    return await fetch(`http://127.0.0.1:8000/api/get_message_thread?sender_id=${sender_id}&recipient_id=${recipient_id}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            return result as MessageIn[];
-        });
+    const messageThreadResponse = await fetch(
+        `${BASE_URL}get_message_thread?sender_id=${sender_id}&recipient_id=${recipient_id}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const messageThread = await messageThreadResponse.json()
+    console.log(messageThread)
+    return messageThread as MessageIn[]
 }
 
 export async function getPinByPublicToken(public_token: string) {
-    return fetch(`http://127.0.0.1:8000/api/get_pin_by_public_token?public_token=${public_token}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Token ${localStorage.getItem('token')}`
-        }
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            return result as PinInPublic;
-        });
+    const pinResponse = await fetch(
+        `${BASE_URL}get_pin_by_public_token?public_token=${public_token}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const pin = await pinResponse.json()
+    return pin as PinInPublic
 }
 
 export async function getRelationshipsStarted(public_token: string) {
-    return fetch(`http://127.0.0.1:8000/api/get_relationships_started?public_token=${public_token}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Token ${localStorage.getItem('token')}`
-        }
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            return result as PinInPublic[];
-        });
+    const relationshipsStartedResponse = await fetch(
+        `${BASE_URL}get_relationships_started?public_token=${public_token}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const relationshipsStarted = await relationshipsStartedResponse.json()
+    return relationshipsStarted as PinInPublic[]
 }
 
 export async function getRelationshipsFinished(public_token: string) {
-    return fetch(`http://127.0.0.1:8000/api/get_relationships_finished?public_token=${public_token}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Token ${localStorage.getItem('token')}`
+    const relationshipsFinishedResponse = await fetch(
+        `${BASE_URL}get_relationships_finished?public_token=${public_token}`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
         }
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            return result as PinInPublic[];
-        });
+    )
+    const relationshipsFinished = await relationshipsFinishedResponse.json()
+    return relationshipsFinished as PinInPublic[]
 }
 
 export async function getNumKM() {
-    return fetch('http://127.0.0.1:8000/api/get_num_km', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Token ${localStorage.getItem('token')}`       
-        },
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            return result as number;
-        });
+    const numKmResponse = await fetch(
+        `${BASE_URL}get_num_km`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+    )
+    const numKm = await numKmResponse.json()
+    return numKm as number
 }
 
 export async function createRelationshipAndMessage(message: MessageOut) {
-    fetch('http://127.0.0.1:8000/api/create_relationship_and_message', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Token ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(message),
-    })
-        .then(response => response.json())
-        .then(result => console.log(result));
+    await fetch(
+        `${BASE_URL}create_relationship_and_message`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message)
+        }
+    )
 }
 
-
 export async function createPin(pin: PinOut) {
-    return fetch('http://127.0.0.1:8000/api/create_pin', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Token ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(pin),
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            return result as PinInPrivate;
-        });
+    const createdPinResponse = await fetch(
+        `${BASE_URL}create_pin`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(pin)
+        }
+    )
+    const createdPin = await createdPinResponse.json()
+    return createdPin as PinInPrivate
 }
 
 export async function createApproveClaimPin(pin: PinOut) {
-    return fetch('http://127.0.0.1:8000/api/create_approve_claim_pin', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Token ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(pin),
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            return result as PinInPrivate;
-        });
+    const createdPinResponse = await fetch(
+        `${BASE_URL}create_approve_claim_pin`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(pin)
+        }
+    )
+    const createdPin = await createdPinResponse.json()
+    return createdPin as PinInPrivate
 }
 
 import { FeatureCollection } from 'geojson';
 
-export async function getApprovedPins(): Promise<FeatureCollection> {
-    return fetch('http://127.0.0.1:8000/api/get_approved_pins', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': `Token ${localStorage.getItem('token')}`
-        },
-    })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            return result as FeatureCollection;
-        });
+export async function getApprovedPins() {
+    const approvedPinsResponse = await fetch(
+        `${BASE_URL}get_approved_pins`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+    )
+    const approvedPins = await approvedPinsResponse.json()
+    return approvedPins as FeatureCollection
 }
 
-
-export async function reverseGeocode(latitude: number, longitude: number): Promise<string> {
+export async function getPlaceName(latitude: number, longitude: number) {
     const accessToken = import.meta.env.VITE_MAPBOX_KEY;
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${accessToken}&limit=1`;
-
-    return fetch(url)
-        .then(response => response.json())
-        .then(result => {
-            const placeName = result.features[0].place_name;
-            return placeName as string;   
-        })
-        .catch(error => {
-            console.error('Error with reverse geocoding:', error); 
-            return "nowhere in particular";
-        });
+    const placeResponse = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${accessToken}&limit=1`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+    )
+    const place = await placeResponse.json()
+    try {
+        const placeName = place.features[0].place_name
+        return placeName as string
+    }
+    catch {
+        console.log("in error case")
+        return "nowhere in particular"
+    }
 }
 

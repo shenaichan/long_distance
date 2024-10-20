@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { FeatureCollection } from "geojson";
-import { getApprovedPins,reverseGeocode, PinInPrivate, PinInPublic } from "api/api";
+import { getApprovedPins, getPlaceName, PinInPrivate, PinInPublic } from "api/api";
 import { coordinates, mouseLocation, creationState, NO_COORDINATES } from "components/App";
 import map_pin from "assets/map_pin.png";
 
@@ -316,7 +316,8 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
         else {
           setCurrState("destinationConfirmation");
         }
-        reverseGeocode(coordinates.lat, coordinates.lng).then(placeName => {
+        getPlaceName(coordinates.lat, coordinates.lng).then(placeName => {
+          console.log(placeName);
           setPlaceName(placeName);
         });
       }
