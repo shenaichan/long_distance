@@ -34,7 +34,10 @@ function Popup({title, content, reStack, name, zIndex, top, left, creationFlow}:
                     {
                         creationFlow ?
                         null :
-                            <button className={css.toggleMinimize} onClick={() => setIsMinimized(!isMinimized)}>
+                            <button className={css.toggleMinimize} 
+                                onClick={() => setIsMinimized(!isMinimized)}
+                                title={isMinimized ? "Open window" : "Minimize window"}
+                            >
                                 {isMinimized ? 
                                     <div className={css.maximizeIcon}></div> : 
                                     <div className={css.minimizeIcon}></div>}

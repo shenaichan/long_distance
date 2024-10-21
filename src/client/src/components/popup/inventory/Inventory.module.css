@@ -1,0 +1,12 @@
+.info {
+    background-color: #fff;
+    padding: 7px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.tabs {
+    margin-left: -3px;
+    background-color: #fff;
+}

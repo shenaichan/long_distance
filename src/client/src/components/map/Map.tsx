@@ -245,13 +245,10 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
         }
       });
 
-      // When a click event occurs on a feature in
-      // the unclustered-point layer, open a popup at
-      // the location of the feature, with
-      // description HTML from its properties.
       map.current.on('click', 'unclustered-point', (e) => {
         if (currStateRef.current === "pinCreation" || currStateRef.current === "destinationCreation") return;
         if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
+          console.log(e.features[0])
           console.log(e.features[0].geometry.coordinates.slice());
           const coordinates = e.features[0].geometry.coordinates.slice();
 

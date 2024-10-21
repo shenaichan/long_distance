@@ -68,13 +68,18 @@ function App() {
   }
 
   useEffect(() => {
+    const myPinsString = localStorage.getItem("pins");
+    let myPins: PinInPrivate[] = [];
+    if (myPinsString){
+      myPins = (JSON.parse(myPinsString) as PinInPrivate[])
+      setPins(myPins)
+    }
+
     if (public_share_token) {
       setCurrState("pinMenu");
 
-      const storedPins = localStorage.getItem("pins");
-      if (storedPins){
-        const sharePin = (JSON.parse(storedPins) as PinInPrivate[])
-        const myPin = sharePin.filter(pin => pin.public_share_token === public_share_token)[0]
+      if (myPins){
+        const myPin = myPins.filter(pin => pin.public_share_token === public_share_token)[0]
         if (myPin){ 
           setHighlightedPin(myPin)
           return
@@ -156,7 +161,7 @@ function App() {
         <Popup
           name="create"
           reStack={reStack}
-          title="Pin menu"
+          title={highlightedPin!.place_name}
           content={<PinMenu 
             setCurrState={setCurrState}
             highlightedPin={highlightedPin}
@@ -166,8 +171,8 @@ function App() {
             // pinLocation={pinLocation}
           />}
           zIndex={stack.length + 1}
-          top={"50vh"}
-          left={"50vw"}
+          top={"20px"}
+          left={"calc(50vw - 200px)"}
           creationFlow={false}
         />
         : null
@@ -315,7 +320,11 @@ function App() {
         name="inventory"
         reStack={reStack}
         title="My inventory"
-        content={ <Inventory /> }
+        content={ <Inventory
+            pins={pins}
+            setHighlightedPin={setHighlightedPin}
+            setCurrState={setCurrState}
+          /> }
         zIndex={stack.indexOf("inventory") + 1}
         top="50vh"
         left="calc(100vw - 400px - 20px)"

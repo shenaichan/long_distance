@@ -52,6 +52,10 @@ p, li, button {
 
 .titleText {
     font-size: 16px;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .windowBody {

@@ -52,26 +52,6 @@ function Moderation({ hasReadRules, setHasReadRules }: ModerationProps) {
             <p>
                 All that said, have fun sharing your affections on the internet :)
             </p>
-            <br />
-            <div>
-                {/* <input type="checkbox" id="moderationRulesCheckbox" 
-                    onChange={(e) => {
-                        if (e.target.checked) {
-                            // setHasReadRules(true);
-                            e.target.disabled = true;
-                        }
-                    }}
-                />
-                <label htmlFor="moderationRulesCheckbox"><p>I have read and understood the moderation rules.</p></label> */}
-                <button
-                    onClick={() => {
-                        setHasReadRules(true);
-
-                    }}
-                    disabled={hasReadRules}
-                >I have read and understood the moderation rules.</button>
-                <br/>
-            </div>
             
         </div>
     );
