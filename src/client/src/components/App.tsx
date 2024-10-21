@@ -132,7 +132,7 @@ function App() {
         <Popup
           name="create"
           reStack={reStack}
-          title="Confirm location?"
+          title={ currState === "pinConfirmation" ? "Set your location here?" : "Set your friend's location here?"}
           content={<PinConfirm 
             placeName={placeName}
             setCurrState={setCurrState}
@@ -148,8 +148,8 @@ function App() {
             setHighlightedPin={setHighlightedPin}
           />}
           zIndex={stack.length + 1}
-          top={`${mouseLocation.y}px`}
-          left={`${mouseLocation.x}px`}
+          top={"20px"}
+          left={"calc(50vw - 200px)"}
           creationFlow={false}
         />
         : null
