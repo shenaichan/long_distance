@@ -297,7 +297,7 @@ function App() {
           setCurrState={setCurrState}
           senderID={senderID}
           recipientID={recipientID}
-          hasReadRules={hasReadRules}
+          
         /> }
         zIndex={stack.indexOf("write") + 1}
         top="20px"

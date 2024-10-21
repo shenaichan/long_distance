@@ -36,7 +36,7 @@ function Inventory({ pins, setHighlightedPin, setCurrState }: InventoryProps) {
                 <div className={`window ${css.info}`} role="tabpanel">
                     <div className="window-body">
                         <h1 style={{fontSize: "16px"}}>{tab}</h1>
-                        <ul style={{paddingLeft: "5px"}}>
+                        <ul style={{paddingLeft: "15px"}}>
                             {
                                 pins.map((pin) => (
                                     <li key={pin.id}
@@ -46,9 +46,11 @@ function Inventory({ pins, setHighlightedPin, setCurrState }: InventoryProps) {
                                                 setCurrState("pinMenu");
                                             }
                                         }
-                                        style={{cursor: "pointer", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis"}}
+                                        style={{cursor: "pointer"}}
                                     >
-                                        {pin.place_name}
+                                        <p style={{overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis"}}>
+                                            {pin.place_name}
+                                        </p>
                                     </li>
                                 ))
                             }
