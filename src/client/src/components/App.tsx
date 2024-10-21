@@ -295,6 +295,7 @@ function App() {
           sourcePlaceName={sourcePlaceName}
           destinationPlaceName={destinationPlaceName}
           setCurrState={setCurrState}
+          currState={currState}
           senderID={senderID}
           recipientID={recipientID}
           

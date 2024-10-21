@@ -9,11 +9,12 @@ type WriteProps = {
   sourcePlaceName: string;
   destinationPlaceName: string;
   setCurrState: (state: creationState) => void;
+  currState: creationState;
   senderID: number;
   recipientID: number;
 }
 
-function Write({ sourcePlaceName, destinationPlaceName, setCurrState, senderID, recipientID }: WriteProps) {
+function Write({ sourcePlaceName, destinationPlaceName, setCurrState, currState, senderID, recipientID }: WriteProps) {
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
 
   const placeholderTexts: string[] = [
@@ -78,10 +79,14 @@ function Write({ sourcePlaceName, destinationPlaceName, setCurrState, senderID, 
   return (
     <>
       <To
-
+        setCurrState={setCurrState}
+        currState={currState}
       />
 
-      <From />
+      <From 
+        setCurrState={setCurrState}
+        currState={currState}
+      />
 
       <div>
         {
