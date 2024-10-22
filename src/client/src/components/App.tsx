@@ -178,79 +178,6 @@ function App() {
         : null
       }
 
-      {
-        (currState === "destinationMenu") ?
-        <Popup
-          name="create"
-          reStack={reStack}
-          title="Where are you sending this note?"
-          content={<DestinationMenu 
-            setCurrState={setCurrState}
-          />}
-          zIndex={stack.length + 1}
-          top={`${mouseLocation.y}px`}
-          left={`${mouseLocation.x}px`}
-          creationFlow={false}
-        />
-        : null
-      }
-
-      {
-        (currState === "destinationSelection") ?
-        <Popup
-          name="create"
-          reStack={reStack}
-          title="Enter your friend's inbox key"
-          content={<DestinationSelect 
-          />}
-          zIndex={stack.length + 1}
-          top={"50vh"}
-          left={"50vw"}
-          creationFlow={false}
-        />
-        : null
-      }
-
-
-      {
-        (currState === "messageCreation") ?
-        <Popup
-          name="create"
-          reStack={reStack}
-          title="Add note"
-          content={<Message 
-            sourcePlaceName={sourcePlaceName}
-            destinationPlaceName={destinationPlaceName}
-            setCurrState={setCurrState}
-            senderID={senderID}
-            recipientID={recipientID}
-            hasReadRules={hasReadRules}
-          />} 
-          zIndex={stack.length + 1}
-          top={`${mouseLocation.y}px`}
-          left={`${mouseLocation.x}px`}
-          creationFlow={false}
-        />
-        : null
-      }
-
-      {
-        (currState === "messageConfirmation") ?
-        <Popup
-          name="create"
-          reStack={reStack}
-          title="Thank you for submitting a note!"
-          content={<MessageConfirm 
-            setCurrState={setCurrState}
-          />} 
-          zIndex={stack.length + 1}
-          top={`${mouseLocation.y}px`}
-          left={`${mouseLocation.x}px`}
-          creationFlow={false}
-        />
-        : null
-      }
-      
       <Popup 
         name="info"
         reStack={reStack}
@@ -269,24 +196,7 @@ function App() {
         left="20px"
         creationFlow={false}
       />
-      {/* <Popup 
-        name="pins"
-        reStack={reStack}
-        title="My pins"
-        content={ <Pins 
-          placeName={placeName} 
-          setCurrState={setCurrState}
-          currState={currState}
-          pins={pins}
-          setPins={setPins}
-          setHighlightedPin={setHighlightedPin}
-        /> }
-        zIndex={stack.indexOf("pins") + 1}
-        top="20px"
-        left="calc(100vw - 400px - 20px)"
-        creationFlow={false}
-      /> */}
-
+      
       <Popup 
         name="write"
         reStack={reStack}
@@ -305,17 +215,6 @@ function App() {
         left="calc(100vw - 400px - 20px)"
         creationFlow={false}
       />
-
-      {/* <Popup 
-        name="favorites"
-        reStack={reStack}
-        title="My favorites"
-        content={ <Favorites /> }
-        zIndex={stack.indexOf("favorites") + 1}
-        top="50vh"
-        left="calc(100vw - 400px - 20px)"
-        creationFlow={false}
-      /> */}
 
       <Popup 
         name="inventory"
