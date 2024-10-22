@@ -17,6 +17,19 @@ type MapProps = {
   pins: PinInPrivate[];
 };
 
+function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+  let earthsRadius = 6371
+
+  const [ y1, y2, x1, x2 ]  = [lat1, lat2, lon1, lon2].map( deg => deg * Math.PI / 180 )
+  const dy = y2 - y1
+  const dx = x2 - x1
+  const a = Math.sin(dy / 2)**2 + Math.cos(y1) * Math.cos(y2) * Math.sin(dx / 2)**2
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const distance = earthsRadius * c
+
+  return distance
+}
+
 function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currState, setCurrState, highlightedPin, setHighlightedPin, pins }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -97,11 +110,14 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
   useEffect(() => {
     if (!highlightedPin) return;
     if (highlightedPin.longitude !== NO_COORDINATES.longitude && highlightedPin.latitude !== NO_COORDINATES.latitude) {
+      const { lng, lat } = map.current!.getCenter()
+      const distance = haversineDistance(lat, lng, highlightedPin.latitude, highlightedPin.longitude)
+      console.log(distance)
       map.current?.flyTo({
         center: [highlightedPin.longitude, highlightedPin.latitude],
         zoom: maxZoom,
         essential: true,
-        duration: 1500 + (maxZoom - map.current.getZoom()) * 250
+        duration: 1500 + (maxZoom - map.current.getZoom()) * 250 + (distance) * 1.5
       });
     }
   }, [highlightedPin]);
