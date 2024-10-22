@@ -298,7 +298,7 @@ function App() {
           currState={currState}
           senderID={senderID}
           recipientID={recipientID}
-          
+          pins={pins}
         /> }
         zIndex={stack.indexOf("write") + 1}
         top="20px"

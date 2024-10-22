@@ -34,7 +34,7 @@ function PinConfirm({placeName, setCurrState, currState, pinLocation, isSource,
             let pin = await createApproveClaimPin({latitude: pinLocation.latitude, longitude: pinLocation.longitude, place_name: placeName});
             setSenderID(pin.id);
             setSourcePlaceName(placeName);
-            setCurrState("pinMenu");
+            setCurrState("none");
             addPinToStorage(pin);
             setHighlightedPin(pin);
         }
@@ -42,7 +42,7 @@ function PinConfirm({placeName, setCurrState, currState, pinLocation, isSource,
             let pin = await createPin({latitude: pinLocation.latitude, longitude: pinLocation.longitude, place_name: placeName});
             setRecipientID(pin.id);
             setDestinationPlaceName(placeName);
-            setCurrState("messageCreation");
+            setCurrState("none");
         }
     }
 

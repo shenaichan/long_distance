@@ -2,7 +2,7 @@ import To from "components/popup/write/sections/To"
 import From from "components/popup/write/sections/From"
 import css from "components/popup/write/Write.module.css";
 import { useState, useRef, useEffect } from "react";
-import { createRelationshipAndMessage } from "api/api";
+import { createRelationshipAndMessage, PinInPrivate } from "api/api";
 import { creationState } from "components/App";
 
 type WriteProps = {
@@ -12,9 +12,10 @@ type WriteProps = {
   currState: creationState;
   senderID: number;
   recipientID: number;
+  pins: PinInPrivate[];
 }
 
-function Write({ sourcePlaceName, destinationPlaceName, setCurrState, currState, senderID, recipientID }: WriteProps) {
+function Write({ sourcePlaceName, destinationPlaceName, setCurrState, currState, senderID, recipientID, pins }: WriteProps) {
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
 
   const placeholderTexts: string[] = [
@@ -86,6 +87,7 @@ function Write({ sourcePlaceName, destinationPlaceName, setCurrState, currState,
       <From 
         setCurrState={setCurrState}
         currState={currState}
+        pins={pins}
       />
 
       <div>
