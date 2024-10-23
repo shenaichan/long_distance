@@ -51,11 +51,17 @@ function From({ sourceState, setSourceState, destState, setDestState, sourcePlac
                 style={{ "flex": 1, "margin": "2px" }}>
                 Choose on map
               </button>
-              <button
-                onClick={() => {setPinEntryMode("pin list")}}
-                style={{ "flex": 1, "margin": "2px" }}>
-                Pick from your pins
-              </button>
+              {
+                pins.length > 0 ?
+
+                <button
+                  onClick={() => {setPinEntryMode("pin list")}}
+                  style={{ "flex": 1, "margin": "2px" }}>
+                  Pick from your pins
+                </button> :
+                null
+                
+              }
             </>
           ) : ( pinEntryMode === "map select" ? 
             <>

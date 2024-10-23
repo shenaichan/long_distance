@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom"
 import Map from "components/map/Map";
 import Popup from "components/popup/Popup";
+import Menu from "components/popup/Menu";
 import Info from "components/popup/info/Info"
 import Write from "components/popup/write/Write"
 import Inventory from "components/popup/inventory/Inventory"
@@ -12,7 +13,7 @@ import { PinInPrivate, PinInPublic, getPinByPublicToken } from "api/api";
 import { useState, useEffect, useRef, ReactNode } from "react";
 
 export type popupProps = {title: string, content: ReactNode};
-export type popupKind = "info" | "pins" | "favorites" | "create" | "write" | "inventory";
+export type menuKind = "info" | "pins" | "favorites" | "create" | "write" | "inventory";
 
 export type coordinates = {longitude: number, latitude: number};
 export const NO_COORDINATES: coordinates = { longitude: -200, latitude: -100 };
@@ -40,7 +41,7 @@ export type pinCreationState =
 
 function App() {
 
-  const [stack, setStack] = useState<popupKind[]>(["info", "write", "inventory"]);
+  const [stack, setStack] = useState<menuKind[]>(["info", "write", "inventory"]);
   const [pinLocation, setPinLocation] = useState<coordinates>(NO_COORDINATES);
   // const [mouseLocation, setMouseLocation] = useState<mouseLocation>(NO_MOUSE_LOCATION);
   const [spinLevel, setSpinLevel] = useState<number>(5);
@@ -64,11 +65,11 @@ function App() {
   const { public_share_token } = useParams();
   console.log("PUBLIC_SHARE_TOKEN", public_share_token );
 
-  function reStack(popup: popupKind) {
+  function reStack(menu: menuKind) {
     let newStack = [...stack]
-    let index = newStack.indexOf(popup); 
+    let index = newStack.indexOf(menu); 
     newStack.splice(index, 1); 
-    newStack.push(popup);
+    newStack.push(menu);
     setStack(newStack);
   }
 
@@ -145,8 +146,6 @@ function App() {
       {
         (sourceState === "confirming" || destState === "confirming") ?
         <Popup
-          name="create"
-          reStack={reStack}
           title={ sourceState === "confirming" ? "Set your location here?" : "Set your friend's location here?"}
           content={<PinConfirm 
             placeName={placeName}
@@ -169,7 +168,12 @@ function App() {
           zIndex={stack.length + 1}
           top={"20px"}
           left={"calc(50vw - 200px)"}
-          creationFlow={false}
+          sourceState={sourceState}
+          setSourceState={setSourceState}
+          destState={destState}
+          setDestState={setDestState}
+          pinIsHighlighted={pinIsHighlighted}
+          setPinIsHighlighted={setPinIsHighlighted}
         />
         : null
       }
@@ -178,8 +182,6 @@ function App() {
       {
         (pinIsHighlighted) ?
         <Popup
-          name="create"
-          reStack={reStack}
           title={highlightedPin!.place_name}
           content={<PinMenu 
             // setCurrState={setCurrState}
@@ -192,12 +194,17 @@ function App() {
           zIndex={stack.length + 1}
           top={"20px"}
           left={"calc(50vw - 200px)"}
-          creationFlow={false}
+          sourceState={sourceState}
+          setSourceState={setSourceState}
+          destState={destState}
+          setDestState={setDestState}
+          pinIsHighlighted={pinIsHighlighted}
+          setPinIsHighlighted={setPinIsHighlighted}
         />
         : null
       }
 
-      <Popup 
+      <Menu 
         name="info"
         reStack={reStack}
         title="Welcome to Notes From Afar!"
@@ -213,10 +220,9 @@ function App() {
         zIndex={stack.indexOf("info") + 1}
         top="20px"
         left="20px"
-        creationFlow={false}
       />
       
-      <Popup 
+      <Menu 
         name="write"
         reStack={reStack}
         title="Write a note"
@@ -240,10 +246,9 @@ function App() {
         zIndex={stack.indexOf("write") + 1}
         top="20px"
         left="calc(100vw - 400px - 20px)"
-        creationFlow={false}
       />
 
-      <Popup 
+      <Menu 
         name="inventory"
         reStack={reStack}
         title="My inventory"
@@ -256,7 +261,6 @@ function App() {
         zIndex={stack.indexOf("inventory") + 1}
         top="50vh"
         left="calc(100vw - 400px - 20px)"
-        creationFlow={false}
       />
 
     </div>
