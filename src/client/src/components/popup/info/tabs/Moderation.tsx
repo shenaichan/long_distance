@@ -1,9 +1,4 @@
-type ModerationProps = {
-    hasReadRules: boolean;
-    setHasReadRules: (hasReadRules: boolean) => void;
-}
-
-function Moderation({ hasReadRules, setHasReadRules }: ModerationProps) {
+function Moderation() {
     return (
         <div>
             <p>

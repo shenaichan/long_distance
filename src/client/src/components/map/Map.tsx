@@ -2,16 +2,24 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { FeatureCollection } from "geojson";
 import { getApprovedPins, getPlaceName, PinInPrivate, PinInPublic } from "api/api";
-import { coordinates, mouseLocation, creationState, NO_COORDINATES } from "components/App";
+// import { coordinates, mouseLocation, creationState, NO_COORDINATES } from "components/App";
+import { coordinates, pinCreationState } from "components/App";
 import map_pin from "assets/map_pin.png";
 
 type MapProps = {
   setPinLocation: (location: coordinates) => void;
-  setMouseLocation: (location: mouseLocation) => void;
   spinLevel: number;
   setPlaceName: (placeName: string) => void;
-  currState: creationState;
-  setCurrState: (state: creationState) => void;
+  
+  sourceState: pinCreationState;
+  setSourceState: (state: pinCreationState) => void;
+
+  destState: pinCreationState;
+  setDestState: (state: pinCreationState) => void;
+
+  pinIsHighlighted: boolean;
+  setPinIsHighlighted: (set: boolean) => void;
+  
   highlightedPin: PinInPrivate | PinInPublic | null;
   setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void;
   pins: PinInPrivate[];
@@ -30,13 +38,18 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return distance
 }
 
-function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currState, setCurrState, highlightedPin, setHighlightedPin, pins }: MapProps) {
+function Map({ setPinLocation, spinLevel, setPlaceName,
+  sourceState, setSourceState, destState, setDestState,
+  pinIsHighlighted, setPinIsHighlighted, highlightedPin, setHighlightedPin, pins }: MapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const smallClusterColor: string = '#1084d0';
   const bigClusterColor: string = '#000080';
   const spinLevelRef = useRef(spinLevel);
-  const currStateRef = useRef(currState);
+  // const currStateRef = useRef(currState);
+  const sourceStateRef = useRef(sourceState);
+  const destStateRef = useRef(destState);
+  const pinIsHighlightedRef = useRef(pinIsHighlighted);
   const maxZoom = 17;
   // Above zoom level 5, do not rotate.
   const maxSpinZoom = 5;
@@ -47,7 +60,8 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
   let spinEnabled = true;
 
   function openPinMenu(feature: GeoJSON.Feature) {
-    setCurrState("pinMenu");
+    // setCurrState("pinMenu");
+    setPinIsHighlighted(true)
     if (feature.geometry.type === "Point" && feature.properties) {
       const pin = pins.find(pin => pin.id === feature.properties!.id);
       if (pin) {
@@ -109,25 +123,38 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
 
   useEffect(() => {
     if (!highlightedPin) return;
-    if (highlightedPin.longitude !== NO_COORDINATES.longitude && highlightedPin.latitude !== NO_COORDINATES.latitude) {
-      const { lng, lat } = map.current!.getCenter()
-      const distance = haversineDistance(lat, lng, highlightedPin.latitude, highlightedPin.longitude)
-      console.log(distance)
-      map.current?.flyTo({
-        center: [highlightedPin.longitude, highlightedPin.latitude],
-        zoom: maxZoom,
-        essential: true,
-        duration: 1500 + (maxZoom - map.current.getZoom()) * 250 + (distance) * 1.5
-      });
-    }
+    // if (highlightedPin.longitude !== NO_COORDINATES.longitude && highlightedPin.latitude !== NO_COORDINATES.latitude) {
+    const { lng, lat } = map.current!.getCenter()
+    const distance = haversineDistance(lat, lng, highlightedPin.latitude, highlightedPin.longitude)
+    console.log(distance)
+    map.current?.flyTo({
+      center: [highlightedPin.longitude, highlightedPin.latitude],
+      zoom: maxZoom,
+      essential: true,
+      duration: 1500 + (maxZoom - map.current.getZoom()) * 250 + (distance) * 1.5
+    });
+    // }
   }, [highlightedPin]);
 
   useEffect(() => {
-    currStateRef.current = currState;
+    // currStateRef.current = currState;
+    sourceStateRef.current = sourceState;
+    destStateRef.current = destState;
+    pinIsHighlightedRef.current = pinIsHighlighted;
     if (!map.current) return;
     if (!mapContainer.current) return;
-    if (currState === "none" || currState === "pinCreation" || currState === "destinationCreation") {
-      if (currState === "pinCreation" || currState === "destinationCreation") {
+    if ( sourceState === "confirming" || destState === "confirming" || pinIsHighlighted) {
+      mapContainer.current.style.cursor = "default";
+      map.current.scrollZoom.disable();
+      map.current.boxZoom.disable();
+      map.current.dragPan.disable();
+      map.current.doubleClickZoom.disable();
+      map.current.touchZoomRotate.disable();
+      map.current.dragRotate.disable();
+      map.current.touchZoomRotate.disableRotation();
+    }
+    else {
+      if ( sourceState === "selecting" || destState === "selecting" ) {
         mapContainer.current.style.cursor = `url(${map_pin}) 16 32, auto`;
       }
       else {
@@ -141,17 +168,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
       map.current.dragRotate.enable();
       map.current.touchZoomRotate.enableRotation();
     }
-    else {
-      mapContainer.current.style.cursor = "default";
-      map.current.scrollZoom.disable();
-      map.current.boxZoom.disable();
-      map.current.dragPan.disable();
-      map.current.doubleClickZoom.disable();
-      map.current.touchZoomRotate.disable();
-      map.current.dragRotate.disable();
-      map.current.touchZoomRotate.disableRotation();
-    }
-  }, [currState]);
+  }, [ sourceState, destState, pinIsHighlighted ]);
 
   useEffect(() => {
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_KEY;
@@ -262,7 +279,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
       });
 
       map.current.on('click', 'unclustered-point', (e) => {
-        if (currStateRef.current === "pinCreation" || currStateRef.current === "destinationCreation") return;
+        if ( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" ) return;
         if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
           console.log(e.features[0])
           console.log(e.features[0].geometry.coordinates.slice());
@@ -310,7 +327,7 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
 
     map.current.on('click', function (e) {
       if (!map.current) return;
-      if ((currStateRef.current === "pinCreation" || currStateRef.current === "destinationCreation") && map.current.getZoom() > 5) {
+      if (( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" ) && map.current.getZoom() > 5) {
         var coordinates = e.lngLat;
         setPinLocation({longitude: coordinates.lng, latitude: coordinates.lat});
         map.current.flyTo({
@@ -319,12 +336,14 @@ function Map({ setPinLocation, setMouseLocation, spinLevel, setPlaceName, currSt
           essential: true,
           duration: 1500 + (maxZoom - map.current.getZoom()) * 250
         });
-        setMouseLocation({x: window.innerWidth / 2, y: window.innerHeight / 2});
-        if (currStateRef.current === "pinCreation") {
-          setCurrState("pinConfirmation");
+        // setMouseLocation({x: window.innerWidth / 2, y: window.innerHeight / 2});
+        if ( sourceStateRef.current === "selecting") {
+          // setCurrState("pinConfirmation");
+          setSourceState("confirming")
         }
         else {
-          setCurrState("destinationConfirmation");
+          // setCurrState("destinationConfirmation");
+          setDestState("confirming")
         }
         getPlaceName(coordinates.lat, coordinates.lng).then(placeName => {
           console.log(placeName);

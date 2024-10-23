@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import css from "components/popup/inventory/Inventory.module.css"
 import { PinInPrivate, PinInPublic } from "api/api"
-import { creationState } from "components/App"
+// import { creationState } from "components/App"
 
 type InventoryProps = {
     pins: PinInPrivate[]
     setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void
-    setCurrState: (state: creationState) => void
+    // setCurrState: (state: creationState) => void
+    setPinIsHighlighted: (pinState: boolean) => void
 }
 
-function Inventory({ pins, setHighlightedPin, setCurrState }: InventoryProps) {
+function Inventory({ pins, setHighlightedPin, setPinIsHighlighted }: InventoryProps) {
     const [tab, setTab] = useState("My notes");
     
     return(
@@ -43,7 +44,8 @@ function Inventory({ pins, setHighlightedPin, setCurrState }: InventoryProps) {
                                         onClick={
                                             () => {
                                                 setHighlightedPin(pin);
-                                                setCurrState("pinMenu");
+                                                // setCurrState("pinMenu");
+                                                setPinIsHighlighted(true);
                                             }
                                         }
                                         style={{cursor: "pointer"}}

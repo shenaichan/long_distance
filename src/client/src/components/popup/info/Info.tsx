@@ -19,11 +19,11 @@ type InfoProps = {
     soundLevel: number;
     setSoundLevel: (soundLevel: number) => void;
     audioRef: React.RefObject<HTMLAudioElement>;
-    hasReadRules: boolean;
-    setHasReadRules: (hasReadRules: boolean) => void;
+    // hasReadRules: boolean;
+    // setHasReadRules: (hasReadRules: boolean) => void;
 }
 
-function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef, hasReadRules, setHasReadRules}: InfoProps) {
+function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef }: InfoProps) {
     const [tab, setTab] = useState("About");
     const [numKM, setNumKM] = useState(0);
     const [dateTime, _] = useState(new Date().toLocaleString());
@@ -94,7 +94,7 @@ function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef, has
                         {tab === "Privacy Policy" && <Privacy />}
                         {tab === "Terms of Use" && <Terms />}
                         {tab === "FAQs" && <FAQs />}
-                        {tab === "Moderation" && <Moderation hasReadRules={hasReadRules} setHasReadRules={setHasReadRules} />}
+                        {tab === "Moderation" && <Moderation/>}
                         {tab === "Donate" && <Donate />}
                         {tab === "Contact" && <Contact />}
                         {tab === "Acknowledgements" && <Acknowledgements />}

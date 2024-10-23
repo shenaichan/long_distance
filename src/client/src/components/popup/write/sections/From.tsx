@@ -1,21 +1,38 @@
-import { creationState } from "components/App"
+import { pinCreationState } from "components/App"
 import { useState, useEffect } from "react"
 import { PinInPrivate } from "api/api"
 
 type FromProps = {
-  setCurrState: (state: creationState) => void;
-  currState: creationState;
+  // setCurrState: (state: creationState) => void;
+  // currState: creationState;
+
+  sourceState: pinCreationState;
+  setSourceState: (state: pinCreationState) => void;
+
+  destState: pinCreationState;
+  setDestState: (state: pinCreationState) => void;
+
+  sourcePlaceName: string;
+
   pins: PinInPrivate[];
 }
 
-function From({ setCurrState, currState, pins }: FromProps) {
+function From({ sourceState, setSourceState, destState, setDestState, sourcePlaceName, pins }: FromProps) {
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")
 
   useEffect(() => {
-    if (currState === "pinCreation" && pinEntryMode === "map select") {
+    console.log(destState)
+    if ( ( destState === "selecting" || destState === "confirming" ) && pinEntryMode === "map select") {
       setPinEntryMode("neither yet")
+      setSourceState("inactive")
     }
-  }, [currState])
+  }, [destState])
+
+  useEffect(() => {
+    if ( sourceState === "selected" ) {
+      setPinEntryMode("finalized")
+    }
+  }, [sourceState])
 
   return (
     <>
@@ -27,12 +44,12 @@ function From({ setCurrState, currState, pins }: FromProps) {
           pinEntryMode === "neither yet" ? (
             <>
               <button
-                onClick={() => {setCurrState("destinationCreation"); setPinEntryMode("map select");}}
+                onClick={() => { setSourceState("selecting"); setPinEntryMode("map select"); }}
                 style={{ "flex": 1, "margin": "2px" }}>
                 Choose on map
               </button>
               <button
-                onClick={() => {setPinEntryMode("friend code input")}}
+                onClick={() => {setPinEntryMode("pin list")}}
                 style={{ "flex": 1, "margin": "2px" }}>
                 Pick from your pins
               </button>
@@ -40,11 +57,11 @@ function From({ setCurrState, currState, pins }: FromProps) {
           ) : ( pinEntryMode === "map select" ? 
             <>
               <button
-                onClick={() => {setCurrState("none"); setPinEntryMode("neither yet");}}
+                onClick={() => { setSourceState("inactive"); setPinEntryMode("neither yet"); }}
                 style={{ "flex": 1, "margin": "2px" }}>
                 Cancel map selection
               </button>
-            </> :
+            </> : ( pinEntryMode === "pin list" ?
             <>
               <select style={{fontSize: "16px", fontFamily: "arial", lineHeight: "1", margin: "4px 2px 2px 2px", width: "calc(100% - 134px)"}}>
                 { pins.map( pin => <option
@@ -53,16 +70,19 @@ function From({ setCurrState, currState, pins }: FromProps) {
                     </option>)}
               </select>
               <button
-                onClick={() => {setCurrState("none"); setPinEntryMode("neither yet");}}
+                onClick={() => { setSourceState("inactive"); setPinEntryMode("neither yet"); }}
                 style={{ "margin": "2px" }}>
                 Back
               </button>
               <button
-                onClick={() => {setCurrState("none"); setPinEntryMode("neither yet");}}
+                onClick={() => { setSourceState("selected"); setPinEntryMode("neither yet"); }}
                 style={{ "margin": "2px" }}>
                 Confirm
               </button>
-            </>
+            </> :
+            <>
+              <p>{sourcePlaceName}</p>
+            </> )
           )
         }
         

@@ -1,19 +1,34 @@
-import { creationState } from "components/App"
+import { pinCreationState } from "components/App"
 import { useState, useEffect } from "react"
 
 type ToProps = {
-  setCurrState: (state: creationState) => void;
-  currState: creationState;
+  // setCurrState: (state: creationState) => void;
+  // currState: creationState;
+
+  sourceState: pinCreationState;
+  setSourceState: (state: pinCreationState) => void;
+
+  destState: pinCreationState;
+  setDestState: (state: pinCreationState) => void;
+
+  destinationPlaceName: string;
 }
 
-function To({ setCurrState, currState }: ToProps) {
+function To({ sourceState, setSourceState, destState, setDestState, destinationPlaceName}: ToProps) {
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")
 
   useEffect(() => {
-    if (currState === "pinCreation" && pinEntryMode === "map select") {
+    if ( ( sourceState === "selecting" || sourceState === "confirming" ) && pinEntryMode === "map select") {
       setPinEntryMode("neither yet")
+      setDestState("inactive")
     }
-  }, [currState])
+  }, [sourceState])
+
+  useEffect(() => {
+    if ( destState === "selected" ) {
+      setPinEntryMode("finalized")
+    }
+  }, [destState])
 
   return (
     <>
@@ -25,7 +40,7 @@ function To({ setCurrState, currState }: ToProps) {
           pinEntryMode === "neither yet" ? (
             <>
               <button
-                onClick={() => {setCurrState("destinationCreation"); setPinEntryMode("map select");}}
+                onClick={() => { setDestState("selecting"); setPinEntryMode("map select"); }}
                 style={{ "flex": 1, "margin": "2px" }}>
                 Choose on map
               </button>
@@ -38,27 +53,30 @@ function To({ setCurrState, currState }: ToProps) {
           ) : ( pinEntryMode === "map select" ? 
             <>
               <button
-                onClick={() => {setCurrState("none"); setPinEntryMode("neither yet");}}
+                onClick={() => { setDestState("inactive"); setPinEntryMode("neither yet"); }}
                 style={{ "flex": 1, "margin": "2px" }}>
                 Cancel map selection
               </button>
-            </> :
+            </> : (pinEntryMode === "friend code input" ?
             <>
               <input 
                 placeholder="Enter friend code"
                 style={{ "flex": 1, "margin": "2px", "fontFamily": "arial", "fontSize": "16px", "lineHeight": "1", "padding": "0px" }}
               ></input>
               <button
-                onClick={() => {setCurrState("none"); setPinEntryMode("neither yet");}}
+                onClick={() => { setDestState("inactive"); setPinEntryMode("neither yet"); }}
                 style={{ "margin": "2px" }}>
                 Back
               </button>
               <button
-                onClick={() => {setCurrState("none"); setPinEntryMode("neither yet");}}
+                onClick={() => { setDestState("selected"); setPinEntryMode("neither yet"); }}
                 style={{ "margin": "2px" }}>
                 Confirm
               </button>
-            </>
+            </> : 
+            <>
+               <p>{destinationPlaceName}</p>
+            </> )
           )
         }
         

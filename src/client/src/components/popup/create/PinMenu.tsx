@@ -1,17 +1,17 @@
-import { creationState } from "components/App";
+// import { creationState } from "components/App";
 import css from "components/popup/create/PinMenu.module.css";
 import { PinInPrivate, PinInPublic, getRelationshipsStarted, getRelationshipsFinished, getMessageThread } from "api/api";
 import { useEffect, useState } from "react";
 
 type PinMenuProps = {
-    setCurrState: (state: creationState) => void;
+    // setCurrState: (state: creationState) => void;
     highlightedPin: PinInPrivate | PinInPublic | null;
     setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void;
-    setSenderID: (id: number) => void;
-    setSourcePlaceName: (placeName: string) => void;
+    // setSenderID: (id: number) => void;
+    // setSourcePlaceName: (placeName: string) => void;
 }
 
-function PinMenu({setCurrState, highlightedPin, setHighlightedPin, setSenderID, setSourcePlaceName}: PinMenuProps) {
+function PinMenu({ highlightedPin, setHighlightedPin }: PinMenuProps) {
     const [started, setStarted] = useState<PinInPublic[]>([]);
     const [finished, setFinished] = useState<PinInPublic[]>([]);
 
@@ -19,11 +19,11 @@ function PinMenu({setCurrState, highlightedPin, setHighlightedPin, setSenderID, 
         getMessageThread(sender_id, recipient_id);
     }
 
-    function addNote() {
-        setCurrState("destinationMenu");
-        setSenderID(highlightedPin!.id);
-        setSourcePlaceName(highlightedPin!.place_name);
-    }
+    // function addNote() {
+    //     setCurrState("destinationMenu");
+    //     setSenderID(highlightedPin!.id);
+    //     setSourcePlaceName(highlightedPin!.place_name);
+    // }
 
     function getPrivateInboxLink() {
         if (!highlightedPin) return;
@@ -59,7 +59,7 @@ function PinMenu({setCurrState, highlightedPin, setHighlightedPin, setSenderID, 
                 highlightedPin && "private_allow_mail_token" in highlightedPin ?
                 <div>
                     <div style={{display: "flex"}}>
-                        <button className={css.fillButton} onClick={addNote}>Add note</button>
+                        {/* <button className={css.fillButton} onClick={addNote}>Add note</button> */}
                         <button className={css.fillButton}>Get private link</button>
                     </div>
                     <div style={{display: "flex"}}>

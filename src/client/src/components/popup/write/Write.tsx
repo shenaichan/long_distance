@@ -3,19 +3,29 @@ import From from "components/popup/write/sections/From"
 import css from "components/popup/write/Write.module.css";
 import { useState, useRef, useEffect } from "react";
 import { createRelationshipAndMessage, PinInPrivate } from "api/api";
-import { creationState } from "components/App";
+import { pinCreationState } from "components/App";
 
 type WriteProps = {
   sourcePlaceName: string;
   destinationPlaceName: string;
-  setCurrState: (state: creationState) => void;
-  currState: creationState;
+  // setCurrState: (state: creationState) => void;
+  // currState: creationState;
+
+  sourceState: pinCreationState;
+  setSourceState: (state: pinCreationState) => void;
+
+  destState: pinCreationState;
+  setDestState: (state: pinCreationState) => void;
+
   senderID: number;
   recipientID: number;
   pins: PinInPrivate[];
 }
 
-function Write({ sourcePlaceName, destinationPlaceName, setCurrState, currState, senderID, recipientID, pins }: WriteProps) {
+function Write({ sourcePlaceName, destinationPlaceName,
+  sourceState, setSourceState,
+  destState, setDestState,
+  senderID, recipientID, pins }: WriteProps) {
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
 
   const placeholderTexts: string[] = [
@@ -45,7 +55,7 @@ function Write({ sourcePlaceName, destinationPlaceName, setCurrState, currState,
 
   async function submitMessage() {
     await createRelationshipAndMessage({ sender: senderID, recipient: recipientID, message: message });
-    setCurrState("messageConfirmation");
+    // setCurrState("messageConfirmation");
   }
 
 
@@ -80,13 +90,31 @@ function Write({ sourcePlaceName, destinationPlaceName, setCurrState, currState,
   return (
     <>
       <To
-        setCurrState={setCurrState}
-        currState={currState}
+        // setCurrState={setCurrState}
+        // currState={currState}
+
+        sourceState={sourceState}
+        setSourceState={setSourceState}
+
+        destState={destState}
+        setDestState={setDestState}
+
+        destinationPlaceName={destinationPlaceName}
+        
       />
 
       <From 
-        setCurrState={setCurrState}
-        currState={currState}
+        // setCurrState={setCurrState}
+        // currState={currState}
+
+        sourceState={sourceState}
+        setSourceState={setSourceState}
+
+        destState={destState}
+        setDestState={setDestState}
+
+        sourcePlaceName={sourcePlaceName}
+
         pins={pins}
       />
 
