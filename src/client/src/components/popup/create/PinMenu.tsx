@@ -30,8 +30,7 @@ function PinMenu({ highlightedPin, setHighlightedPin }: PinMenuProps) {
         if ("private_allow_mail_token" in highlightedPin) {
         navigator.clipboard.writeText(highlightedPin.private_allow_mail_token)
             .then(() => {
-                console.log('Private inbox link copied to clipboard');
-                alert('Private inbox link copied to clipboard!');
+                alert('Friend code copied to clipboard!');
             })
             .catch(err => {
                 console.error('Failed to copy: ', err);
@@ -59,12 +58,8 @@ function PinMenu({ highlightedPin, setHighlightedPin }: PinMenuProps) {
                 highlightedPin && "private_allow_mail_token" in highlightedPin ?
                 <div>
                     <div style={{display: "flex"}}>
-                        {/* <button className={css.fillButton} onClick={addNote}>Add note</button> */}
-                        <button className={css.fillButton}>Get private link</button>
-                    </div>
-                    <div style={{display: "flex"}}>
-                        <button className={css.fillButton} onClick={getPrivateInboxLink}>Get private inbox link</button>
-                        <button className={css.fillButton}>Delete pin</button>
+                        <button className={css.fillButton} onClick={getPrivateInboxLink}>Get friend code</button>
+                        <button className={css.fillButton}>Get editor link</button>
                     </div>
                 </div>
                 : null
