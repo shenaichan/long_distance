@@ -157,6 +157,24 @@ def get_message_thread(request, sender_id: int, recipient_id: int):
     '''
     return thread
 
+@api.post("/get_all_my_message_threads", response=List[List[MessageOut]])
+def get_all_my_message_threads(request, data: List[int]):
+    ret = [[],[]] # sent by me, sent to me
+    relationships = ( Relationship.objects.select_related("message").select_related("response").select_related("sender").filter(sender__in=data)
+                    | Relationship.objects.select_related("message").select_related("response").select_related("sender").filter(recipient__in=data) )
+
+    for relationship in relationships:
+        if relationship.sender.id in data:
+            ret[0].append(relationship.message)
+            if relationship.response:
+                ret[1].append(relationship.response)
+        else:
+            ret[1].append(relationship.message)
+            if relationship.response:
+                ret[0].append(relationship.response)
+
+    return ret
+
 def write_to(request):
     return
 

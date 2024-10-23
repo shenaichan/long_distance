@@ -14,13 +14,19 @@ type FromProps = {
   setDestState: (state: pinCreationState) => void;
 
   sourcePlaceName: string;
+  setSourcePlaceName: (placeName: string) => void;
 
   pins: PinInPrivate[];
 }
 
-function From({ sourceState, setSourceState, destState, setDestState, sourcePlaceName, pins }: FromProps) {
+function From({ sourceState, setSourceState, destState, setDestState, sourcePlaceName, setSourcePlaceName, pins }: FromProps) {
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")
 
+  useEffect(() => {
+    if (pins.length > 0) {
+      setSourcePlaceName(pins[0].place_name);
+    }
+  }, [])
   useEffect(() => {
     console.log(destState)
     if ( ( destState === "selecting" || destState === "confirming" ) && pinEntryMode === "map select") {
@@ -60,7 +66,7 @@ function From({ sourceState, setSourceState, destState, setDestState, sourcePlac
                   Pick from your pins
                 </button> :
                 null
-                
+
               }
             </>
           ) : ( pinEntryMode === "map select" ? 
@@ -72,8 +78,11 @@ function From({ sourceState, setSourceState, destState, setDestState, sourcePlac
               </button>
             </> : ( pinEntryMode === "pin list" ?
             <>
-              <select style={{fontSize: "16px", fontFamily: "arial", lineHeight: "1", margin: "4px 2px 2px 2px", width: "calc(100% - 134px)"}}>
+              <select style={{fontSize: "16px", fontFamily: "arial", lineHeight: "1", margin: "4px 2px 2px 2px", width: "calc(100% - 134px)"}}
+                onChange={(e) => {setSourcePlaceName(e.target.value); console.log(sourcePlaceName);}}
+              >
                 { pins.map( pin => <option
+                    key={pin.id}
                     style={{overflow: "hidden"}}
                     >{pin.place_name}
                     </option>)}

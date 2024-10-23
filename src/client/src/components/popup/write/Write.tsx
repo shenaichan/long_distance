@@ -7,7 +7,9 @@ import { pinCreationState } from "components/App";
 
 type WriteProps = {
   sourcePlaceName: string;
+  setSourcePlaceName: (placeName: string) => void;
   destinationPlaceName: string;
+  setDestinationPlaceName: (placeName: string) => void;
   // setCurrState: (state: creationState) => void;
   // currState: creationState;
 
@@ -22,7 +24,8 @@ type WriteProps = {
   pins: PinInPrivate[];
 }
 
-function Write({ sourcePlaceName, destinationPlaceName,
+function Write({ sourcePlaceName, setSourcePlaceName, 
+  destinationPlaceName, setDestinationPlaceName,
   sourceState, setSourceState,
   destState, setDestState,
   senderID, recipientID, pins }: WriteProps) {
@@ -53,6 +56,13 @@ function Write({ sourcePlaceName, destinationPlaceName,
 
   function startWriting() {
     setWriting(true);
+  }
+
+  function reset() {
+    setWriting(false);
+    setSourceState("inactive");
+    setDestState("inactive");
+    setMessage("");
   }
 
   async function submitMessage() {
@@ -108,6 +118,7 @@ function Write({ sourcePlaceName, destinationPlaceName,
           setDestState={setDestState}
 
           destinationPlaceName={destinationPlaceName}
+          setDestinationPlaceName={setDestinationPlaceName}
           
         />
 
@@ -122,6 +133,7 @@ function Write({ sourcePlaceName, destinationPlaceName,
           setDestState={setDestState}
 
           sourcePlaceName={sourcePlaceName}
+          setSourcePlaceName={setSourcePlaceName}
 
           pins={pins}
         />
@@ -156,12 +168,19 @@ function Write({ sourcePlaceName, destinationPlaceName,
             )
           }
         </div>
+        <div style={{display: "flex"}}>
 
-        <button onClick={submitMessage} disabled={ 
-            ! ( sourceState === "selected" && destState === "selected" && message.trim() ) 
-          }>
-          Submit!
-        </button>
+          <button onClick={reset} style={{display: "inline", flex: "1", marginRight: "2px" }}>
+            Reset
+          </button>
+          <button onClick={submitMessage} disabled={ 
+              ! ( sourceState === "selected" && destState === "selected" && message.trim() ) 
+            }
+            style={{display: "inline", flex: "1", marginLeft: "2px" }}>
+            Submit!
+          </button>
+
+        </div>
       </> 
       :
       <>

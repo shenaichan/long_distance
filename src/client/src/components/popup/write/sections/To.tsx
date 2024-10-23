@@ -13,9 +13,10 @@ type ToProps = {
   setDestState: (state: pinCreationState) => void;
 
   destinationPlaceName: string;
+  setDestinationPlaceName: (placeName: string) => void;
 }
 
-function To({ sourceState, setSourceState, destState, setDestState, destinationPlaceName}: ToProps) {
+function To({ sourceState, setSourceState, destState, setDestState, destinationPlaceName, setDestinationPlaceName}: ToProps) {
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")
 
   useEffect(() => {

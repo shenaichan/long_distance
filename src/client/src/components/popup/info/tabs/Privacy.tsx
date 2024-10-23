@@ -1,7 +1,7 @@
 function Privacy() {
     return (
         <div>
-            <p>Privacy</p>
+            <p>TBD</p>
         </div>
     )
 }

@@ -1,7 +1,7 @@
 function Terms() {
     return (
         <div>
-            <p>Terms</p>
+            <p>TBD</p>
         </div>
     )
 }

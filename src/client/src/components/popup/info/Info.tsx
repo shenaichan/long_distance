@@ -57,26 +57,17 @@ function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef }: I
                                 Terms of Use
                             </p>
                         </li>
-                        <li role="tab" onClick={() => setTab("FAQs")}>
-                            <p style={{fontWeight: tab === "FAQs" ? "bold" : "normal"}}>
-                                FAQs
-                            </p>
-                        </li>
+                        
                     </menu>
                     <menu role="tablist" className={`multirows ${css.tabs}`}>
-                        <li role="tab" onClick={() => setTab("Moderation")}>
-                            <p style={{fontWeight: tab === "Moderation" ? "bold" : "normal"}}>
-                                Moderation
-                            </p>
-                        </li>
                         <li role="tab" onClick={() => setTab("Donate")}>
                             <p style={{fontWeight: tab === "Donate" ? "bold" : "normal"}}>
                                 Donate
                             </p>
                         </li>
-                        <li role="tab" onClick={() => setTab("Contact")}>
-                            <p style={{fontWeight: tab === "Contact" ? "bold" : "normal"}}>
-                                Contact
+                        <li role="tab" onClick={() => setTab("FAQs")}>
+                            <p style={{fontWeight: tab === "FAQs" ? "bold" : "normal"}}>
+                                FAQs
                             </p>
                         </li>
                         <li role="tab" onClick={() => setTab("Acknowledgements")}>

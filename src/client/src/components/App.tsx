@@ -8,7 +8,7 @@ import Inventory from "components/popup/inventory/Inventory"
 import PinConfirm from "components/popup/create/PinConfirm"
 import PinMenu from "components/popup/create/PinMenu"
 import longdist from "assets/longdist_long.mp3";
-import { PinInPrivate, PinInPublic, getPinByPublicToken } from "api/api";
+import { PinInPrivate, PinInPublic, getPinByPublicToken, getAllMyMessageThreads, MessageIn } from "api/api";
 
 import { useState, useEffect, useRef, ReactNode } from "react";
 
@@ -54,6 +54,8 @@ function App() {
   const [recipientID, setRecipientID] = useState<number>(-1);
   // const [hasReadRules, setHasReadRules] = useState<boolean>(false);
   const [pins, setPins] = useState<PinInPrivate[]>([]);
+  const [sentNotes, setSentNotes] = useState<MessageIn[]>([]);
+  const [receivedNotes, setReceivedNotes] = useState<MessageIn[]>([]);
   const [highlightedPin, setHighlightedPin] = useState<PinInPrivate | PinInPublic | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -73,12 +75,21 @@ function App() {
     setStack(newStack);
   }
 
+  const getAllNotes = async (pinIds: number[]) => {
+    const myNotes = await getAllMyMessageThreads(pinIds)
+    console.log(myNotes)
+    setSentNotes(myNotes[0])
+    setReceivedNotes(myNotes[1])
+  }
+
   useEffect(() => {
     const myPinsString = localStorage.getItem("pins");
     let myPins: PinInPrivate[] = [];
     if (myPinsString){
       myPins = (JSON.parse(myPinsString) as PinInPrivate[])
       setPins(myPins)
+      const pinIds = myPins.map(pin => pin.id)
+      getAllNotes(pinIds)
     }
 
     if (public_share_token) {
@@ -228,7 +239,9 @@ function App() {
         title="Write a note"
         content={ <Write 
           sourcePlaceName={sourcePlaceName}
+          setSourcePlaceName={setSourcePlaceName}
           destinationPlaceName={destinationPlaceName}
+          setDestinationPlaceName={setDestinationPlaceName}
           // setCurrState={setCurrState}
           // currState={currState}
 

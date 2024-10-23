@@ -10,7 +10,7 @@ type MessageOut = {
     message:string
 }
 
-type MessageIn = {
+export type MessageIn = {
     content:string
 }
 
@@ -37,6 +37,20 @@ export type PinInPublic = {
 const BASE_URL = "http://127.0.0.1:8000/api/"
 
 
+
+export async function getAllMyMessageThreads(sender_ids: number[]) {
+    const messagesResponse = await fetch(
+        `${BASE_URL}get_all_my_message_threads`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(sender_ids)
+        })
+    const messages = await messagesResponse.json()
+    return messages as MessageIn[][]
+}
 
 export async function getMessageThread(sender_id: number, recipient_id: number) {
     const messageThreadResponse = await fetch(
