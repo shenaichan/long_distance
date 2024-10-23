@@ -1,5 +1,6 @@
 import { pinCreationState } from "components/App"
 import { useState, useEffect } from "react"
+import css from "components/popup/Popup.module.css"
 
 type ToProps = {
   // setCurrState: (state: creationState) => void;
@@ -27,6 +28,8 @@ function To({ sourceState, setSourceState, destState, setDestState, destinationP
   useEffect(() => {
     if ( destState === "selected" ) {
       setPinEntryMode("finalized")
+    } else if ( destState === "inactive" ) {
+      setPinEntryMode("neither yet")
     }
   }, [destState])
 
@@ -75,7 +78,7 @@ function To({ sourceState, setSourceState, destState, setDestState, destinationP
               </button>
             </> : 
             <>
-               <p>{destinationPlaceName}</p>
+               <p className={css.truncated} style={{margin: "0px 0px 3px 3px"}}>{destinationPlaceName}</p>
             </> )
           )
         }

@@ -1,7 +1,7 @@
 .info {
     background-color: #fff;
     padding: 7px;
-    max-height: 400px;
+    max-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
 }

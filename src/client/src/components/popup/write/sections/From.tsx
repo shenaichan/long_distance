@@ -1,6 +1,7 @@
 import { pinCreationState } from "components/App"
 import { useState, useEffect } from "react"
 import { PinInPrivate } from "api/api"
+import css from "components/popup/Popup.module.css"
 
 type FromProps = {
   // setCurrState: (state: creationState) => void;
@@ -31,6 +32,8 @@ function From({ sourceState, setSourceState, destState, setDestState, sourcePlac
   useEffect(() => {
     if ( sourceState === "selected" ) {
       setPinEntryMode("finalized")
+    } else if ( sourceState === "inactive" ) {
+      setPinEntryMode("neither yet")
     }
   }, [sourceState])
 
@@ -81,7 +84,7 @@ function From({ sourceState, setSourceState, destState, setDestState, sourcePlac
               </button>
             </> :
             <>
-              <p>{sourcePlaceName}</p>
+              <p className={css.truncated} style={{margin: "0px 0px 3px 3px"}}>{sourcePlaceName}</p>
             </> )
           )
         }

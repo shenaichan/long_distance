@@ -28,7 +28,7 @@ function Popup({title, content, reStack, name, zIndex, top, left, creationFlow}:
                     height: isMinimized ? "36px" : "auto", 
                     resize: (isMinimized || creationFlow) ? "none" : "both"}}>
                 <div className={creationFlow ? "title-bar" : `title-bar ${css.handle}`}>
-                    <div className={`title-bar-text ${css.titleText}`}>
+                    <div className={`title-bar-text ${css.titleText} ${css.truncated}`}>
                         {title}
                     </div>
                     {

@@ -53,9 +53,6 @@ p, li, button {
 .titleText {
     font-size: 16px;
     cursor: pointer;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 .windowBody {
@@ -69,4 +66,10 @@ button {
     display: block;
     margin: 0 auto;
     background-color: #c8e8e8;
+}
+
+.truncated {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }

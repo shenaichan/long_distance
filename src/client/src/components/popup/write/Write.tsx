@@ -26,6 +26,7 @@ function Write({ sourcePlaceName, destinationPlaceName,
   sourceState, setSourceState,
   destState, setDestState,
   senderID, recipientID, pins }: WriteProps) {
+
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
 
   const placeholderTexts: string[] = [
@@ -48,6 +49,7 @@ function Write({ sourcePlaceName, destinationPlaceName,
   const [writing, setWriting] = useState(false);
   const [textIndex, setTextIndex] = useState(Math.floor(Math.random() * placeholderTexts.length));
   const [message, setMessage] = useState("");
+  const [creating, setCreating] = useState<boolean>(true);
 
   function startWriting() {
     setWriting(true);
@@ -55,9 +57,12 @@ function Write({ sourcePlaceName, destinationPlaceName,
 
   async function submitMessage() {
     await createRelationshipAndMessage({ sender: senderID, recipient: recipientID, message: message });
+    setSourceState("inactive");
+    setDestState("inactive");
+    setMessage("");
+    setCreating(false);
     // setCurrState("messageConfirmation");
   }
-
 
   useEffect(() => {
     if (textEntryRef.current) {
@@ -89,70 +94,84 @@ function Write({ sourcePlaceName, destinationPlaceName,
 
   return (
     <>
-      <To
-        // setCurrState={setCurrState}
-        // currState={currState}
 
-        sourceState={sourceState}
-        setSourceState={setSourceState}
+    { creating ? 
+      <>
+        <To
+          // setCurrState={setCurrState}
+          // currState={currState}
 
-        destState={destState}
-        setDestState={setDestState}
+          sourceState={sourceState}
+          setSourceState={setSourceState}
 
-        destinationPlaceName={destinationPlaceName}
-        
-      />
+          destState={destState}
+          setDestState={setDestState}
 
-      <From 
-        // setCurrState={setCurrState}
-        // currState={currState}
+          destinationPlaceName={destinationPlaceName}
+          
+        />
 
-        sourceState={sourceState}
-        setSourceState={setSourceState}
+        <From 
+          // setCurrState={setCurrState}
+          // currState={currState}
 
-        destState={destState}
-        setDestState={setDestState}
+          sourceState={sourceState}
+          setSourceState={setSourceState}
 
-        sourcePlaceName={sourcePlaceName}
+          destState={destState}
+          setDestState={setDestState}
 
-        pins={pins}
-      />
+          sourcePlaceName={sourcePlaceName}
 
-      <div>
-        {
-          writing ? (
-            <div>
-              <textarea className={`window ${css.textEntryBox}`}
-                ref={textEntryRef}
-                style={{ width: "100%", resize: "none" }}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-              ></textarea>
+          pins={pins}
+        />
 
-            </div>
-          ) : (
-            <div className={`window ${css.textEntryBox}`}
-              onClick={startWriting}
-              style={{ marginBottom: "5px" }}
-            >
+        <div>
+          {
+            writing ? (
+              <div>
+                <textarea className={`window ${css.textEntryBox}`}
+                  ref={textEntryRef}
+                  style={{ width: "100%", resize: "none" }}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                ></textarea>
 
-              <div className={css.typewriter}
-                key={textIndex}>
-                <p>
-                  {placeholderTexts[textIndex]}
-                </p>
+              </div>
+            ) : (
+              <div className={`window ${css.textEntryBox}`}
+                onClick={startWriting}
+                style={{ marginBottom: "5px" }}
+              >
+
+                <div className={css.typewriter}
+                  key={textIndex}>
+                  <p>
+                    {placeholderTexts[textIndex]}
+                  </p>
+                </div>
+
               </div>
 
-            </div>
+            )
+          }
+        </div>
 
-          )
-        }
-      </div>
-
-      <button onClick={submitMessage} disabled={!message.trim()}>
-        Submit!
-      </button>
+        <button onClick={submitMessage} disabled={ 
+            ! ( sourceState === "selected" && destState === "selected" && message.trim() ) 
+          }>
+          Submit!
+        </button>
+      </> 
+      :
+      <>
+        <p style={{ textAlign: "center" }}>Thank you for submitting your note!</p>
+        <br/>
+        <button onClick={() => setCreating(true)}>Write a new note</button>
+      </>
+    }
     </>
+    
   );
 }
 
