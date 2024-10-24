@@ -1,22 +1,30 @@
 // import { creationState } from "components/App";
 import css from "components/popup/create/PinMenu.module.css";
-import { PinInPrivate, PinInPublic, getRelationshipsStarted, getRelationshipsFinished, getMessageThread } from "api/api";
+import { PinInPrivate, PinInPublic, getRelationshipsStarted, getRelationshipsFinished, getMessageThread, MessageIn } from "api/api";
 import { useEffect, useState } from "react";
 
 type PinMenuProps = {
     // setCurrState: (state: creationState) => void;
     highlightedPin: PinInPrivate | PinInPublic | null;
     setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void;
+
+    setPinIsHighlighted: (pinState: boolean) => void;
+
+    setHighlightedThread: (thread: MessageIn) => void;
+    setThreadIsHighlighted: (threadState: boolean) => void;
     // setSenderID: (id: number) => void;
     // setSourcePlaceName: (placeName: string) => void;
 }
 
-function PinMenu({ highlightedPin, setHighlightedPin }: PinMenuProps) {
+function PinMenu({ highlightedPin, setHighlightedPin, setHighlightedThread, setThreadIsHighlighted, setPinIsHighlighted }: PinMenuProps) {
     const [started, setStarted] = useState<PinInPublic[]>([]);
     const [finished, setFinished] = useState<PinInPublic[]>([]);
 
-    function getMessages(sender_id: number, recipient_id: number) {
-        getMessageThread(sender_id, recipient_id);
+    const getThread = async (sender_id: number, recipient_id: number) => {
+        const thread = await getMessageThread(sender_id, recipient_id)
+        setHighlightedThread(thread)
+        setThreadIsHighlighted(true)
+        setPinIsHighlighted(false)
     }
 
     // function addNote() {
@@ -71,8 +79,7 @@ function PinMenu({ highlightedPin, setHighlightedPin }: PinMenuProps) {
                     {started.map(pin => (
                         // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
                         <li key={pin.id} onClick={() => {if (!highlightedPin) return;
-                            getMessages(highlightedPin.id, pin.id); 
-                            setHighlightedPin(pin);}}>{pin.place_name}</li>
+                            getThread(highlightedPin.id, pin.id);}}>{pin.place_name}</li>
                     ))}
                 </ul>
             </div>
@@ -82,8 +89,7 @@ function PinMenu({ highlightedPin, setHighlightedPin }: PinMenuProps) {
                     {finished.map(pin => (
                         // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
                         <li key={pin.id} onClick={() => {if (!highlightedPin) return;
-                            getMessages(pin.id, highlightedPin.id);
-                            setHighlightedPin(pin);}}>{pin.place_name}</li>
+                            getThread(pin.id, highlightedPin.id);}}>{pin.place_name}</li>
                     ))}
                 </ul>
             </div>

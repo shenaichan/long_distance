@@ -2,27 +2,58 @@ from ninja import NinjaAPI, Schema
 from longdist.models import Pin, Message, Relationship
 from pprint import pprint
 from django.db import transaction
-from typing import List
+from typing import List, Optional
 
 api = NinjaAPI()
 
 class Geometry(Schema):
     type: str
-    coordinates: List[float]
+    coordinates: List[float] | List[List[float]]
 
-class Properties(Schema):
+class PinProperties(Schema):
     id: int
     place_name: str
     public_share_token: str
 
+class RouteProperties(Schema):
+    sender_id: int
+    recipient_id: int
+
 class Feature(Schema):
     type: str
     geometry: Geometry
-    properties: Properties
+    properties: PinProperties | RouteProperties
 
 class FeatureCollection(Schema):
     type: str
     features: List[Feature]
+
+
+
+'''
+          // San Francisco
+      const origin = [-122.414, 37.776];
+
+      // Washington DC
+      const destination = [-77.032, 38.913];
+
+      // A simple line from origin to destination.
+      const route: GeoJSON.GeoJSON = {
+          'type': 'FeatureCollection',
+          'features': [
+              {
+                  'type': 'Feature',
+                  'geometry': {
+                      'type': 'LineString',
+                      'coordinates': [origin, destination]
+                  },
+                  'properties': {
+                    
+                  }
+              }
+          ]
+      };
+'''
 
 class PinIn(Schema):
     latitude:float
@@ -33,9 +64,6 @@ class MessageIn(Schema):
     sender:int
     recipient:int
     message:str
-
-class MessageOut(Schema):
-    content:str
 
 class PinOutPrivate(Schema):
     id:int
@@ -52,6 +80,19 @@ class PinOutPublic(Schema):
     longitude:float
     place_name:str
     public_share_token:str
+
+class MessageOut(Schema):
+    sender:PinOutPublic
+    recipient:PinOutPublic
+    message:str
+    response:Optional[str] = None
+
+class InventoryMessageOut(Schema):
+    sender_id:int
+    recipient_id:int
+    content:str
+
+
 
 def print_queryset(queryset):
     for entry in queryset:
@@ -76,11 +117,26 @@ def get_approved_pins(request):
                     geometry=Geometry(
                         type="Point", 
                         coordinates=[pin.longitude, pin.latitude]),
-                    properties=Properties(
+                    properties=PinProperties(
                         id=pin.id,
                         place_name=pin.place_name,
                         public_share_token=pin.public_share_token)) 
                 for pin in pins]
+    return FeatureCollection(type="FeatureCollection", features=features)
+
+@api.get("get_approved_routes", response=FeatureCollection)
+def get_approved_routes(request):
+    routes = Relationship.objects.select_related("sender").select_related("recipient").filter(is_approved=True)
+    features = [Feature(
+                    type="Feature",
+                    geometry=Geometry(
+                        type="LineString", 
+                        coordinates=[[route.sender.longitude, route.sender.latitude], [route.recipient.longitude, route.recipient.latitude]]),
+                    properties=RouteProperties(
+                        sender_id=route.sender.id,
+                        recipient_id=route.recipient.id)) 
+                for route in routes]
+    # print(features)
     return FeatureCollection(type="FeatureCollection", features=features)
 
 @api.post("/create_pin", response=PinOutPrivate)
@@ -110,6 +166,11 @@ def create_relationship_and_message(request, data: MessageIn):
                                     recipient=recipient,
                                     message=message)
         relationship.calculate_distance()
+
+        # temporarily approve all messages
+        relationship.approve()
+        relationship.message.approve()
+        relationship.recipient.approve()
     return
 
 @api.patch("/add_email_to_message")
@@ -137,15 +198,14 @@ def get_relationships_finished(request, public_token: str):
     pin = Pin.objects.get(public_share_token=public_token)
     return pin.get_relationships_finished()
 
-@api.get("/get_message_thread", response=List[MessageOut])
+@api.get("/get_message_thread", response=MessageOut)
 def get_message_thread(request, sender_id: int, recipient_id: int):
-    message = Relationship.objects.select_related("message").get(sender=sender_id, recipient=recipient_id)
-    response = Relationship.objects.select_related("response").get(sender=sender_id, recipient=recipient_id)
-    thread = []
-    if (response.response):
-        thread = [message.message, response.response]
-    else:
-        thread = [message.message]
+    thread_query = Relationship.objects.select_related("message").select_related("response").select_related("sender").select_related("recipient").get(sender=sender_id, recipient=recipient_id)
+    
+    thread = MessageOut(sender=thread_query.sender, recipient=thread_query.recipient, message=thread_query.message.content, response=None)
+    if (thread_query.response):
+        thread.response = thread_query.response.content
+    
     print(thread)
     '''
     get relationship from relationships table given these two IDs
@@ -157,21 +217,26 @@ def get_message_thread(request, sender_id: int, recipient_id: int):
     '''
     return thread
 
-@api.post("/get_all_my_message_threads", response=List[List[MessageOut]])
+@api.post("/get_all_my_message_threads", response=List[List[InventoryMessageOut]])
 def get_all_my_message_threads(request, data: List[int]):
     ret = [[],[]] # sent by me, sent to me
-    relationships = ( Relationship.objects.select_related("message").select_related("response").select_related("sender").filter(sender__in=data)
-                    | Relationship.objects.select_related("message").select_related("response").select_related("sender").filter(recipient__in=data) )
+    relationships = ( Relationship.objects.select_related("message").select_related("response").select_related("sender").select_related("recipient").filter(sender__in=data)
+                    | Relationship.objects.select_related("message").select_related("response").select_related("sender").select_related("recipient").filter(recipient__in=data) )
 
     for relationship in relationships:
+        thread = InventoryMessageOut(sender_id=relationship.sender.id, 
+                                     recipient_id=relationship.recipient.id,
+                                     content=relationship.message.content)
         if relationship.sender.id in data:
-            ret[0].append(relationship.message)
+            ret[0].append(thread)
             if relationship.response:
-                ret[1].append(relationship.response)
+                thread.content = relationship.response.content
+                ret[1].append(thread)
         else:
-            ret[1].append(relationship.message)
+            ret[1].append(thread)
             if relationship.response:
-                ret[0].append(relationship.response)
+                thread.content = relationship.response.content
+                ret[0].append(thread)
 
     return ret
 

@@ -10,10 +10,6 @@ type MessageOut = {
     message:string
 }
 
-export type MessageIn = {
-    content:string
-}
-
 export type PinInPrivate = {
     id: number;
     latitude: number;
@@ -30,6 +26,19 @@ export type PinInPublic = {
     longitude: number;
     place_name: string;
     public_share_token: string;
+}
+
+export type MessageIn = {
+    sender:PinInPublic
+    recipient:PinInPublic
+    message:string
+    response:string | null
+}
+
+export type InventoryMessageIn = {
+    sender_id:number
+    recipient_id:number
+    content:string
 }
 
 
@@ -49,7 +58,7 @@ export async function getAllMyMessageThreads(sender_ids: number[]) {
             body: JSON.stringify(sender_ids)
         })
     const messages = await messagesResponse.json()
-    return messages as MessageIn[][]
+    return messages as InventoryMessageIn[][]
 }
 
 export async function getMessageThread(sender_id: number, recipient_id: number) {
@@ -63,7 +72,7 @@ export async function getMessageThread(sender_id: number, recipient_id: number) 
         })
     const messageThread = await messageThreadResponse.json()
     console.log(messageThread)
-    return messageThread as MessageIn[]
+    return messageThread as MessageIn
 }
 
 export async function getPinByPublicToken(public_token: string) {
@@ -177,6 +186,20 @@ export async function getApprovedPins() {
     )
     const approvedPins = await approvedPinsResponse.json()
     return approvedPins as FeatureCollection
+}
+
+export async function getApprovedRoutes() {
+    const approvedRoutesResponse = await fetch(
+        `${BASE_URL}get_approved_routes`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+    )
+    const approvedRoutes = await approvedRoutesResponse.json()
+    return approvedRoutes as FeatureCollection
 }
 
 export async function getPlaceName(latitude: number, longitude: number) {

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import css from "components/popup/inventory/Inventory.module.css"
 import popupCss from "components/popup/Popup.module.css"
-import { PinInPrivate, PinInPublic, MessageIn } from "api/api"
+import { PinInPrivate, PinInPublic, InventoryMessageIn, MessageIn, getMessageThread } from "api/api"
 // import { creationState } from "components/App"
 
 type InventoryProps = {
@@ -10,12 +10,22 @@ type InventoryProps = {
     // setCurrState: (state: creationState) => void
     setPinIsHighlighted: (pinState: boolean) => void
 
-    sentNotes: MessageIn[]
-    receivedNotes: MessageIn[]
+    setHighlightedThread: (thread: MessageIn) => void
+    setThreadIsHighlighted: (threadState: boolean) => void
+
+    sentNotes: InventoryMessageIn[]
+    receivedNotes: InventoryMessageIn[]
 }
 
-function Inventory({ pins, setHighlightedPin, setPinIsHighlighted, sentNotes, receivedNotes }: InventoryProps) {
+function Inventory({ pins, setHighlightedPin, setPinIsHighlighted, setHighlightedThread, setThreadIsHighlighted, sentNotes, receivedNotes }: InventoryProps) {
     const [tab, setTab] = useState("Sent");
+
+    const getThread = async (sender_id: number, recipient_id: number) => {
+        const thread = await getMessageThread(sender_id, recipient_id)
+        setHighlightedThread(thread)
+        setThreadIsHighlighted(true)
+        setPinIsHighlighted(false)
+    }
     
     return(
         <>
@@ -46,7 +56,7 @@ function Inventory({ pins, setHighlightedPin, setPinIsHighlighted, sentNotes, re
                                 tab === "Sent" ?
                                 sentNotes.map((note) => (
                                     <li key={note.content}
-                                        onClick={() => {}}
+                                        onClick={() => { getThread(note.sender_id, note.recipient_id) }}
                                         style={{cursor: "pointer"}}
                                     >
                                         <p className={popupCss.truncated}>
@@ -56,7 +66,7 @@ function Inventory({ pins, setHighlightedPin, setPinIsHighlighted, sentNotes, re
                                 )) : tab === "Inbox" ?
                                 receivedNotes.map((note) => (
                                     <li key={note.content}
-                                        onClick={() => {}}
+                                        onClick={() => { getThread(note.sender_id, note.recipient_id) }}
                                         style={{cursor: "pointer"}}
                                     >
                                         <p className={popupCss.truncated}>
@@ -68,9 +78,11 @@ function Inventory({ pins, setHighlightedPin, setPinIsHighlighted, sentNotes, re
                                     <li key={pin.id}
                                         onClick={
                                             () => {
+                                                console.log(`go to ${pin.longitude}, ${pin.latitude}`)
                                                 setHighlightedPin(pin);
                                                 // setCurrState("pinMenu");
                                                 setPinIsHighlighted(true);
+                                                setThreadIsHighlighted(false);
                                             }
                                         }
                                         style={{cursor: "pointer"}}

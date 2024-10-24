@@ -18,12 +18,16 @@ type popupProps = {
 
     pinIsHighlighted: boolean
     setPinIsHighlighted: (pinState: boolean) => void;
+
+    threadIsHighlighted: boolean
+    setThreadIsHighlighted: (pinState: boolean) => void;
 }
 
 function Popup({title, content, zIndex, top, left, 
     sourceState, setSourceState,
     destState, setDestState,
-    pinIsHighlighted, setPinIsHighlighted}: popupProps) {
+    pinIsHighlighted, setPinIsHighlighted, 
+    threadIsHighlighted, setThreadIsHighlighted }: popupProps) {
 
     // const [isMinimized, setIsMinimized] = useState(false);
 
@@ -34,6 +38,8 @@ function Popup({title, content, zIndex, top, left,
             setDestState("selecting")
         } else if ( pinIsHighlighted ) {
             setPinIsHighlighted(false)
+        } else if ( threadIsHighlighted ) {
+            setThreadIsHighlighted(false)
         }
     }
 

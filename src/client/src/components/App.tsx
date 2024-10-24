@@ -7,8 +7,9 @@ import Write from "components/popup/write/Write"
 import Inventory from "components/popup/inventory/Inventory"
 import PinConfirm from "components/popup/create/PinConfirm"
 import PinMenu from "components/popup/create/PinMenu"
+import MessageMenu from "components/popup/create/MessageMenu"
 import longdist from "assets/longdist_long.mp3";
-import { PinInPrivate, PinInPublic, getPinByPublicToken, getAllMyMessageThreads, MessageIn } from "api/api";
+import { PinInPrivate, PinInPublic, getPinByPublicToken, getAllMyMessageThreads, MessageIn, InventoryMessageIn } from "api/api";
 
 import { useState, useEffect, useRef, ReactNode } from "react";
 
@@ -54,8 +55,8 @@ function App() {
   const [recipientID, setRecipientID] = useState<number>(-1);
   // const [hasReadRules, setHasReadRules] = useState<boolean>(false);
   const [pins, setPins] = useState<PinInPrivate[]>([]);
-  const [sentNotes, setSentNotes] = useState<MessageIn[]>([]);
-  const [receivedNotes, setReceivedNotes] = useState<MessageIn[]>([]);
+  const [sentNotes, setSentNotes] = useState<InventoryMessageIn[]>([]);
+  const [receivedNotes, setReceivedNotes] = useState<InventoryMessageIn[]>([]);
   const [highlightedPin, setHighlightedPin] = useState<PinInPrivate | PinInPublic | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -63,6 +64,9 @@ function App() {
   const [ destState, setDestState ] = useState<pinCreationState>("inactive")
 
   const [ pinIsHighlighted, setPinIsHighlighted ] = useState<boolean>(false)
+
+  const [ threadIsHighlighted, setThreadIsHighlighted ] = useState<boolean>(false)
+  const [ highlightedThread, setHighlightedThread ] = useState< MessageIn | null >(null)
 
   const { public_share_token } = useParams();
   console.log("PUBLIC_SHARE_TOKEN", public_share_token );
@@ -155,6 +159,29 @@ function App() {
       />
 
       {
+        (threadIsHighlighted) ? 
+        <Popup
+          title="A note from afar..."
+          content={<MessageMenu 
+            highlightedThread={highlightedThread!}
+          />}
+          zIndex={stack.length + 1}
+          top={"20px"}
+          left={"calc(50vw - 200px)"}
+          sourceState={sourceState}
+          setSourceState={setSourceState}
+          destState={destState}
+          setDestState={setDestState}
+          pinIsHighlighted={pinIsHighlighted}
+          setPinIsHighlighted={setPinIsHighlighted}
+          threadIsHighlighted={threadIsHighlighted}
+          setThreadIsHighlighted={setThreadIsHighlighted}
+        />
+         :
+        null
+      }
+
+      {
         (sourceState === "confirming" || destState === "confirming") ?
         <Popup
           title={ sourceState === "confirming" ? "Set your location here?" : "Set your friend's location here?"}
@@ -185,6 +212,8 @@ function App() {
           setDestState={setDestState}
           pinIsHighlighted={pinIsHighlighted}
           setPinIsHighlighted={setPinIsHighlighted}
+          threadIsHighlighted={threadIsHighlighted}
+          setThreadIsHighlighted={setThreadIsHighlighted}
         />
         : null
       }
@@ -195,12 +224,11 @@ function App() {
         <Popup
           title={highlightedPin!.place_name}
           content={<PinMenu 
-            // setCurrState={setCurrState}
             highlightedPin={highlightedPin}
             setHighlightedPin={setHighlightedPin}
-            // setSenderID={setSenderID}
-            // setSourcePlaceName={setSourcePlaceName}
-            // pinLocation={pinLocation}
+            setPinIsHighlighted={setPinIsHighlighted}
+            setHighlightedThread={setHighlightedThread}
+            setThreadIsHighlighted={setThreadIsHighlighted}
           />}
           zIndex={stack.length + 1}
           top={"20px"}
@@ -211,6 +239,8 @@ function App() {
           setDestState={setDestState}
           pinIsHighlighted={pinIsHighlighted}
           setPinIsHighlighted={setPinIsHighlighted}
+          threadIsHighlighted={threadIsHighlighted}
+          setThreadIsHighlighted={setThreadIsHighlighted}
         />
         : null
       }
@@ -270,6 +300,8 @@ function App() {
             setHighlightedPin={setHighlightedPin}
             // setCurrState={setCurrState}
             setPinIsHighlighted={setPinIsHighlighted}
+            setHighlightedThread={setHighlightedThread}
+            setThreadIsHighlighted={setThreadIsHighlighted}
             sentNotes={sentNotes}
             receivedNotes={receivedNotes}
           /> }

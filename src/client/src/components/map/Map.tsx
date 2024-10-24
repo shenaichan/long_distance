@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { FeatureCollection } from "geojson";
-import { getApprovedPins, getPlaceName, PinInPrivate, PinInPublic } from "api/api";
+import { getApprovedPins, getApprovedRoutes, getPlaceName, PinInPrivate, PinInPublic } from "api/api";
 // import { coordinates, mouseLocation, creationState, NO_COORDINATES } from "components/App";
 import { coordinates, pinCreationState } from "components/App";
 import map_pin from "assets/map_pin.png";
@@ -134,7 +134,7 @@ function Map({ setPinLocation, spinLevel, setPlaceName,
       duration: 1500 + (maxZoom - map.current.getZoom()) * 250 + (distance) * 1.5
     });
     // }
-  }, [highlightedPin]);
+  }, [highlightedPin, pinIsHighlighted]);
 
   useEffect(() => {
     // currStateRef.current = currState;
@@ -187,8 +187,25 @@ function Map({ setPinLocation, spinLevel, setPlaceName,
 
     map.current.on('load', async () => {
       const pins: FeatureCollection = await getApprovedPins();
+      const routes: FeatureCollection = await getApprovedRoutes();
 
       if (!map.current) return;
+
+
+      map.current.addSource('routes', {
+        'type': 'geojson',
+        'data': routes
+      });
+
+      map.current.addLayer({
+        'id': 'routes',
+        'source': 'routes',
+        'type': 'line',
+        'paint': {
+            'line-width': 2,
+            'line-color': '#007cbf'
+        }
+      });
 
       map.current.addSource('pins', {
         type: 'geojson',
