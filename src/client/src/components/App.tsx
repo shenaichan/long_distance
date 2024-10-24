@@ -270,6 +270,8 @@ function App() {
             setHighlightedPin={setHighlightedPin}
             // setCurrState={setCurrState}
             setPinIsHighlighted={setPinIsHighlighted}
+            sentNotes={sentNotes}
+            receivedNotes={receivedNotes}
           /> }
         zIndex={stack.indexOf("inventory") + 1}
         top="50vh"
