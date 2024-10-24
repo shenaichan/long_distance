@@ -26,7 +26,8 @@ function From({ sourceState, setSourceState, destState, setDestState, sourcePlac
     if (pins.length > 0) {
       setSourcePlaceName(pins[0].place_name);
     }
-  }, [])
+  }, [pins])
+
   useEffect(() => {
     console.log(destState)
     if ( ( destState === "selecting" || destState === "confirming" ) && pinEntryMode === "map select") {
