@@ -23,10 +23,10 @@ function From({ sourceState, setSourceState, destState, setDestState, sourcePlac
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")
 
   useEffect(() => {
-    if (pins.length > 0) {
+    if (pins.length > 0 && pinEntryMode === "pin list") {
       setSourcePlaceName(pins[0].place_name);
     }
-  }, [pins])
+  }, [pinEntryMode])
 
   useEffect(() => {
     console.log(destState)
