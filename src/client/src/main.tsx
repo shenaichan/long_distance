@@ -14,6 +14,10 @@ const router = createBrowserRouter([
   {
     path: "/pin/:public_share_token",
     element: <App />
+  },
+  {
+    path: "/reply/:secret_reply_token",
+    element: <App />
   }
 ])
 

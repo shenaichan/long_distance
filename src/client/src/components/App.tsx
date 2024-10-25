@@ -9,7 +9,8 @@ import PinConfirm from "components/popup/create/PinConfirm"
 import PinMenu from "components/popup/create/PinMenu"
 import MessageMenu from "components/popup/create/MessageMenu"
 import longdist from "assets/longdist_long.mp3";
-import { PinInPrivate, PinInPublic, getPinByPublicToken, getAllMyMessageThreads, MessageIn, InventoryMessageIn } from "api/api";
+import { PinInPrivate, PinInPublic, getPinByPublicToken, getAllMyMessageThreads, 
+  MessageIn, InventoryMessageIn, getMessageThreadBySecret } from "api/api";
 
 import { useState, useEffect, useRef, ReactNode } from "react";
 
@@ -68,8 +69,11 @@ function App() {
   const [ threadIsHighlighted, setThreadIsHighlighted ] = useState<boolean>(false)
   const [ highlightedThread, setHighlightedThread ] = useState< MessageIn | null >(null)
 
-  const { public_share_token } = useParams();
+  const [ isResponse, setIsResponse ] = useState<boolean>(false)
+
+  const { public_share_token, secret_reply_token } = useParams();
   console.log("PUBLIC_SHARE_TOKEN", public_share_token );
+  console.log("SECRET_REPLY_TOKEN", secret_reply_token );
 
   function reStack(menu: menuKind) {
     let newStack = [...stack]
@@ -114,6 +118,20 @@ function App() {
       
       fetchPin(public_share_token);
       
+    }
+
+    if (secret_reply_token) {
+      async function fetchThread() {
+        const thread: MessageIn =  await getMessageThreadBySecret(secret_reply_token as string)
+        setSenderID(thread.sender.id)
+        setRecipientID(thread.recipient.id)
+        setSourcePlaceName(thread.sender.place_name)
+        setDestinationPlaceName(thread.recipient.place_name)
+        setSourceState("selected")
+        setDestState("selected")
+        setIsResponse(true)
+      }
+      fetchThread()
     }
   }, []);
 
@@ -288,6 +306,10 @@ function App() {
           recipientID={recipientID}
           setRecipientID={setRecipientID}
           pins={pins}
+
+          isResponse={isResponse}
+          setIsResponse={setIsResponse}
+          
         /> }
         zIndex={stack.indexOf("write") + 1}
         top="20px"

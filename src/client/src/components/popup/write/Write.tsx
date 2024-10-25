@@ -2,7 +2,7 @@ import To from "components/popup/write/sections/To"
 import From from "components/popup/write/sections/From"
 import css from "components/popup/write/Write.module.css";
 import { useState, useRef, useEffect } from "react";
-import { createRelationshipAndMessage, PinInPrivate } from "api/api";
+import { createRelationshipAndMessage, createAndAddResponse, PinInPrivate } from "api/api";
 import { pinCreationState } from "components/App";
 
 type WriteProps = {
@@ -24,6 +24,9 @@ type WriteProps = {
   recipientID: number;
   setRecipientID: (id: number) => void;
   pins: PinInPrivate[];
+
+  isResponse: boolean;
+  setIsResponse: (status: boolean) => void;
 }
 
 function Write({ sourcePlaceName, setSourcePlaceName, 
@@ -31,7 +34,8 @@ function Write({ sourcePlaceName, setSourcePlaceName,
   sourceState, setSourceState,
   destState, setDestState,
   senderID, setSenderID,
-  recipientID, setRecipientID, pins }: WriteProps) {
+  recipientID, setRecipientID, pins,
+  isResponse, setIsResponse }: WriteProps) {
 
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
 
@@ -56,6 +60,7 @@ function Write({ sourcePlaceName, setSourcePlaceName,
   const [textIndex, setTextIndex] = useState(Math.floor(Math.random() * placeholderTexts.length));
   const [message, setMessage] = useState("");
   const [creating, setCreating] = useState<boolean>(true);
+  const [secretLink, setSecretLink] = useState<string>("");
 
   function startWriting() {
     setWriting(true);
@@ -69,12 +74,28 @@ function Write({ sourcePlaceName, setSourcePlaceName,
   }
 
   async function submitMessage() {
-    await createRelationshipAndMessage({ sender: senderID, recipient: recipientID, message: message });
+    if (isResponse) {
+      await createAndAddResponse({ sender: senderID, recipient: recipientID, message: message });
+    } else {
+      const secretToken = await createRelationshipAndMessage({ sender: senderID, recipient: recipientID, message: message });
+      setSecretLink(`localhost:5173/reply/${secretToken}`)
+    }
     setSourceState("inactive");
     setDestState("inactive");
     setMessage("");
     setCreating(false);
     // setCurrState("messageConfirmation");
+  }
+
+  function copySecretLink() {
+    navigator.clipboard.writeText(secretLink)
+      .then(() => {
+          alert('Secret reply link copied to clipboard!');
+      })
+      .catch(err => {
+          console.error('Failed to copy: ', err);
+          alert('Failed to copy the link. Please try again.');
+      });
   }
 
   useEffect(() => {
@@ -140,7 +161,7 @@ function Write({ sourcePlaceName, setSourcePlaceName,
           setSourcePlaceName={setSourcePlaceName}
 
           setSenderID={setSenderID}
-          
+
           pins={pins}
         />
 
@@ -192,7 +213,22 @@ function Write({ sourcePlaceName, setSourcePlaceName,
       <>
         <p style={{ textAlign: "center" }}>Thank you for submitting your note!</p>
         <br/>
-        <button onClick={() => setCreating(true)}>Write a new note</button>
+        { isResponse ? null :
+        <>
+          <p style={{ textAlign: "center" }}>Want to let your friend write back? Send them the secret link below ;)</p>
+          <br/>
+        </>
+        }
+        <div style={{display: "flex"}}>
+
+          <button onClick={copySecretLink} style={{display: "inline", flex: "1", marginRight: "2px" }}>
+            Get secret reply link
+          </button>
+          <button onClick={() => { setCreating(true); setIsResponse(false); }} 
+            style={{display: "inline", flex: "1", marginLeft: "2px" }}>
+            Write a new note
+          </button>
+        </div>
       </>
     }
     </>

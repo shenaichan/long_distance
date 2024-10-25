@@ -61,6 +61,20 @@ export async function getAllMyMessageThreads(sender_ids: number[]) {
     return messages as InventoryMessageIn[][]
 }
 
+export async function getMessageThreadBySecret(secret: string) {
+    const messageThreadResponse = await fetch(
+        `${BASE_URL}get_message_thread_by_secret?secret=${secret}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const messageThread = await messageThreadResponse.json()
+    console.log(messageThread)
+    return messageThread as MessageIn
+}
+
 export async function getMessageThread(sender_id: number, recipient_id: number) {
     const messageThreadResponse = await fetch(
         `${BASE_URL}get_message_thread?sender_id=${sender_id}&recipient_id=${recipient_id}`, 
@@ -143,10 +157,25 @@ export async function getNumKM() {
 }
 
 export async function createRelationshipAndMessage(message: MessageOut) {
-    await fetch(
+    const secretLinkResponse = await fetch(
         `${BASE_URL}create_relationship_and_message`,
         {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message)
+        }
+    )
+    const secretLink = await secretLinkResponse.json()
+    return secretLink as string
+}
+
+export async function createAndAddResponse(message: MessageOut) {
+    await fetch(
+        `${BASE_URL}create_and_add_response`,
+        {
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },

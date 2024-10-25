@@ -23,10 +23,12 @@ function MessageMenu ( { highlightedThread }: MessageMenuProps ) {
                 highlightedThread.response ? 
                 <>
                     <br></br>
-                    <p><b>From:</b> { highlightedThread.recipient.place_name }</p>
-                    <p><b>To:</b> { highlightedThread.sender.place_name }</p>
+                    <p className={popupCss.truncated}><b>To:</b> { highlightedThread.sender.place_name }</p>
+                    <p className={popupCss.truncated}><b>From:</b> { highlightedThread.recipient.place_name }</p>
                     <br></br>
-                    <p><b>Message:</b> { highlightedThread.response }</p> 
+                    <div className={`window ${css.info}`}>
+                        <p>{ highlightedThread.response }</p>
+                    </div>
                 </> :
                 null
             }

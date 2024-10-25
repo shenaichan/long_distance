@@ -175,7 +175,7 @@ def create_relationship_and_message(request, data: MessageIn):
         relationship.approve()
         relationship.message.approve()
         relationship.recipient.approve()
-    return
+    return relationship.private_allow_response_token
 
 @api.patch("/add_email_to_message")
 def add_email_to_message(request, data: MessageIn):
@@ -190,6 +190,9 @@ def create_and_add_response(request, data: MessageIn):
         response = Message.objects.create(content=data.message)
         relationship = Relationship.objects.get(sender=data.sender, recipient=data.recipient)
         relationship.add_response(response)
+
+        # temporarily approve response
+        relationship.response.approve()
     return
 
 @api.get("/get_relationships_started", response=List[PinOutPublic])
@@ -221,26 +224,51 @@ def get_message_thread(request, sender_id: int, recipient_id: int):
     '''
     return thread
 
+@api.get("/get_message_thread_by_secret", response=MessageOut)
+def get_message_thread_by_secret(request, secret: str):
+    thread_query = Relationship.objects.select_related("message").select_related("response").select_related("sender").select_related("recipient").get(private_allow_response_token=secret)
+    
+    thread = MessageOut(sender=thread_query.sender, recipient=thread_query.recipient, message=thread_query.message.content, response=None)
+    if (thread_query.response):
+        thread.response = thread_query.response.content
+    
+    print(thread)
+    '''
+    get relationship from relationships table given these two IDs
+    ^ query to the model
+    want to return message contents only
+    want to specifically return contents?
+    have to jump into message object for this
+    specify return type
+    '''
+    return thread
+
 @api.post("/get_all_my_message_threads", response=List[List[InventoryMessageOut]])
 def get_all_my_message_threads(request, data: List[int]):
+    print(data)
     ret = [[],[]] # sent by me, sent to me
     relationships = ( Relationship.objects.select_related("message").select_related("response").select_related("sender").select_related("recipient").filter(sender__in=data)
                     | Relationship.objects.select_related("message").select_related("response").select_related("sender").select_related("recipient").filter(recipient__in=data) )
 
     for relationship in relationships:
-        thread = InventoryMessageOut(sender_id=relationship.sender.id, 
+        msg = InventoryMessageOut(sender_id=relationship.sender.id, 
                                      recipient_id=relationship.recipient.id,
                                      content=relationship.message.content)
+
         if relationship.sender.id in data:
-            ret[0].append(thread)
+            ret[0].append(msg)
             if relationship.response:
-                thread.content = relationship.response.content
-                ret[1].append(thread)
+                rsp = InventoryMessageOut(sender_id=relationship.sender.id, 
+                                            recipient_id=relationship.recipient.id,
+                                            content=relationship.response.content)
+                ret[1].append(rsp)
         else:
-            ret[1].append(thread)
+            ret[1].append(msg)
             if relationship.response:
-                thread.content = relationship.response.content
-                ret[0].append(thread)
+                rsp = InventoryMessageOut(sender_id=relationship.sender.id, 
+                                            recipient_id=relationship.recipient.id,
+                                            content=relationship.response.content)
+                ret[0].append(rsp)
 
     return ret
 
