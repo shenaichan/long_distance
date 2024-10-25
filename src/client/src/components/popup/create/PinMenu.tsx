@@ -2,21 +2,11 @@
 import css from "components/popup/create/PinMenu.module.css";
 import { PinInPrivate, PinInPublic, getRelationshipsStarted, getRelationshipsFinished, getMessageThread, MessageIn } from "api/api";
 import { useEffect, useState } from "react";
+import { useAppState } from "state/context"
 
-type PinMenuProps = {
-    // setCurrState: (state: creationState) => void;
-    highlightedPin: PinInPrivate | PinInPublic | null;
-    setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void;
+function PinMenu() {
 
-    setPinIsHighlighted: (pinState: boolean) => void;
-
-    setHighlightedThread: (thread: MessageIn) => void;
-    setThreadIsHighlighted: (threadState: boolean) => void;
-    // setSenderID: (id: number) => void;
-    // setSourcePlaceName: (placeName: string) => void;
-}
-
-function PinMenu({ highlightedPin, setHighlightedPin, setHighlightedThread, setThreadIsHighlighted, setPinIsHighlighted }: PinMenuProps) {
+    const { highlightedPin, setHighlightedPin, setHighlightedThread, setThreadIsHighlighted, setPinIsHighlighted } = useAppState()
     const [started, setStarted] = useState<PinInPublic[]>([]);
     const [finished, setFinished] = useState<PinInPublic[]>([]);
 

@@ -2,29 +2,17 @@ import { pinCreationState, coordinates } from "components/App";
 import { createPin, createApproveClaimPin } from "api/api";
 import css from "components/popup/create/PinMenu.module.css";
 import { PinInPrivate } from "api/api";
+import { useAppState } from "state/context"
 
-type PinConfirmProps = {       
-    placeName: string;
-    // setCurrState: (state: creationState) => void;
-    // currState: creationState;
 
-    setSourceState: (state: pinCreationState) => void;
-    setDestState: (state: pinCreationState) => void;
 
-    pinLocation: coordinates;
-    isSource: boolean;
-    setSourcePlaceName: (placeName: string) => void;
-    setDestinationPlaceName: (placeName: string) => void;
-    setSenderID: (id: number) => void;
-    setRecipientID: (id: number) => void;
-    pins: PinInPrivate[];
-    setPins: (pins: PinInPrivate[]) => void;
-    setHighlightedPin: (pin: PinInPrivate | null) => void;
-}
+function PinConfirm() {
 
-function PinConfirm({placeName, setSourceState, setDestState, pinLocation, isSource, 
-    setSourcePlaceName, setDestinationPlaceName, setSenderID, setRecipientID, 
-    pins, setPins, setHighlightedPin}: PinConfirmProps) {
+    const {placeName, setSourceState, setDestState, pinLocation, sourceState,
+        setSourcePlaceName, setDestinationPlaceName, setSenderID, setRecipientID, 
+        pins, setPins, setHighlightedPin} = useAppState()
+    
+    const isSource = sourceState === "confirming"
         
         // Function to add a new pin
     function addPinToStorage(newPin: PinInPrivate) {

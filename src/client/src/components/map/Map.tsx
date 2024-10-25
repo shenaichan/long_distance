@@ -5,25 +5,7 @@ import { getApprovedPins, getApprovedRoutes, getPlaceName, PinInPrivate, PinInPu
 // import { coordinates, mouseLocation, creationState, NO_COORDINATES } from "components/App";
 import { coordinates, pinCreationState } from "components/App";
 import map_pin from "assets/map_pin.png";
-
-type MapProps = {
-  setPinLocation: (location: coordinates) => void;
-  spinLevel: number;
-  setPlaceName: (placeName: string) => void;
-  
-  sourceState: pinCreationState;
-  setSourceState: (state: pinCreationState) => void;
-
-  destState: pinCreationState;
-  setDestState: (state: pinCreationState) => void;
-
-  pinIsHighlighted: boolean;
-  setPinIsHighlighted: (set: boolean) => void;
-  
-  highlightedPin: PinInPrivate | PinInPublic | null;
-  setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void;
-  pins: PinInPrivate[];
-};
+import { useAppState } from "state/context"
 
 function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   let earthsRadius = 6371
@@ -38,9 +20,14 @@ function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return distance
 }
 
-function Map({ setPinLocation, spinLevel, setPlaceName,
-  sourceState, setSourceState, destState, setDestState,
-  pinIsHighlighted, setPinIsHighlighted, highlightedPin, setHighlightedPin, pins }: MapProps) {
+function Map() {
+
+  const { setPinLocation, spinLevel, setPlaceName,
+    sourceState, setSourceState, destState, setDestState,
+    pinIsHighlighted, setPinIsHighlighted, highlightedPin, setHighlightedPin, 
+    pins 
+  } = useAppState()
+  
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const smallClusterColor: string = '#1084d0';
@@ -202,7 +189,7 @@ function Map({ setPinLocation, spinLevel, setPlaceName,
         'source': 'routes',
         'type': 'line',
         'paint': {
-            'line-width': 2,
+            'line-width': 1.5,
             'line-color': '#007cbf'
         }
       });

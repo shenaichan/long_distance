@@ -11,29 +11,16 @@ import MessageMenu from "components/popup/create/MessageMenu"
 import longdist from "assets/longdist_long.mp3";
 import { PinInPrivate, PinInPublic, getPinByPublicToken, getAllMyMessageThreads, 
   MessageIn, InventoryMessageIn, getMessageThreadBySecret } from "api/api";
+// import { AppProvider } from "state/ContextProvider"
+import { useAppState } from "state/context"
 
-import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useEffect, useRef, ReactNode, useContext } from "react";
 
 export type popupProps = {title: string, content: ReactNode};
 export type menuKind = "info" | "pins" | "favorites" | "create" | "write" | "inventory";
 
 export type coordinates = {longitude: number, latitude: number};
 export const NO_COORDINATES: coordinates = { longitude: -200, latitude: -100 };
-
-// export type mouseLocation = {x: number, y: number};
-// export const NO_MOUSE_LOCATION: mouseLocation = { x: -1, y: -1 };
-
-// export type creationState = 
-//     "pinCreation" 
-//   | "pinConfirmation" 
-//   | "pinMenu" 
-//   | "destinationMenu" 
-//   | "destinationCreation"
-//   | "destinationConfirmation"
-//   | "destinationSelection"
-//   | "messageCreation" 
-//   | "messageConfirmation" 
-//   | "none";
 
 export type pinCreationState = 
     "inactive"
@@ -43,33 +30,49 @@ export type pinCreationState =
 
 function App() {
 
-  const [stack, setStack] = useState<menuKind[]>(["info", "write", "inventory"]);
-  const [pinLocation, setPinLocation] = useState<coordinates>(NO_COORDINATES);
-  // const [mouseLocation, setMouseLocation] = useState<mouseLocation>(NO_MOUSE_LOCATION);
-  const [spinLevel, setSpinLevel] = useState<number>(5);
-  const [soundLevel, setSoundLevel] = useState<number>(0);
-  const [placeName, setPlaceName] = useState<string>("");
-  // const [currState, setCurrState] = useState<creationState>("none");
-  const [sourcePlaceName, setSourcePlaceName] = useState<string>("");
-  const [destinationPlaceName, setDestinationPlaceName] = useState<string>("");
-  const [senderID, setSenderID] = useState<number>(-1);
-  const [recipientID, setRecipientID] = useState<number>(-1);
-  // const [hasReadRules, setHasReadRules] = useState<boolean>(false);
-  const [pins, setPins] = useState<PinInPrivate[]>([]);
-  const [sentNotes, setSentNotes] = useState<InventoryMessageIn[]>([]);
-  const [receivedNotes, setReceivedNotes] = useState<InventoryMessageIn[]>([]);
-  const [highlightedPin, setHighlightedPin] = useState<PinInPrivate | PinInPublic | null>(null);
+  const {
+      stack,
+      setStack,
+      pinLocation,
+      setPinLocation,
+      spinLevel,
+      setSpinLevel,
+      soundLevel,
+      setSoundLevel,
+      placeName,
+      setPlaceName,
+      sourcePlaceName,
+      setSourcePlaceName,
+      destinationPlaceName,
+      setDestinationPlaceName,
+      senderID,
+      setSenderID,
+      recipientID,
+      setRecipientID,
+      pins,
+      setPins,
+      sentNotes,
+      setSentNotes,
+      receivedNotes,
+      setReceivedNotes,
+      highlightedPin,
+      setHighlightedPin,
+      sourceState,
+      setSourceState,
+      destState,
+      setDestState,
+      pinIsHighlighted,
+      setPinIsHighlighted,
+      threadIsHighlighted,
+      setThreadIsHighlighted,
+      highlightedThread,
+      setHighlightedThread,
+      isResponse,
+      setIsResponse
+  } = useAppState()
+
+
   const audioRef = useRef<HTMLAudioElement>(null);
-
-  const [ sourceState, setSourceState ] = useState<pinCreationState>("inactive")
-  const [ destState, setDestState ] = useState<pinCreationState>("inactive")
-
-  const [ pinIsHighlighted, setPinIsHighlighted ] = useState<boolean>(false)
-
-  const [ threadIsHighlighted, setThreadIsHighlighted ] = useState<boolean>(false)
-  const [ highlightedThread, setHighlightedThread ] = useState< MessageIn | null >(null)
-
-  const [ isResponse, setIsResponse ] = useState<boolean>(false)
 
   const { public_share_token, secret_reply_token } = useParams();
   console.log("PUBLIC_SHARE_TOKEN", public_share_token );
@@ -154,46 +157,16 @@ function App() {
         style={{display: "none"}}
       />
 
-      <Map 
-        setPinLocation={setPinLocation}
-        // setMouseLocation={setMouseLocation}
-        spinLevel={spinLevel}
-        setPlaceName={setPlaceName}
-        // currState={currState}
-        // setCurrState={setCurrState}
-
-        sourceState={sourceState}
-        setSourceState={setSourceState}
-
-        destState={destState}
-        setDestState={setDestState}
-
-        pinIsHighlighted={pinIsHighlighted}
-        setPinIsHighlighted={setPinIsHighlighted}
-
-        highlightedPin={highlightedPin}
-        setHighlightedPin={setHighlightedPin}
-        pins={pins}
-      />
+      <Map />
 
       {
         (threadIsHighlighted) ? 
         <Popup
           title="A note from afar..."
-          content={<MessageMenu 
-            highlightedThread={highlightedThread!}
-          />}
+          content={<MessageMenu />}
           zIndex={stack.length + 1}
           top={"20px"}
           left={"calc(50vw - 200px)"}
-          sourceState={sourceState}
-          setSourceState={setSourceState}
-          destState={destState}
-          setDestState={setDestState}
-          pinIsHighlighted={pinIsHighlighted}
-          setPinIsHighlighted={setPinIsHighlighted}
-          threadIsHighlighted={threadIsHighlighted}
-          setThreadIsHighlighted={setThreadIsHighlighted}
         />
          :
         null
@@ -203,35 +176,10 @@ function App() {
         (sourceState === "confirming" || destState === "confirming") ?
         <Popup
           title={ sourceState === "confirming" ? "Set your location here?" : "Set your friend's location here?"}
-          content={<PinConfirm 
-            placeName={placeName}
-            // setCurrState={setCurrState}
-            // currState={currState}
-
-            setSourceState={setSourceState}
-            setDestState={setDestState}
-
-            pinLocation={pinLocation}
-            isSource={ sourceState === "confirming" }
-            setSourcePlaceName={setSourcePlaceName}
-            setDestinationPlaceName={setDestinationPlaceName}
-            setSenderID={setSenderID}
-            setRecipientID={setRecipientID}
-            pins={pins}
-            setPins={setPins}
-            setHighlightedPin={setHighlightedPin}
-          />}
+          content={<PinConfirm />}
           zIndex={stack.length + 1}
           top={"20px"}
           left={"calc(50vw - 200px)"}
-          sourceState={sourceState}
-          setSourceState={setSourceState}
-          destState={destState}
-          setDestState={setDestState}
-          pinIsHighlighted={pinIsHighlighted}
-          setPinIsHighlighted={setPinIsHighlighted}
-          threadIsHighlighted={threadIsHighlighted}
-          setThreadIsHighlighted={setThreadIsHighlighted}
         />
         : null
       }
@@ -241,24 +189,10 @@ function App() {
         (pinIsHighlighted) ?
         <Popup
           title={highlightedPin!.place_name}
-          content={<PinMenu 
-            highlightedPin={highlightedPin}
-            setHighlightedPin={setHighlightedPin}
-            setPinIsHighlighted={setPinIsHighlighted}
-            setHighlightedThread={setHighlightedThread}
-            setThreadIsHighlighted={setThreadIsHighlighted}
-          />}
+          content={<PinMenu />}
           zIndex={stack.length + 1}
           top={"20px"}
           left={"calc(50vw - 200px)"}
-          sourceState={sourceState}
-          setSourceState={setSourceState}
-          destState={destState}
-          setDestState={setDestState}
-          pinIsHighlighted={pinIsHighlighted}
-          setPinIsHighlighted={setPinIsHighlighted}
-          threadIsHighlighted={threadIsHighlighted}
-          setThreadIsHighlighted={setThreadIsHighlighted}
         />
         : null
       }
@@ -268,13 +202,7 @@ function App() {
         reStack={reStack}
         title="Welcome to Notes From Afar!"
         content={<Info 
-          spinLevel={spinLevel}
-          setSpinLevel={setSpinLevel}
-          soundLevel={soundLevel}
-          setSoundLevel={setSoundLevel}
           audioRef={audioRef}
-          // hasReadRules={hasReadRules}
-          // setHasReadRules={setHasReadRules}
         />}
         zIndex={stack.indexOf("info") + 1}
         top="20px"
@@ -285,32 +213,7 @@ function App() {
         name="write"
         reStack={reStack}
         title="Write a note"
-        content={ <Write 
-          sourcePlaceName={sourcePlaceName}
-          setSourcePlaceName={setSourcePlaceName}
-          destinationPlaceName={destinationPlaceName}
-          setDestinationPlaceName={setDestinationPlaceName}
-          // setCurrState={setCurrState}
-          // currState={currState}
-
-          sourceState={sourceState}
-          setSourceState={setSourceState}
-
-          destState={destState}
-          setDestState={setDestState}
-
-
-          senderID={senderID}
-          setSenderID={setSenderID}
-
-          recipientID={recipientID}
-          setRecipientID={setRecipientID}
-          pins={pins}
-
-          isResponse={isResponse}
-          setIsResponse={setIsResponse}
-          
-        /> }
+        content={ <Write /> }
         zIndex={stack.indexOf("write") + 1}
         top="20px"
         left="calc(100vw - 400px - 20px)"
@@ -320,16 +223,7 @@ function App() {
         name="inventory"
         reStack={reStack}
         title="My inventory"
-        content={ <Inventory
-            pins={pins}
-            setHighlightedPin={setHighlightedPin}
-            // setCurrState={setCurrState}
-            setPinIsHighlighted={setPinIsHighlighted}
-            setHighlightedThread={setHighlightedThread}
-            setThreadIsHighlighted={setThreadIsHighlighted}
-            sentNotes={sentNotes}
-            receivedNotes={receivedNotes}
-          /> }
+        content={ <Inventory /> }
         zIndex={stack.indexOf("inventory") + 1}
         top="50vh"
         left="calc(100vw - 400px - 20px)"

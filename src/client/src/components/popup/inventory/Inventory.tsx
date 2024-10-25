@@ -3,21 +3,13 @@ import css from "components/popup/inventory/Inventory.module.css"
 import popupCss from "components/popup/Popup.module.css"
 import { PinInPrivate, PinInPublic, InventoryMessageIn, MessageIn, getMessageThread } from "api/api"
 // import { creationState } from "components/App"
+import { useAppState } from "state/context"
 
-type InventoryProps = {
-    pins: PinInPrivate[]
-    setHighlightedPin: (pin: PinInPrivate | PinInPublic | null) => void
-    // setCurrState: (state: creationState) => void
-    setPinIsHighlighted: (pinState: boolean) => void
 
-    setHighlightedThread: (thread: MessageIn) => void
-    setThreadIsHighlighted: (threadState: boolean) => void
 
-    sentNotes: InventoryMessageIn[]
-    receivedNotes: InventoryMessageIn[]
-}
+function Inventory() {
 
-function Inventory({ pins, setHighlightedPin, setPinIsHighlighted, setHighlightedThread, setThreadIsHighlighted, sentNotes, receivedNotes }: InventoryProps) {
+    const { pins, setHighlightedPin, setPinIsHighlighted, setHighlightedThread, setThreadIsHighlighted, sentNotes, receivedNotes } = useAppState()
     const [tab, setTab] = useState("Sent");
 
     const getThread = async (sender_id: number, recipient_id: number) => {

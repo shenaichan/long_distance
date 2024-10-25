@@ -1,6 +1,7 @@
 import css from "components/popup/Popup.module.css";
 import { ReactNode } from 'react';
 import { pinCreationState } from "components/App";
+import { useAppState } from "state/context"
 
 type popupProps = {
     title: string, 
@@ -9,27 +10,18 @@ type popupProps = {
     zIndex: number,
     top: string,
     left: string,
-
-    sourceState: pinCreationState
-    setSourceState: (state: pinCreationState) => void;
-
-    destState: pinCreationState
-    setDestState: (state: pinCreationState) => void;
-
-    pinIsHighlighted: boolean
-    setPinIsHighlighted: (pinState: boolean) => void;
-
-    threadIsHighlighted: boolean
-    setThreadIsHighlighted: (pinState: boolean) => void;
 }
 
-function Popup({title, content, zIndex, top, left, 
-    sourceState, setSourceState,
-    destState, setDestState,
-    pinIsHighlighted, setPinIsHighlighted, 
-    threadIsHighlighted, setThreadIsHighlighted }: popupProps) {
+function Popup({title, content, zIndex, top, left, }: popupProps) {
 
     // const [isMinimized, setIsMinimized] = useState(false);
+    const { 
+        sourceState, setSourceState,
+        destState, setDestState,
+        pinIsHighlighted, setPinIsHighlighted, 
+        threadIsHighlighted, setThreadIsHighlighted
+    } = useAppState()
+
 
     function closeWindow() {
         if ( sourceState === "confirming" ) {

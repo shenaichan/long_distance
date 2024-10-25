@@ -8,22 +8,20 @@ import Moderation from "components/popup/info/tabs/Moderation"
 import Donate from "components/popup/info/tabs/Donate"
 import Contact from "components/popup/info/tabs/Contact"
 import Acknowledgements from "components/popup/info/tabs/Acknowledgements"
+import { useAppState } from "state/context"
 
 import { getNumKM } from "api/api"
 
 import { useState, useEffect } from "react";
 
 type InfoProps = {
-    spinLevel: number;
-    setSpinLevel: (spinLevel: number) => void;
-    soundLevel: number;
-    setSoundLevel: (soundLevel: number) => void;
     audioRef: React.RefObject<HTMLAudioElement>;
-    // hasReadRules: boolean;
-    // setHasReadRules: (hasReadRules: boolean) => void;
 }
 
-function Info({spinLevel, setSpinLevel, soundLevel, setSoundLevel, audioRef }: InfoProps) {
+function Info({ audioRef }: InfoProps) {
+
+    const {spinLevel, setSpinLevel, soundLevel, setSoundLevel } = useAppState()
+
     const [tab, setTab] = useState("About");
     const [numKM, setNumKM] = useState(0);
     const [dateTime, _] = useState(new Date().toLocaleString());

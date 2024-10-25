@@ -4,38 +4,19 @@ import css from "components/popup/write/Write.module.css";
 import { useState, useRef, useEffect } from "react";
 import { createRelationshipAndMessage, createAndAddResponse, PinInPrivate } from "api/api";
 import { pinCreationState } from "components/App";
+import { useAppState } from "state/context"
 
-type WriteProps = {
-  sourcePlaceName: string;
-  setSourcePlaceName: (placeName: string) => void;
-  destinationPlaceName: string;
-  setDestinationPlaceName: (placeName: string) => void;
-  // setCurrState: (state: creationState) => void;
-  // currState: creationState;
 
-  sourceState: pinCreationState;
-  setSourceState: (state: pinCreationState) => void;
 
-  destState: pinCreationState;
-  setDestState: (state: pinCreationState) => void;
+function Write() {
 
-  senderID: number;
-  setSenderID: (id: number) => void;
-  recipientID: number;
-  setRecipientID: (id: number) => void;
-  pins: PinInPrivate[];
-
-  isResponse: boolean;
-  setIsResponse: (status: boolean) => void;
-}
-
-function Write({ sourcePlaceName, setSourcePlaceName, 
-  destinationPlaceName, setDestinationPlaceName,
-  sourceState, setSourceState,
-  destState, setDestState,
-  senderID, setSenderID,
-  recipientID, setRecipientID, pins,
-  isResponse, setIsResponse }: WriteProps) {
+  const { sourcePlaceName, setSourcePlaceName, 
+    destinationPlaceName, setDestinationPlaceName,
+    sourceState, setSourceState,
+    destState, setDestState,
+    senderID, setSenderID,
+    recipientID, setRecipientID, pins,
+    isResponse, setIsResponse } = useAppState()
 
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
 

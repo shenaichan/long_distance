@@ -26,8 +26,7 @@ function Acknowledgements() {
             </p>
             <br />
             <p>
-                And thank you to Caroline Pastrano, for
-                collaborating with me in the usability testing of the site, and for so much more. 
+                And thank you to Caroline Pastrano. 
                 In Gabrielle Zevin's <em>Tomorrow, and Tomorrow, and Tomorrow</em>, 
                 she writes, 
                 "To design a game is to imagine the person who will eventually play it."
