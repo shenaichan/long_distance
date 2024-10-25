@@ -20,7 +20,9 @@ type WriteProps = {
   setDestState: (state: pinCreationState) => void;
 
   senderID: number;
+  setSenderID: (id: number) => void;
   recipientID: number;
+  setRecipientID: (id: number) => void;
   pins: PinInPrivate[];
 }
 
@@ -28,7 +30,8 @@ function Write({ sourcePlaceName, setSourcePlaceName,
   destinationPlaceName, setDestinationPlaceName,
   sourceState, setSourceState,
   destState, setDestState,
-  senderID, recipientID, pins }: WriteProps) {
+  senderID, setSenderID,
+  recipientID, setRecipientID, pins }: WriteProps) {
 
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
 
@@ -120,6 +123,7 @@ function Write({ sourcePlaceName, setSourcePlaceName,
           destinationPlaceName={destinationPlaceName}
           setDestinationPlaceName={setDestinationPlaceName}
           
+          setRecipientID={setRecipientID}
         />
 
         <From 
@@ -135,6 +139,8 @@ function Write({ sourcePlaceName, setSourcePlaceName,
           sourcePlaceName={sourcePlaceName}
           setSourcePlaceName={setSourcePlaceName}
 
+          setSenderID={setSenderID}
+          
           pins={pins}
         />
 

@@ -283,7 +283,10 @@ function App() {
 
 
           senderID={senderID}
+          setSenderID={setSenderID}
+
           recipientID={recipientID}
+          setRecipientID={setRecipientID}
           pins={pins}
         /> }
         zIndex={stack.indexOf("write") + 1}

@@ -75,6 +75,19 @@ export async function getMessageThread(sender_id: number, recipient_id: number) 
     return messageThread as MessageIn
 }
 
+export async function getPinByFriendCode(friend_code: string) {
+    const pinResponse = await fetch(
+        `${BASE_URL}get_pin_by_friend_code?friend_code=${friend_code}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const pin = await pinResponse.json()
+    return pin as PinInPublic
+}
+
 export async function getPinByPublicToken(public_token: string) {
     const pinResponse = await fetch(
         `${BASE_URL}get_pin_by_public_token?public_token=${public_token}`, 

@@ -1,5 +1,6 @@
 import { pinCreationState } from "components/App"
 import { useState, useEffect } from "react"
+import { PinInPublic, getPinByFriendCode } from "api/api"
 import css from "components/popup/Popup.module.css"
 
 type ToProps = {
@@ -14,10 +15,19 @@ type ToProps = {
 
   destinationPlaceName: string;
   setDestinationPlaceName: (placeName: string) => void;
+
+  setRecipientID: (id: number) => void;
 }
 
-function To({ sourceState, setSourceState, destState, setDestState, destinationPlaceName, setDestinationPlaceName}: ToProps) {
+function To({ sourceState, setSourceState, destState, setDestState, destinationPlaceName, setDestinationPlaceName, setRecipientID}: ToProps) {
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")
+  const [ friendCode, setFriendCode ] = useState("")
+
+  const getFriendPin = async (friendCode: string) => {
+    const pin: PinInPublic = await getPinByFriendCode(friendCode)
+    setRecipientID(pin.id);
+    setDestinationPlaceName(pin.place_name);
+  }
 
   useEffect(() => {
     if ( ( sourceState === "selecting" || sourceState === "confirming" ) && pinEntryMode === "map select") {
@@ -66,6 +76,7 @@ function To({ sourceState, setSourceState, destState, setDestState, destinationP
               <input 
                 placeholder="Enter friend code"
                 style={{ "flex": 1, "margin": "2px", "fontFamily": "arial", "fontSize": "16px", "lineHeight": "1", "padding": "0px" }}
+                onChange={(e) => { setFriendCode(e.target.value) }}
               ></input>
               <button
                 onClick={() => { setDestState("inactive"); setPinEntryMode("neither yet"); }}
@@ -73,7 +84,7 @@ function To({ sourceState, setSourceState, destState, setDestState, destinationP
                 Back
               </button>
               <button
-                onClick={() => { setDestState("selected"); setPinEntryMode("neither yet"); }}
+                onClick={() => { getFriendPin(friendCode); setDestState("selected"); setPinEntryMode("finalized"); }}
                 style={{ "margin": "2px" }}>
                 Confirm
               </button>

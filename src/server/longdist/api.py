@@ -100,6 +100,10 @@ def print_queryset(queryset):
         print("\n")
     return
 
+@api.get("get_pin_by_friend_code", response=PinOutPublic)
+def get_pin_by_friend_code(request, friend_code: str):
+    return Pin.objects.get(private_allow_mail_token=friend_code)
+
 @api.get("get_pin_by_public_token", response=PinOutPublic)
 def get_pin_by_public_token(request, public_token: str):
     return Pin.objects.get(public_share_token=public_token)

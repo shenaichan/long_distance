@@ -16,15 +16,18 @@ type FromProps = {
   sourcePlaceName: string;
   setSourcePlaceName: (placeName: string) => void;
 
+  setSenderID: (id: number) => void;
+
   pins: PinInPrivate[];
 }
 
-function From({ sourceState, setSourceState, destState, setDestState, sourcePlaceName, setSourcePlaceName, pins }: FromProps) {
+function From({ sourceState, setSourceState, destState, setDestState, sourcePlaceName, setSourcePlaceName, setSenderID, pins }: FromProps) {
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")
 
   useEffect(() => {
     if (pins.length > 0 && pinEntryMode === "pin list") {
       setSourcePlaceName(pins[0].place_name);
+      setSenderID(pins[0].id);
     }
   }, [pinEntryMode])
 
@@ -80,7 +83,7 @@ function From({ sourceState, setSourceState, destState, setDestState, sourcePlac
             </> : ( pinEntryMode === "pin list" ?
             <>
               <select style={{fontSize: "16px", fontFamily: "arial", lineHeight: "1", margin: "4px 2px 2px 2px", width: "calc(100% - 134px)"}}
-                onChange={(e) => {setSourcePlaceName(e.target.value); console.log(sourcePlaceName);}}
+                onChange={(e) => {setSourcePlaceName(e.target.value); setSenderID(pins[e.target.options.selectedIndex].id);}}
               >
                 { pins.map( pin => <option
                     key={pin.id}
