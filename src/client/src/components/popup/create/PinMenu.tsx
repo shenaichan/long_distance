@@ -64,18 +64,13 @@ function PinMenu() {
             }
  
             <div>
-                <p style={{fontWeight: "bold"}}>Sent</p>
+                <p style={{fontWeight: "bold"}}>Friends</p>
                 <ul>
                     {started.map(pin => (
                         // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
                         <li key={pin.id} onClick={() => {if (!highlightedPin) return;
                             getThread(highlightedPin.id, pin.id);}}>{pin.place_name}</li>
                     ))}
-                </ul>
-            </div>
-            <div>
-                <p style={{fontWeight: "bold"}}>Received</p>   
-                <ul>
                     {finished.map(pin => (
                         // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
                         <li key={pin.id} onClick={() => {if (!highlightedPin) return;

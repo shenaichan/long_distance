@@ -72,7 +72,7 @@ function Map() {
   const slowSpinZoom = 3;
 
   let userInteracting = false;
-  let spinEnabled = true;
+  const spinEnabledRef = useRef(true);
 
   function openPinMenu(feature: GeoJSON.Feature) {
     // setCurrState("pinMenu");
@@ -99,7 +99,8 @@ function Map() {
 
     const zoom = map.current.getZoom();
     let speed = spinLevelRef.current * 1.2;
-    if (spinEnabled && !userInteracting && zoom < maxSpinZoom) {
+    console.log("spin enabled is ", spinEnabledRef.current)
+    if (spinEnabledRef.current && !userInteracting && zoom < maxSpinZoom) {
       if (zoom > slowSpinZoom) {
         // Slow spinning at higher zooms
         const zoomDif =
@@ -155,8 +156,9 @@ function Map() {
 
   useEffect(() => {
     if (!highlightedThread) return;
-    if (!threadIsHighlighted) return;
-    setSpinLevel(0)
+    if (!threadIsHighlighted) {spinEnabledRef.current = true; spinGlobe(); return;}
+    if (!map.current) return;
+    // setSpinLevel(0)
     const { lng, lat } = map.current!.getCenter()
     const {geometry} = center(points([[ highlightedThread.sender.longitude,
                                                highlightedThread.sender.latitude ] ,
@@ -166,10 +168,12 @@ function Map() {
     const [threadLong, threadLat] = geometry.coordinates
     console.log(threadLat, threadLong)
     const jumpDist = distance([lng, lat], [threadLong, threadLat])
+    console.log(jumpDist)
     const threadDist = distance([ highlightedThread.sender.longitude,
       highlightedThread.sender.latitude ] ,
     [ highlightedThread.recipient.longitude,
       highlightedThread.recipient.latitude ])
+    console.log(threadDist)
     console.log(map.current?.getZoom())
     const zoom = (1 - threadDist/20004)**1.3 * 2.0 + 2
     map.current?.flyTo({
@@ -178,6 +182,8 @@ function Map() {
       essential: true,
       duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 + (jumpDist) 
     });
+    console.log("theoretically jumped?")
+    spinEnabledRef.current = false;
     // }
   }, [highlightedThread, threadIsHighlighted]);
 
@@ -327,64 +333,6 @@ function Map() {
           'circle-stroke-color': '#fff'
         }
       });
-
-      // // // inspect a cluster on click
-      // function handleClusterClick(e: mapboxgl.MapMouseEvent) {
-      //   // const features = map.current?.queryRenderedFeatures(e.point, {
-      //   //   layers: ['clusters']
-      //   // });
-      //   if (map.current && e.features && e.features[0].properties) {
-      //     const clusterId = e.features[0].properties.cluster_id;
-      //     const source: mapboxgl.GeoJSONSource = map.current.getSource('pins') as mapboxgl.GeoJSONSource
-
-      //     source
-      //       .getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
-      //         if (err) return;
-      //         if (e.features![0].geometry.type == "Point") {
-      //           map.current?.easeTo({
-      //             center: [e.features![0].geometry.coordinates[0], e.features![0].geometry.coordinates[1]],
-      //             zoom: zoom
-      //           });
-      //         }
-      //       });
-      //   }
-      // }
-
-      // function handleRouteClick(e: mapboxgl.MapMouseEvent) {
-      //   if ( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" ) return;
-      //   if (e.features && e.features[0].properties) {
-      //     console.log(e.features[0])
-          
-      //     const openMessageMenu = async (sender_id: number, recipient_id: number) => {
-      //       const thread = await getMessageThread(sender_id, recipient_id)
-      //       setHighlightedThread(thread)
-      //       setThreadIsHighlighted(true)
-      //       setPinIsHighlighted(false)
-      //     }
-
-      //     openMessageMenu(e.features[0].properties.sender_id, e.features[0].properties.recipient_id)
-      //   }
-      // }
-
-      // function handleUnclusteredClick(e: mapboxgl.MapMouseEvent) {
-      //   if ( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" ) return;
-      //   if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
-      //     console.log(e.features[0])
-      //     console.log(e.features[0].geometry.coordinates.slice());
-      //     const coordinates = e.features[0].geometry.coordinates.slice();
-
-      //     // Ensure that if the map is zoomed out such that
-      //     // multiple copies of the feature are visible, the
-      //     // popup appears over the copy being pointed to.
-      //     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-      //       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      //     }
-
-      //     openPinMenu(e.features[0]);
-      //   }
-      // }
-
-
 
       map.current.on('mouseenter', 'unclustered-point', () => {
         if (!map.current) return;
