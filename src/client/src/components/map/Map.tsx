@@ -1,33 +1,61 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import { FeatureCollection } from "geojson";
-import { getApprovedPins, getApprovedRoutes, getPlaceName, PinInPrivate, PinInPublic } from "api/api";
-// import { coordinates, mouseLocation, creationState, NO_COORDINATES } from "components/App";
-import { coordinates, pinCreationState } from "components/App";
+import { getApprovedPins, getApprovedRoutes, getPlaceName, getMessageThread } from "api/api";
 import map_pin from "assets/map_pin.png";
 import { useAppState } from "state/context"
+import { center } from "@turf/center"
+import { distance } from "@turf/distance"
+import { points } from "@turf/helpers"
 
-function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-  let earthsRadius = 6371
+// function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+//   let earthsRadius = 6371
 
-  const [ y1, y2, x1, x2 ]  = [lat1, lat2, lon1, lon2].map( deg => deg * Math.PI / 180 )
-  const dy = y2 - y1
-  const dx = x2 - x1
-  const a = Math.sin(dy / 2)**2 + Math.cos(y1) * Math.cos(y2) * Math.sin(dx / 2)**2
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-  const distance = earthsRadius * c
+//   const [ y1, y2, x1, x2 ]  = [lat1, lat2, lon1, lon2].map( deg => deg * Math.PI / 180 )
+//   const dy = y2 - y1
+//   const dx = x2 - x1
+//   const a = Math.sin(dy / 2)**2 + Math.cos(y1) * Math.cos(y2) * Math.sin(dx / 2)**2
+//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+//   const distance = earthsRadius * c
 
-  return distance
-}
+//   return distance
+// }
+
+// function midpoint(lat1: number, lng1: number, lat2: number, lng2: number) {
+//   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
+//   const toDegrees = (radians: number) => radians * (180 / Math.PI);
+
+//   lat1 = toRadians(lat1);
+//   lng1 = toRadians(lng1);
+//   lat2 = toRadians(lat2);
+//   lng2 = toRadians(lng2);
+
+//   const dLng = lng2 - lng1;
+
+//   const Bx = Math.cos(lat2) * Math.cos(dLng);
+//   const By = Math.cos(lat2) * Math.sin(dLng);
+
+//   const midLat = Math.atan2(
+//     Math.sin(lat1) + Math.sin(lat2),
+//     Math.sqrt((Math.cos(lat1) + Bx) ** 2 + By ** 2)
+//   );
+
+//   const midLng = lng1 + Math.atan2(By, Math.cos(lat1) + Bx);
+
+//   return [
+//     toDegrees(midLat),
+//     toDegrees(midLng)
+//   ];
+// }
 
 function Map() {
 
-  const { setPinLocation, spinLevel, setPlaceName,
+  const { setPinLocation, spinLevel, setSpinLevel, setPlaceName,
     sourceState, setSourceState, destState, setDestState,
     pinIsHighlighted, setPinIsHighlighted, highlightedPin, setHighlightedPin, 
-    pins 
+    pins, highlightedThread, setHighlightedThread, threadIsHighlighted, setThreadIsHighlighted
   } = useAppState()
-  
+
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const smallClusterColor: string = '#1084d0';
@@ -48,6 +76,7 @@ function Map() {
 
   function openPinMenu(feature: GeoJSON.Feature) {
     // setCurrState("pinMenu");
+    setThreadIsHighlighted(false)
     setPinIsHighlighted(true)
     if (feature.geometry.type === "Point" && feature.properties) {
       const pin = pins.find(pin => pin.id === feature.properties!.id);
@@ -110,18 +139,47 @@ function Map() {
 
   useEffect(() => {
     if (!highlightedPin) return;
+    if (!pinIsHighlighted) return;
     // if (highlightedPin.longitude !== NO_COORDINATES.longitude && highlightedPin.latitude !== NO_COORDINATES.latitude) {
     const { lng, lat } = map.current!.getCenter()
-    const distance = haversineDistance(lat, lng, highlightedPin.latitude, highlightedPin.longitude)
-    console.log(distance)
+    const dist = distance([lng, lat], [highlightedPin.longitude, highlightedPin.latitude])
+    console.log(dist)
     map.current?.flyTo({
       center: [highlightedPin.longitude, highlightedPin.latitude],
       zoom: maxZoom,
       essential: true,
-      duration: 1500 + (maxZoom - map.current.getZoom()) * 250 + (distance) * 1.5
+      duration: 1500 + (maxZoom - map.current.getZoom())**1.2 * 250 + (dist) * 1.5
     });
     // }
   }, [highlightedPin, pinIsHighlighted]);
+
+  useEffect(() => {
+    if (!highlightedThread) return;
+    if (!threadIsHighlighted) return;
+    setSpinLevel(0)
+    const { lng, lat } = map.current!.getCenter()
+    const {geometry} = center(points([[ highlightedThread.sender.longitude,
+                                               highlightedThread.sender.latitude ] ,
+                                             [ highlightedThread.recipient.longitude,
+                                               highlightedThread.recipient.latitude ]]
+    ))
+    const [threadLong, threadLat] = geometry.coordinates
+    console.log(threadLat, threadLong)
+    const jumpDist = distance([lng, lat], [threadLong, threadLat])
+    const threadDist = distance([ highlightedThread.sender.longitude,
+      highlightedThread.sender.latitude ] ,
+    [ highlightedThread.recipient.longitude,
+      highlightedThread.recipient.latitude ])
+    console.log(map.current?.getZoom())
+    const zoom = (1 - threadDist/20004)**1.3 * 2.0 + 2
+    map.current?.flyTo({
+      center: [threadLong, threadLat],
+      zoom: zoom,
+      essential: true,
+      duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 + (jumpDist) 
+    });
+    // }
+  }, [highlightedThread, threadIsHighlighted]);
 
   useEffect(() => {
     // currStateRef.current = currState;
@@ -173,11 +231,11 @@ function Map() {
     if (!map.current) return;
 
     map.current.on('load', async () => {
+      // tellServerMapLoaded();
       const pins: FeatureCollection = await getApprovedPins();
       const routes: FeatureCollection = await getApprovedRoutes();
 
       if (!map.current) return;
-
 
       map.current.addSource('routes', {
         'type': 'geojson',
@@ -191,6 +249,16 @@ function Map() {
         'paint': {
             'line-width': 1.5,
             'line-color': '#007cbf'
+        }
+      });
+
+      map.current.addLayer({
+        'id': 'routes-hitbox',
+        'source': 'routes',
+        'type': 'line',
+        'paint': {
+            'line-width': 10,
+            'line-opacity': 0
         }
       });
 
@@ -260,44 +328,72 @@ function Map() {
         }
       });
 
-      // // inspect a cluster on click
-      map.current.on('click', 'clusters', (e) => {
-        const features = map.current?.queryRenderedFeatures(e.point, {
-          layers: ['clusters']
-        });
-        if (map.current && features && features[0].properties) {
-          const clusterId = features[0].properties.cluster_id;
-          const source: mapboxgl.GeoJSONSource = map.current.getSource('pins') as mapboxgl.GeoJSONSource
+      // // // inspect a cluster on click
+      // function handleClusterClick(e: mapboxgl.MapMouseEvent) {
+      //   // const features = map.current?.queryRenderedFeatures(e.point, {
+      //   //   layers: ['clusters']
+      //   // });
+      //   if (map.current && e.features && e.features[0].properties) {
+      //     const clusterId = e.features[0].properties.cluster_id;
+      //     const source: mapboxgl.GeoJSONSource = map.current.getSource('pins') as mapboxgl.GeoJSONSource
 
-          source
-            .getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
-              if (err) return;
-              if (features[0].geometry.type == "Point") {
-                map.current?.easeTo({
-                  center: [features[0].geometry.coordinates[0], features[0].geometry.coordinates[1]],
-                  zoom: zoom
-                });
-              }
-            });
-        }
+      //     source
+      //       .getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
+      //         if (err) return;
+      //         if (e.features![0].geometry.type == "Point") {
+      //           map.current?.easeTo({
+      //             center: [e.features![0].geometry.coordinates[0], e.features![0].geometry.coordinates[1]],
+      //             zoom: zoom
+      //           });
+      //         }
+      //       });
+      //   }
+      // }
+
+      // function handleRouteClick(e: mapboxgl.MapMouseEvent) {
+      //   if ( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" ) return;
+      //   if (e.features && e.features[0].properties) {
+      //     console.log(e.features[0])
+          
+      //     const openMessageMenu = async (sender_id: number, recipient_id: number) => {
+      //       const thread = await getMessageThread(sender_id, recipient_id)
+      //       setHighlightedThread(thread)
+      //       setThreadIsHighlighted(true)
+      //       setPinIsHighlighted(false)
+      //     }
+
+      //     openMessageMenu(e.features[0].properties.sender_id, e.features[0].properties.recipient_id)
+      //   }
+      // }
+
+      // function handleUnclusteredClick(e: mapboxgl.MapMouseEvent) {
+      //   if ( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" ) return;
+      //   if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
+      //     console.log(e.features[0])
+      //     console.log(e.features[0].geometry.coordinates.slice());
+      //     const coordinates = e.features[0].geometry.coordinates.slice();
+
+      //     // Ensure that if the map is zoomed out such that
+      //     // multiple copies of the feature are visible, the
+      //     // popup appears over the copy being pointed to.
+      //     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      //       coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      //     }
+
+      //     openPinMenu(e.features[0]);
+      //   }
+      // }
+
+
+
+      map.current.on('mouseenter', 'unclustered-point', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = 'pointer';
       });
 
-      map.current.on('click', 'unclustered-point', (e) => {
-        if ( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" ) return;
-        if (e.features && e.features[0].properties && e.features[0].geometry.type == "Point") {
-          console.log(e.features[0])
-          console.log(e.features[0].geometry.coordinates.slice());
-          const coordinates = e.features[0].geometry.coordinates.slice();
-
-          // Ensure that if the map is zoomed out such that
-          // multiple copies of the feature are visible, the
-          // popup appears over the copy being pointed to.
-          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-          }
-
-          openPinMenu(e.features[0]);
-        }
+      map.current.on('mouseleave', 'unclustered-point', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = '';
       });
 
       map.current.on('mouseenter', 'clusters', () => {
@@ -306,6 +402,16 @@ function Map() {
       });
 
       map.current.on('mouseleave', 'clusters', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = '';
+      });
+
+      map.current.on('mouseenter', 'routes-hitbox', () => {
+        if (!map.current) return;
+        map.current.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.current.on('mouseleave', 'routes-hitbox', () => {
         if (!map.current) return;
         map.current.getCanvas().style.cursor = '';
       });
@@ -331,15 +437,20 @@ function Map() {
 
     map.current.on('click', function (e) {
       if (!map.current) return;
-      if (( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" ) && map.current.getZoom() > 5) {
+      if (( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" )) {
         var coordinates = e.lngLat;
         setPinLocation({longitude: coordinates.lng, latitude: coordinates.lat});
-        map.current.flyTo({
+        
+        const { lng, lat } = map.current!.getCenter()
+        const dist = distance([lng, lat], [coordinates.lng, coordinates.lat])
+        console.log(dist)
+        map.current?.flyTo({
           center: [coordinates.lng, coordinates.lat],
           zoom: maxZoom,
           essential: true,
-          duration: 1500 + (maxZoom - map.current.getZoom()) * 250
+          duration: 1500 + (maxZoom - map.current.getZoom())**1.2 * 250 + (dist) * 1.5
         });
+
         // setMouseLocation({x: window.innerWidth / 2, y: window.innerHeight / 2});
         if ( sourceStateRef.current === "selecting") {
           // setCurrState("pinConfirmation");
@@ -353,6 +464,52 @@ function Map() {
           console.log(placeName);
           setPlaceName(placeName);
         });
+      } else {
+        const features = map.current.queryRenderedFeatures(e.point, { layers: ['clusters','routes-hitbox','unclustered-point'] });
+        if (features.length) {
+          const layer = features[0].layer!.id
+          console.log(layer)
+          if (layer === 'clusters') {
+            console.log("in clusters")
+            if (features && features[0].properties) {
+              console.log("ok like really in clusters")
+              const clusterId = features[0].properties.cluster_id;
+              const source: mapboxgl.GeoJSONSource = map.current.getSource('pins') as mapboxgl.GeoJSONSource
+    
+              source
+                .getClusterExpansionZoom(clusterId, (err: any, zoom: any) => {
+                  if (err) return;
+                  if (features![0].geometry.type == "Point") {
+                    map.current?.easeTo({
+                      center: [features![0].geometry.coordinates[0], features![0].geometry.coordinates[1]],
+                      zoom: zoom
+                    });
+                  }
+                });
+            }
+          } else if (layer === "routes-hitbox") {
+            
+            if (features && features[0].properties) {
+              console.log(features[0])
+              
+              const openMessageMenu = async (sender_id: number, recipient_id: number) => {
+                const thread = await getMessageThread(sender_id, recipient_id)
+                setHighlightedThread(thread)
+                setThreadIsHighlighted(true)
+                setPinIsHighlighted(false)
+              }
+
+              openMessageMenu(features[0].properties.sender_id, features[0].properties.recipient_id)
+            }
+          } else if (layer === "unclustered-point") {
+
+            
+            if (features && features[0].properties && features[0].geometry.type == "Point") {
+              openPinMenu(features[0]);
+            }
+
+          }
+        }
       }
     });
 

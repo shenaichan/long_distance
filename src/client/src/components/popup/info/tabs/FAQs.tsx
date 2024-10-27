@@ -1,6 +1,12 @@
 function FAQs() {
     return (
         <div>
+            <p><b>I want to hire you as a software engineer!</b></p>
+            <p>
+                That's not a question, but I'd love to talk! You can email me at
+                shenaiwc [at] gmail [dot] com. Feel free to check out my portfolio as well.
+            </p>
+            <br />
             <p><b>What is a "mile/kilometer of love"?</b></p>
             <p>
                 Every time a new connection between two pins is created, the 
@@ -8,14 +14,12 @@ function FAQs() {
                 miles/kilometers of love in the world.
             </p>
             <br />
-            <p><b>Why does my message require approval?</b></p>
+            <p><b>Why did my message get rejected?</b></p>
             <p>
-                Notes From Afar whitelists the ten thousand most common words in the
-                English language. Any message containing a word not in this list
-                requires manual approval to go up on the site. This ameliorates
+                Notes From Afar uses OpenAI's content moderation API to decide
+                whether or not a message can go up on the site. This ameliorates
                 moderation load for me while also allowing most users to post messages
-                in real time. I recognize that this has limitations, notably bias towards
-                English speakers, but I feel that given my limited time and labor,
+                in real time. I recognize that this has limitations, but I feel that given my limited time and labor,
                 combined with my desire to foster a digital space free from
                 hate speech or offensive content, this is 
                 an appropriate, though imperfect, solution.
@@ -27,7 +31,7 @@ function FAQs() {
                 Python & Django backend and a PostgreSQL database, all hosted on Heroku. It uses the
                 Mapbox API for the globe, and 98.css as a starter
                 template for the styling. You can find the entirety of the code in
-                this repository. It is open-source, and I welcome community contributions :)
+                this repository, so feel free to get nosy :)
             </p>
             <br />
             <p><b>Why did you make Notes From Afar?</b></p>
