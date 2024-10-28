@@ -69,12 +69,12 @@ function PinMenu() {
                     {started.map(pin => (
                         // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
                         <li key={pin.id} onClick={() => {if (!highlightedPin) return;
-                            getThread(highlightedPin.id, pin.id);}}>{pin.place_name}</li>
+                            getThread(highlightedPin.id, pin.id);}} style={{ cursor: "pointer" }}>{pin.place_name}</li>
                     ))}
                     {finished.map(pin => (
                         // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
                         <li key={pin.id} onClick={() => {if (!highlightedPin) return;
-                            getThread(pin.id, highlightedPin.id);}}>{pin.place_name}</li>
+                            getThread(pin.id, highlightedPin.id);}} style={{ cursor: "pointer" }}>{pin.place_name}</li>
                     ))}
                 </ul>
             </div>

@@ -174,7 +174,7 @@ function Map() {
 
   useEffect(() => {
     if (!highlightedThread) return;
-    if (!threadIsHighlighted) {spinEnabledRef.current = true; spinGlobe(); return;}
+    if (!threadIsHighlighted) {spinEnabledRef.current = true; if (!pinIsHighlighted) {spinGlobe();} return;}
     const { lng, lat } = map.current!.getCenter()
     const {geometry} = center(points([[ highlightedThread.sender.longitude,
                                                highlightedThread.sender.latitude ] ,
