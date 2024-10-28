@@ -1,4 +1,4 @@
-from ninja import NinjaAPI, Schema
+from ninja import NinjaAPI, Schema, HttpError
 from longdist.models import Pin, Message, Relationship
 from pprint import pprint
 from django.db import transaction
@@ -150,6 +150,9 @@ def create_approve_claim_pin(request, data: PinIn):
 
 @api.post("/create_relationship_and_message")
 def create_relationship_and_message(request, data: MessageIn):
+    if Relationship.objects.filter(sender=data.sender, recipient=data.recipient).exists():
+        raise HttpError(400, "Cannot make two messages")
+
     with transaction.atomic():
         message = Message.objects.create(content=data.message)
         sender = Pin.objects.get(id=data.sender)
@@ -174,6 +177,9 @@ def add_email_to_message(request, data: MessageIn):
 
 @api.patch("/create_and_add_response")
 def create_and_add_response(request, data: MessageIn):
+    if Relationship.objects.filter(sender=data.sender, recipient=data.recipient).response:
+        raise HttpError(400, "Cannot make two responses")
+    
     with transaction.atomic():
         response = Message.objects.create(content=data.message)
         relationship = Relationship.objects.get(sender=data.sender, recipient=data.recipient)
