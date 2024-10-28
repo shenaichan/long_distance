@@ -20,11 +20,15 @@ type InfoProps = {
 
 function Info({ audioRef }: InfoProps) {
 
-    const {spinLevel, setSpinLevel, soundLevel, setSoundLevel } = useAppState()
+    const {spinLevel, setSpinLevel, soundLevel, setSoundLevel, numWorldNotes, setRandomNote } = useAppState()
 
     const [tab, setTab] = useState("About");
     const [numKM, setNumKM] = useState(0);
     const [dateTime, _] = useState(new Date().toLocaleString());
+
+    function randomNote() {
+        setRandomNote(Math.floor(Math.random() * numWorldNotes));
+    }
 
     useEffect(() => {
         getNumKM().then((numKM) => {
@@ -115,7 +119,7 @@ function Info({ audioRef }: InfoProps) {
             </div>
             <br />
 
-            <button>Show me a random note</button>
+            <button onClick={randomNote}>Show me a random note</button>
             <br/>
             <p style={{textAlign: "center"}}>Made with &lt;3 by <a href="https://shenaichan.github.io/" target="_blank" rel="noopener noreferrer">Shenai Chan</a> at the <a href="https://www.recurse.com/" target="_blank" rel="noopener noreferrer">Recurse Center</a></p>
         </>

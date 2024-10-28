@@ -196,7 +196,9 @@ function Write() {
         <br/>
         { isResponse ? null :
         <>
-          <p style={{ textAlign: "center" }}>Want to let your friend write back? Send them the secret link below ;)</p>
+          <p style={{ textAlign: "center" }}>Want to let your friend write back? Send them the secret link below ;)
+            Make sure to get it now -- you won't be able to see it again!
+          </p>
           <br/>
         </>
         }

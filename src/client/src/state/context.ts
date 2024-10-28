@@ -1,6 +1,6 @@
 import { PinInPrivate, InventoryMessageIn, PinInPublic, MessageIn } from "api/api";
 import { createContext, useContext } from "react";
-import { menuKind, coordinates, pinCreationState, NO_COORDINATES } from "components/App"
+import { menuKind, coordinates, pinCreationState } from "components/App"
 
 export type AppState = {
   stack: menuKind[];
@@ -41,6 +41,10 @@ export type AppState = {
   setHighlightedThread: (thread: MessageIn | null) => void;
   isResponse: boolean;
   setIsResponse: (isResponse: boolean) => void;
+  numWorldNotes: number;
+  setNumWorldNotes: (num: number) => void;
+  randomNote: number;
+  setRandomNote: (num: number) => void;
 }
 
 const noop = () => {};
@@ -84,6 +88,10 @@ export const AppContext = createContext<AppState>({
   setHighlightedThread: noop,
   isResponse: false,
   setIsResponse: noop,
+  numWorldNotes: 0,
+  setNumWorldNotes: noop,
+  randomNote: -1,
+  setRandomNote: noop,
   }
 );
 

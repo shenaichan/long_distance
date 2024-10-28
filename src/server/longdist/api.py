@@ -28,33 +28,6 @@ class FeatureCollection(Schema):
     type: str
     features: List[Feature]
 
-
-
-'''
-          // San Francisco
-      const origin = [-122.414, 37.776];
-
-      // Washington DC
-      const destination = [-77.032, 38.913];
-
-      // A simple line from origin to destination.
-      const route: GeoJSON.GeoJSON = {
-          'type': 'FeatureCollection',
-          'features': [
-              {
-                  'type': 'Feature',
-                  'geometry': {
-                      'type': 'LineString',
-                      'coordinates': [origin, destination]
-                  },
-                  'properties': {
-                    
-                  }
-              }
-          ]
-      };
-'''
-
 class PinIn(Schema):
     latitude:float
     longitude:float

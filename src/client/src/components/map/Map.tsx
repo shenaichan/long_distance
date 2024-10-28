@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import { FeatureCollection } from "geojson";
+import { FeatureCollection, Point } from "geojson";
 import { getApprovedPins, getApprovedRoutes, getPlaceName, getMessageThread } from "api/api";
 import map_pin from "assets/map_pin.png";
 import { useAppState } from "state/context"
@@ -53,7 +53,8 @@ function Map() {
   const { setPinLocation, spinLevel, setSpinLevel, setPlaceName,
     sourceState, setSourceState, destState, setDestState,
     pinIsHighlighted, setPinIsHighlighted, highlightedPin, setHighlightedPin, 
-    pins, highlightedThread, setHighlightedThread, threadIsHighlighted, setThreadIsHighlighted
+    pins, highlightedThread, setHighlightedThread, threadIsHighlighted, setThreadIsHighlighted,
+    setNumWorldNotes, randomNote
   } = useAppState()
 
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -73,6 +74,16 @@ function Map() {
 
   let userInteracting = false;
   const spinEnabledRef = useRef(true);
+
+  const allPinsRef = useRef<FeatureCollection>()
+  const allNotesRef = useRef<FeatureCollection>()
+
+  async function openMessageMenu(sender_id: number, recipient_id: number){
+    const thread = await getMessageThread(sender_id, recipient_id)
+    setHighlightedThread(thread)
+    setThreadIsHighlighted(true)
+    setPinIsHighlighted(false)
+  }
 
   function openPinMenu(feature: GeoJSON.Feature) {
     // setCurrState("pinMenu");
@@ -134,6 +145,13 @@ function Map() {
   }
 
   useEffect(() => {
+    if (randomNote === -1) return;
+    console.log(allNotesRef.current)
+    const feature = allNotesRef.current!.features[randomNote]
+    openMessageMenu(feature.properties!.sender_id, feature.properties!.recipient_id)
+  }, [randomNote])
+
+  useEffect(() => {
     spinLevelRef.current = spinLevel;
     spinGlobe();
   }, [spinLevel]);
@@ -157,8 +175,6 @@ function Map() {
   useEffect(() => {
     if (!highlightedThread) return;
     if (!threadIsHighlighted) {spinEnabledRef.current = true; spinGlobe(); return;}
-    if (!map.current) return;
-    // setSpinLevel(0)
     const { lng, lat } = map.current!.getCenter()
     const {geometry} = center(points([[ highlightedThread.sender.longitude,
                                                highlightedThread.sender.latitude ] ,
@@ -166,15 +182,11 @@ function Map() {
                                                highlightedThread.recipient.latitude ]]
     ))
     const [threadLong, threadLat] = geometry.coordinates
-    console.log(threadLat, threadLong)
     const jumpDist = distance([lng, lat], [threadLong, threadLat])
-    console.log(jumpDist)
     const threadDist = distance([ highlightedThread.sender.longitude,
       highlightedThread.sender.latitude ] ,
     [ highlightedThread.recipient.longitude,
       highlightedThread.recipient.latitude ])
-    console.log(threadDist)
-    console.log(map.current?.getZoom())
     const zoom = (1 - threadDist/20004)**1.3 * 2.0 + 2
     map.current?.flyTo({
       center: [threadLong, threadLat],
@@ -182,7 +194,6 @@ function Map() {
       essential: true,
       duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 + (jumpDist) 
     });
-    console.log("theoretically jumped?")
     spinEnabledRef.current = false;
     // }
   }, [highlightedThread, threadIsHighlighted]);
@@ -238,14 +249,16 @@ function Map() {
 
     map.current.on('load', async () => {
       // tellServerMapLoaded();
-      const pins: FeatureCollection = await getApprovedPins();
-      const routes: FeatureCollection = await getApprovedRoutes();
+      allPinsRef.current = await getApprovedPins();
+      allNotesRef.current = await getApprovedRoutes();
+      setNumWorldNotes(allNotesRef.current.features.length)
+
 
       if (!map.current) return;
 
       map.current.addSource('routes', {
         'type': 'geojson',
-        'data': routes
+        'data': allNotesRef.current
       });
 
       map.current.addLayer({
@@ -270,7 +283,7 @@ function Map() {
 
       map.current.addSource('pins', {
         type: 'geojson',
-        data: pins,
+        data: allPinsRef.current,
         // data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson',
         cluster: true,
         clusterMaxZoom: 14,
@@ -439,13 +452,6 @@ function Map() {
             
             if (features && features[0].properties) {
               console.log(features[0])
-              
-              const openMessageMenu = async (sender_id: number, recipient_id: number) => {
-                const thread = await getMessageThread(sender_id, recipient_id)
-                setHighlightedThread(thread)
-                setThreadIsHighlighted(true)
-                setPinIsHighlighted(false)
-              }
 
               openMessageMenu(features[0].properties.sender_id, features[0].properties.recipient_id)
             }

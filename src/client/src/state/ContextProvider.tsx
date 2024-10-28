@@ -23,6 +23,8 @@ export function AppProvider( { children }: { children: ReactNode }) {
     const [ threadIsHighlighted, setThreadIsHighlighted ] = useState<boolean>(false)
     const [ highlightedThread, setHighlightedThread ] = useState< MessageIn | null >(null)
     const [ isResponse, setIsResponse ] = useState<boolean>(false)
+    const [ numWorldNotes, setNumWorldNotes ] = useState<number>(0)
+    const [ randomNote, setRandomNote ] = useState<number>(-1)
 
     return (
         <AppContext.Provider
@@ -64,7 +66,11 @@ export function AppProvider( { children }: { children: ReactNode }) {
                 highlightedThread,
                 setHighlightedThread,
                 isResponse,
-                setIsResponse
+                setIsResponse,
+                numWorldNotes,
+                setNumWorldNotes,
+                randomNote,
+                setRandomNote
             }}
         >
             { children }
