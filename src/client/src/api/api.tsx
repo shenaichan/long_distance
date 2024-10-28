@@ -75,6 +75,21 @@ export async function getMessageThreadBySecret(secret: string) {
     return messageThread as MessageIn
 }
 
+
+export async function checkIfMessageIsSafe(message: string) {
+    const messageSafetyResponse = await fetch(
+        `${BASE_URL}check_if_message_is_safe?content=${message}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const messageSafety = await messageSafetyResponse.json()
+    console.log(messageSafety)
+    return messageSafety as boolean
+}
+
 export async function getMessageThread(sender_id: number, recipient_id: number) {
     const messageThreadResponse = await fetch(
         `${BASE_URL}get_message_thread?sender_id=${sender_id}&recipient_id=${recipient_id}`, 

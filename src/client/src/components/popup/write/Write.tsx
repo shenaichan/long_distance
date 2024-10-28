@@ -2,7 +2,7 @@ import To from "components/popup/write/sections/To"
 import From from "components/popup/write/sections/From"
 import css from "components/popup/write/Write.module.css";
 import { useState, useRef, useEffect } from "react";
-import { createRelationshipAndMessage, createAndAddResponse, PinInPrivate } from "api/api";
+import { createRelationshipAndMessage, createAndAddResponse, checkIfMessageIsSafe } from "api/api";
 import { pinCreationState } from "components/App";
 import { useAppState } from "state/context"
 
@@ -42,12 +42,14 @@ function Write() {
   const [message, setMessage] = useState("");
   const [creating, setCreating] = useState<boolean>(true);
   const [secretLink, setSecretLink] = useState<string>("");
+  const [reprimand, setReprimand] = useState<boolean>(false);
 
   function startWriting() {
     setWriting(true);
   }
 
   function reset() {
+    setReprimand(false);
     setWriting(false);
     setSourceState("inactive");
     setDestState("inactive");
@@ -55,18 +57,28 @@ function Write() {
   }
 
   async function submitMessage() {
-    if (isResponse) {
-      await createAndAddResponse({ sender: senderID, recipient: recipientID, message: message });
+    const isSafe = await checkIfMessageIsSafe(message)
+    if(isSafe){
+      if (isResponse) {
+        await createAndAddResponse({ sender: senderID, recipient: recipientID, message: message });
+      } else {
+        const secretToken = await createRelationshipAndMessage({ sender: senderID, recipient: recipientID, message: message });
+        setSecretLink(`localhost:5173/reply/${secretToken}`)
+      }
+      setSourceState("inactive");
+      setDestState("inactive");
+      setMessage("");
+      setCreating(false);
+      setReprimand(false);
     } else {
-      const secretToken = await createRelationshipAndMessage({ sender: senderID, recipient: recipientID, message: message });
-      setSecretLink(`localhost:5173/reply/${secretToken}`)
+      setReprimand(true)
     }
-    setSourceState("inactive");
-    setDestState("inactive");
-    setMessage("");
-    setCreating(false);
     // setCurrState("messageConfirmation");
   }
+
+  useEffect(() => {
+    setReprimand(false)
+  }, [message])
 
   function copySecretLink() {
     navigator.clipboard.writeText(secretLink)
@@ -176,6 +188,11 @@ function Write() {
             )
           }
         </div>
+
+        { reprimand ? 
+          <p style={{ textAlign: "center" }}>Sorry, your message was found to be inappropriate, and could not be submitted.</p> : null
+        }
+        
         <div style={{display: "flex"}}>
 
           <button onClick={reset} style={{display: "inline", flex: "1", marginRight: "2px" }}>

@@ -3,6 +3,12 @@ from longdist.models import Pin, Message, Relationship
 from pprint import pprint
 from django.db import transaction
 from typing import List, Optional
+from openai import OpenAI
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
+client = OpenAI()
 
 api = NinjaAPI()
 
@@ -72,6 +78,15 @@ def print_queryset(queryset):
         pprint(entry)
         print("\n")
     return
+
+@api.get("check_if_message_is_safe", response=bool)
+def check_if_message_is_safe(request, content: str):
+    response = client.moderations.create(
+        model="omni-moderation-latest",
+        input=content
+    )
+    pprint(response)
+    return not response.results[0].flagged
 
 @api.get("get_pin_by_friend_code", response=PinOutPublic)
 def get_pin_by_friend_code(request, friend_code: str):
