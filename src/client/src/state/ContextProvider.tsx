@@ -1,11 +1,10 @@
-import { AppState, AppContext, useAppState } from "state/context"
+import { AppContext } from "state/context"
 import { ReactNode, useState } from 'react'
 import { PinInPrivate, InventoryMessageIn, PinInPublic, MessageIn } from "api/api";
-import { menuKind, coordinates, pinCreationState, NO_COORDINATES } from "components/App"
+import { menuKind, coordinates, pinCreationState } from "components/App"
 
 export function AppProvider( { children }: { children: ReactNode }) {
     const [stack, setStack] = useState<menuKind[]>(["info", "write", "inventory"]);
-    const [pinLocation, setPinLocation] = useState<coordinates>({ longitude: -200, latitude: -100 });
     const [spinLevel, setSpinLevel] = useState<number>(2);
     const [soundLevel, setSoundLevel] = useState<number>(0);
     const [placeName, setPlaceName] = useState<string>("");
@@ -25,14 +24,19 @@ export function AppProvider( { children }: { children: ReactNode }) {
     const [ isResponse, setIsResponse ] = useState<boolean>(false)
     const [ numWorldNotes, setNumWorldNotes ] = useState<number>(0)
     const [ randomNote, setRandomNote ] = useState<number>(-1)
+    const [ sourceLocation, setSourceLocation ] = useState<coordinates>({ longitude: -200, latitude: -100 });
+    const [ destLocation, setDestLocation ] = useState<coordinates>({ longitude: -200, latitude: -100 });
+    const [ replyPW, setReplyPW ] = useState<string>("");
 
     return (
         <AppContext.Provider
             value={{
                 stack,
                 setStack,
-                pinLocation,
-                setPinLocation,
+                sourceLocation,
+                setSourceLocation,
+                destLocation,
+                setDestLocation,
                 spinLevel,
                 setSpinLevel,
                 soundLevel,
@@ -70,7 +74,9 @@ export function AppProvider( { children }: { children: ReactNode }) {
                 numWorldNotes,
                 setNumWorldNotes,
                 randomNote,
-                setRandomNote
+                setRandomNote,
+                replyPW,
+                setReplyPW,
             }}
         >
             { children }

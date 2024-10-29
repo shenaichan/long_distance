@@ -50,7 +50,7 @@ import { points } from "@turf/helpers"
 
 function Map() {
 
-  const { setPinLocation, spinLevel, setSpinLevel, setPlaceName,
+  const { setSourceLocation, setDestLocation, spinLevel, setSpinLevel, setSourcePlaceName, setDestinationPlaceName,
     sourceState, setSourceState, destState, setDestState,
     pinIsHighlighted, setPinIsHighlighted, highlightedPin, setHighlightedPin, 
     pins, highlightedThread, setHighlightedThread, threadIsHighlighted, setThreadIsHighlighted,
@@ -165,9 +165,9 @@ function Map() {
     console.log(dist)
     map.current?.flyTo({
       center: [highlightedPin.longitude, highlightedPin.latitude],
-      zoom: maxZoom,
+      zoom: 14,
       essential: true,
-      duration: 1500 + (maxZoom - map.current.getZoom())**1.2 * 250 + (dist) * 1.5
+      duration: 1500 + (14 - map.current.getZoom())**1.2 * 250 * dist/2000
     });
     // }
   }, [highlightedPin, pinIsHighlighted]);
@@ -192,7 +192,7 @@ function Map() {
       center: [threadLong, threadLat],
       zoom: zoom,
       essential: true,
-      duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 + (jumpDist) 
+      duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 * jumpDist/1000 
     });
     spinEnabledRef.current = false;
     // }
@@ -202,6 +202,8 @@ function Map() {
     // currStateRef.current = currState;
     sourceStateRef.current = sourceState;
     destStateRef.current = destState;
+    console.log("source state is", sourceState)
+    console.log("dest state is", destState)
     pinIsHighlightedRef.current = pinIsHighlighted;
     if (!map.current) return;
     if (!mapContainer.current) return;
@@ -400,7 +402,12 @@ function Map() {
       if (!map.current) return;
       if (( sourceStateRef.current === "selecting" || destStateRef.current === "selecting" )) {
         var coordinates = e.lngLat;
-        setPinLocation({longitude: coordinates.lng, latitude: coordinates.lat});
+        if ( sourceStateRef.current === "selecting" ) {
+          setSourceLocation({longitude: coordinates.lng, latitude: coordinates.lat});
+        } else {
+          setDestLocation({longitude: coordinates.lng, latitude: coordinates.lat});
+        }
+        
         
         const { lng, lat } = map.current!.getCenter()
         const dist = distance([lng, lat], [coordinates.lng, coordinates.lat])
@@ -409,22 +416,31 @@ function Map() {
           center: [coordinates.lng, coordinates.lat],
           zoom: maxZoom,
           essential: true,
-          duration: 1500 + (maxZoom - map.current.getZoom())**1.2 * 250 + (dist) * 1.5
+          duration: 1500 + (maxZoom - map.current.getZoom())**1.2 * 250 + dist
         });
+
+        async function getName(lat: number, lng: number, isSource: boolean) {
+          const name = await getPlaceName(lat, lng)
+          if (isSource) {
+            setSourcePlaceName(name)
+          } else {
+            setDestinationPlaceName(name)
+            console.log(name)
+          }
+        }
 
         // setMouseLocation({x: window.innerWidth / 2, y: window.innerHeight / 2});
         if ( sourceStateRef.current === "selecting") {
           // setCurrState("pinConfirmation");
           setSourceState("confirming")
+          getName(coordinates.lat, coordinates.lng, true)
         }
         else {
           // setCurrState("destinationConfirmation");
           setDestState("confirming")
+          getName(coordinates.lat, coordinates.lng, false)
         }
-        getPlaceName(coordinates.lat, coordinates.lng).then(placeName => {
-          console.log(placeName);
-          setPlaceName(placeName);
-        });
+        
       } else {
         const features = map.current.queryRenderedFeatures(e.point, { layers: ['clusters','routes-hitbox','unclustered-point'] });
         if (features.length) {

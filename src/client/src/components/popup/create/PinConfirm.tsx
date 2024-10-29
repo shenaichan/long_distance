@@ -8,34 +8,29 @@ import { useAppState } from "state/context"
 
 function PinConfirm() {
 
-    const {placeName, setSourceState, setDestState, pinLocation, sourceState,
-        setSourcePlaceName, setDestinationPlaceName, setSenderID, setRecipientID, 
+    const {placeName, setSourceState, setDestState, sourceState,
+        sourcePlaceName, destinationPlaceName, setSenderID, setRecipientID, 
         pins, setPins, setHighlightedPin} = useAppState()
     
     const isSource = sourceState === "confirming"
         
         // Function to add a new pin
-    function addPinToStorage(newPin: PinInPrivate) {
-        const updatedPins = [...pins, newPin];
-        setPins(updatedPins);
-        localStorage.setItem("pins", JSON.stringify(updatedPins));
-    };
 
     async function confirmPin() {
         if (isSource) {
-            let pin = await createApproveClaimPin({latitude: pinLocation.latitude, longitude: pinLocation.longitude, place_name: placeName});
-            setSenderID(pin.id);
-            setSourcePlaceName(placeName);
-            // setCurrState("none");
+            // let pin = await createApproveClaimPin({latitude: pinLocation.latitude, longitude: pinLocation.longitude, place_name: placeName});
+            // setSenderID(pin.id);
+            // setSourcePlaceName(placeName);
+            
             setSourceState("selected");
-            addPinToStorage(pin);
-            // setHighlightedPin(pin);
+            // addPinToStorage(pin);
+            
         }
         else {
-            let pin = await createApproveClaimPin({latitude: pinLocation.latitude, longitude: pinLocation.longitude, place_name: placeName});
-            setRecipientID(pin.id);
-            setDestinationPlaceName(placeName);
-            // setCurrState("none");
+            // let pin = await createApproveClaimPin({latitude: pinLocation.latitude, longitude: pinLocation.longitude, place_name: placeName});
+            // setRecipientID(pin.id);
+            // setDestinationPlaceName(placeName);
+            
             setDestState("selected");
         }
     }
@@ -59,7 +54,7 @@ function PinConfirm() {
                     "Sorry, we couldn't find a place name for your location. " :
                     ""
                 }
-                Create a new pin representing {isSource ? "you" : "your friend"} at <b>{placeName}</b>?
+                Create a new pin representing {isSource ? "you" : "your friend"} at <b>{isSource ? sourcePlaceName : destinationPlaceName}</b>?
             </p>
             <div style={{display: "flex"}}>
                 <button className={css.fillButton} onClick={confirmPin}>Yes</button>

@@ -1,4 +1,5 @@
-from ninja import NinjaAPI, Schema, HttpError
+from ninja import NinjaAPI, Schema
+from ninja.errors import HttpError
 from longdist.models import Pin, Message, Relationship
 from pprint import pprint
 from django.db import transaction
@@ -41,7 +42,15 @@ class PinIn(Schema):
 
 class MessageIn(Schema):
     sender:int
+    senderPW:str
     recipient:int
+    recipientPW:str
+    message:str
+
+class ResponseIn(Schema):
+    sender:int
+    recipient:int
+    replyPW:str
     message:str
 
 class PinOutPrivate(Schema):
@@ -53,6 +62,10 @@ class PinOutPrivate(Schema):
     private_ownership_token:str
     private_allow_mail_token:str
 
+class PinOutFriend(Schema):
+    id: int
+    private_allow_mail_token:str
+
 class PinOutPublic(Schema):
     id:int
     latitude:float
@@ -62,7 +75,7 @@ class PinOutPublic(Schema):
 
 class MessageOut(Schema):
     sender:PinOutPublic
-    recipient:PinOutPublic
+    recipient:PinOutPrivate
     message:str
     response:Optional[str] = None
 
@@ -90,7 +103,10 @@ def check_if_message_is_safe(request, content: str):
 
 @api.get("get_pin_by_friend_code", response=PinOutPublic)
 def get_pin_by_friend_code(request, friend_code: str):
-    return Pin.objects.get(private_allow_mail_token=friend_code)
+    if Pin.objects.filter(private_allow_mail_token=friend_code).exists():
+        return Pin.objects.get(private_allow_mail_token=friend_code)
+    else:
+        return PinOutPublic(id=-1, latitude=-100, longitude=-200, place_name="", public_share_token="")
 
 @api.get("get_pin_by_public_token", response=PinOutPublic)
 def get_pin_by_public_token(request, public_token: str):
@@ -131,11 +147,13 @@ def get_approved_routes(request):
     # print(features)
     return FeatureCollection(type="FeatureCollection", features=features)
 
-@api.post("/create_pin", response=PinOutPrivate)
-def create_pin(request, data: PinIn):
-    pin = Pin.objects.create(latitude=data.latitude,
-                             longitude=data.longitude,
-                             place_name=data.place_name)
+@api.post("/create_friend_pin", response=PinOutFriend)
+def create_friend_pin(request, data: PinIn):
+    with transaction.atomic():
+        pin = Pin.objects.create(latitude=data.latitude,
+                                longitude=data.longitude,
+                                place_name=data.place_name)
+        pin.approve()
     return pin
 
 @api.post("/create_approve_claim_pin", response=PinOutPrivate)
@@ -148,46 +166,80 @@ def create_approve_claim_pin(request, data: PinIn):
         pin.claim()
     return pin
 
+@api.get("/get_secret_reply_link")
+def get_secret_reply_link(request, sender, senderPW, recipient):
+    with transaction.atomic():
+        sender = Pin.objects.get(id=sender)
+        recipient = Pin.objects.get(id=recipient)
+        if (sender.private_ownership_token == senderPW):
+            relationship = Relationship.objects.get(sender=sender, recipient=recipient)
+            return relationship.private_allow_response_token
+        else:
+            raise HttpError(400, "Invalid credentials")
+        
+@api.get("/check_if_relationship_exists")
+def create_relationship_and_message(request, sender, recipient):
+    if (Relationship.objects.filter(sender=sender, recipient=recipient).exists() or 
+        Relationship.objects.filter(recipient=sender, sender=recipient).exists()):
+        return True
+    return False
+
 @api.post("/create_relationship_and_message")
 def create_relationship_and_message(request, data: MessageIn):
-    if Relationship.objects.filter(sender=data.sender, recipient=data.recipient).exists():
+    if (Relationship.objects.filter(sender=data.sender, recipient=data.recipient).exists() or 
+        Relationship.objects.filter(recipient=data.sender, sender=data.recipient).exists()):
         raise HttpError(400, "Cannot make two messages")
 
     with transaction.atomic():
-        message = Message.objects.create(content=data.message)
         sender = Pin.objects.get(id=data.sender)
         recipient = Pin.objects.get(id=data.recipient)
-        relationship = Relationship.objects.create(sender=sender,
-                                    recipient=recipient,
-                                    message=message)
-        relationship.calculate_distance()
+        print("actual sender pw is", sender.private_ownership_token)
+        print("submitted sender pw is", data.senderPW)
+        print("actual recipient pw is", recipient.private_allow_mail_token)
+        print("submitted recipient pw is", data.recipientPW)
+        if (sender.private_ownership_token == data.senderPW and recipient.private_allow_mail_token == data.recipientPW):
+            message = Message.objects.create(content=data.message)
+            relationship = Relationship.objects.create(sender=sender,
+                                        recipient=recipient,
+                                        message=message)
+            relationship.calculate_distance()
 
-        # temporarily approve all messages
-        relationship.approve()
-        relationship.message.approve()
-        relationship.recipient.approve()
-    return relationship.private_allow_response_token
-
-@api.patch("/add_email_to_message")
-def add_email_to_message(request, data: MessageIn):
-    # message = Message.objects.get(id=data.message)
-    # message.email = data.email
-    # message.save()
-    return
+            # temporarily approve all messages
+            relationship.approve()
+            relationship.message.approve()
+            relationship.recipient.approve()
+            return relationship.private_allow_response_token
+        else:
+            raise HttpError(400, "Invalid credentials")
+    
 
 @api.patch("/create_and_add_response")
-def create_and_add_response(request, data: MessageIn):
-    if Relationship.objects.filter(sender=data.sender, recipient=data.recipient).response:
+def create_and_add_response(request, data: ResponseIn):
+    if Relationship.objects.filter(sender=data.sender, recipient=data.recipient).first().response:
         raise HttpError(400, "Cannot make two responses")
     
     with transaction.atomic():
-        response = Message.objects.create(content=data.message)
         relationship = Relationship.objects.get(sender=data.sender, recipient=data.recipient)
-        relationship.add_response(response)
+        if relationship.private_allow_response_token == data.replyPW:
+            response = Message.objects.create(content=data.message)
+            
+            relationship.add_response(response)
 
-        # temporarily approve response
-        relationship.response.approve()
-    return
+            # temporarily approve response
+            relationship.response.approve()
+            return
+        else:
+            raise HttpError(400, "Invalid credentials")
+
+@api.get("/can_write_response")
+def can_write_response(request, secret: str):
+    relationship_exists = Relationship.objects.filter(private_allow_response_token=secret).exists()
+    if not relationship_exists:
+        return False
+    response_exists = Relationship.objects.get(private_allow_response_token=secret).response
+    if response_exists:
+        return False
+    return True
 
 @api.get("/get_relationships_started", response=List[PinOutPublic])
 def get_relationships_started(request, public_token: str):

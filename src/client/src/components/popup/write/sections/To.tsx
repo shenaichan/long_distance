@@ -2,31 +2,32 @@ import { pinCreationState } from "components/App"
 import { useState, useEffect } from "react"
 import { PinInPublic, getPinByFriendCode } from "api/api"
 import css from "components/popup/Popup.module.css"
+import { useAppState } from "state/context"
 
 type ToProps = {
-  // setCurrState: (state: creationState) => void;
-  // currState: creationState;
-
-  sourceState: pinCreationState;
-  setSourceState: (state: pinCreationState) => void;
-
-  destState: pinCreationState;
-  setDestState: (state: pinCreationState) => void;
-
-  destinationPlaceName: string;
-  setDestinationPlaceName: (placeName: string) => void;
-
-  setRecipientID: (id: number) => void;
+  friendCode: string
+  setFriendCode: (code: string) => void
+  setDestIsExisting: (exists: boolean) => void
 }
 
-function To({ sourceState, setSourceState, destState, setDestState, destinationPlaceName, setDestinationPlaceName, setRecipientID}: ToProps) {
+function To({ friendCode, setFriendCode, setDestIsExisting }: ToProps) {
+  const { sourceState, setSourceState, destState, setDestState, destinationPlaceName, setDestinationPlaceName, setRecipientID,
+    isResponse, sourcePlaceName
+  } = useAppState()
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")
-  const [ friendCode, setFriendCode ] = useState("")
 
   const getFriendPin = async (friendCode: string) => {
     const pin: PinInPublic = await getPinByFriendCode(friendCode)
-    setRecipientID(pin.id);
-    setDestinationPlaceName(pin.place_name);
+    if (pin.id === -1) {
+      alert('Invalid friend code!');
+      setFriendCode("");
+    } else {
+      setDestIsExisting(true);
+      setRecipientID(pin.id);
+      setDestinationPlaceName(pin.place_name);
+      setDestState("selected"); 
+      setPinEntryMode("finalized");
+    }
   }
 
   useEffect(() => {
@@ -41,6 +42,7 @@ function To({ sourceState, setSourceState, destState, setDestState, destinationP
       setPinEntryMode("finalized")
     } else if ( destState === "inactive" ) {
       setPinEntryMode("neither yet")
+      setFriendCode("")
     }
   }, [destState])
 
@@ -76,6 +78,7 @@ function To({ sourceState, setSourceState, destState, setDestState, destinationP
               <input 
                 placeholder="Enter friend code"
                 style={{ "flex": 1, "margin": "2px", "fontFamily": "arial", "fontSize": "16px", "lineHeight": "1", "padding": "0px" }}
+                value={friendCode}
                 onChange={(e) => { setFriendCode(e.target.value) }}
               ></input>
               <button
@@ -84,13 +87,13 @@ function To({ sourceState, setSourceState, destState, setDestState, destinationP
                 Back
               </button>
               <button
-                onClick={() => { getFriendPin(friendCode); setDestState("selected"); setPinEntryMode("finalized"); }}
+                onClick={() => { getFriendPin(friendCode); }}
                 style={{ "margin": "2px" }}>
                 Confirm
               </button>
             </> : 
             <>
-               <p className={css.truncated} style={{margin: "0px 0px 3px 3px"}}>{destinationPlaceName}</p>
+               <p className={css.truncated} style={{margin: "0px 0px 3px 3px"}}>{isResponse ? sourcePlaceName : destinationPlaceName}</p>
             </> )
           )
         }

@@ -6,7 +6,16 @@ type PinOut = {
 
 type MessageOut = {
     sender:number
+    senderPW:string
     recipient:number
+    recipientPW:string
+    message:string
+}
+
+type ResponseOut = {
+    sender:number
+    recipient:number
+    replyPW:string
     message:string
 }
 
@@ -28,9 +37,14 @@ export type PinInPublic = {
     public_share_token: string;
 }
 
+export type PinInFriend = {
+    id: number;
+    private_allow_mail_token: string;
+}
+
 export type MessageIn = {
     sender:PinInPublic
-    recipient:PinInPublic
+    recipient:PinInPrivate
     message:string
     response:string | null
 }
@@ -44,6 +58,7 @@ export type InventoryMessageIn = {
 
 
 const BASE_URL = "http://127.0.0.1:8000/api/"
+
 
 
 
@@ -75,6 +90,33 @@ export async function getMessageThreadBySecret(secret: string) {
     return messageThread as MessageIn
 }
 
+export async function getSecretReplyLink(sender: number, senderPW: string, recipient: number) {
+    const replyLinkResponse = await fetch(
+        `${BASE_URL}get_secret_reply_link?sender=${sender}&senderPW=${senderPW}&recipient=${recipient}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const replyLink = await replyLinkResponse.json()
+    console.log(replyLink)
+    return replyLink as string
+}
+
+export async function canWriteResponse(secret: string) {
+    const canReplyResponse = await fetch(
+        `${BASE_URL}can_write_response?secret=${secret}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const canReply = await canReplyResponse.json()
+    console.log(canReply)
+    return canReply as boolean
+}
 
 export async function checkIfMessageIsSafe(message: string) {
     const messageSafetyResponse = await fetch(
@@ -88,6 +130,20 @@ export async function checkIfMessageIsSafe(message: string) {
     const messageSafety = await messageSafetyResponse.json()
     console.log(messageSafety)
     return messageSafety as boolean
+}
+
+export async function checkIfRelationshipExists(sender: number, recipient: number) {
+    const relationshipExistsResponse = await fetch(
+        `${BASE_URL}check_if_relationship_exists?sender=${sender}&recipient=${recipient}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const relationshipExists= await relationshipExistsResponse.json()
+    console.log(relationshipExists)
+    return relationshipExists as boolean
 }
 
 export async function getMessageThread(sender_id: number, recipient_id: number) {
@@ -186,7 +242,7 @@ export async function createRelationshipAndMessage(message: MessageOut) {
     return secretLink as string
 }
 
-export async function createAndAddResponse(message: MessageOut) {
+export async function createAndAddResponse(message: ResponseOut) {
     await fetch(
         `${BASE_URL}create_and_add_response`,
         {
@@ -199,9 +255,9 @@ export async function createAndAddResponse(message: MessageOut) {
     )
 }
 
-export async function createPin(pin: PinOut) {
+export async function createFriendPin(pin: PinOut) {
     const createdPinResponse = await fetch(
-        `${BASE_URL}create_pin`,
+        `${BASE_URL}create_friend_pin`,
         {
             method: 'POST',
             headers: {
@@ -211,7 +267,7 @@ export async function createPin(pin: PinOut) {
         }
     )
     const createdPin = await createdPinResponse.json()
-    return createdPin as PinInPrivate
+    return createdPin as PinInFriend
 }
 
 export async function createApproveClaimPin(pin: PinOut) {

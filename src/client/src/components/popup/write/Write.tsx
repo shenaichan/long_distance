@@ -2,8 +2,9 @@ import To from "components/popup/write/sections/To"
 import From from "components/popup/write/sections/From"
 import css from "components/popup/write/Write.module.css";
 import { useState, useRef, useEffect } from "react";
-import { createRelationshipAndMessage, createAndAddResponse, checkIfMessageIsSafe } from "api/api";
-import { pinCreationState } from "components/App";
+import { createRelationshipAndMessage, createAndAddResponse, checkIfMessageIsSafe, PinInPrivate, 
+  createApproveClaimPin, createFriendPin, checkIfRelationshipExists
+ } from "api/api";
 import { useAppState } from "state/context"
 
 
@@ -12,11 +13,12 @@ function Write() {
 
   const { sourcePlaceName, setSourcePlaceName, 
     destinationPlaceName, setDestinationPlaceName,
+    sourceLocation, destLocation,
     sourceState, setSourceState,
     destState, setDestState,
     senderID, setSenderID,
-    recipientID, setRecipientID, pins,
-    isResponse, setIsResponse } = useAppState()
+    recipientID, setRecipientID, pins, setPins,
+    isResponse, setIsResponse, replyPW, highlightedThread } = useAppState()
 
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
 
@@ -43,6 +45,13 @@ function Write() {
   const [creating, setCreating] = useState<boolean>(true);
   const [secretLink, setSecretLink] = useState<string>("");
   const [reprimand, setReprimand] = useState<boolean>(false);
+  const [friendCode, setFriendCode] = useState<string>("");
+  const [senderPW, setSenderPW] = useState<string>("");
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [resubmissionReprimand, setResubmissionReprimand] = useState<boolean>(false)
+
+  const [ sourceIsExisting, setSourceIsExisting ] = useState<boolean>(false);
+  const [ destIsExisting, setDestIsExisting ] = useState<boolean>(false);
 
   function startWriting() {
     setWriting(true);
@@ -50,30 +59,61 @@ function Write() {
 
   function reset() {
     setReprimand(false);
+    setResubmissionReprimand(false);
     setWriting(false);
     setSourceState("inactive");
     setDestState("inactive");
     setMessage("");
   }
 
+  function addPinToStorage(newPin: PinInPrivate) {
+    const updatedPins = [...pins, newPin];
+    setPins(updatedPins);
+    localStorage.setItem("pins", JSON.stringify(updatedPins));
+  };
+
   async function submitMessage() {
+    setSubmitting(true);
     const isSafe = await checkIfMessageIsSafe(message)
     if(isSafe){
       if (isResponse) {
-        await createAndAddResponse({ sender: senderID, recipient: recipientID, message: message });
+        await createAndAddResponse({ sender: senderID, recipient: recipientID, replyPW: replyPW, message: message } );
+        addPinToStorage(highlightedThread?.recipient!)
       } else {
-        const secretToken = await createRelationshipAndMessage({ sender: senderID, recipient: recipientID, message: message });
-        setSecretLink(`localhost:5173/reply/${secretToken}`)
+        let senderIDLocal = senderID;
+        let senderPWLocal = senderPW;
+        let recipientIDLocal = recipientID;
+        let recipientPWLocal = friendCode;
+        if (!sourceIsExisting) {
+          let pin = await createApproveClaimPin({latitude: sourceLocation.latitude, longitude: sourceLocation.longitude, place_name: sourcePlaceName});
+          setSenderID(pin.id);
+          senderIDLocal = pin.id;
+          if (pins.filter(myPin => myPin.id === pin.id).length == 0) {
+            addPinToStorage(pin);
+          }
+          setSenderPW(pin.private_ownership_token);
+          senderPWLocal = pin.private_ownership_token;
+        } 
+        if (!destIsExisting) {
+          let pin = await createFriendPin({latitude: destLocation.latitude, longitude: destLocation.longitude, place_name: destinationPlaceName});
+          setRecipientID(pin.id);
+          recipientIDLocal = pin.id;
+          setFriendCode(pin.private_allow_mail_token);
+          recipientPWLocal = pin.private_allow_mail_token;
+        }
+        const relationshipExists = await checkIfRelationshipExists(senderIDLocal, recipientIDLocal)
+        if (relationshipExists) {
+          setResubmissionReprimand(true)
+        } else {
+          const secretToken = await createRelationshipAndMessage({ sender: senderIDLocal, senderPW: senderPWLocal, recipient: recipientIDLocal, recipientPW: recipientPWLocal, message: message });
+          setSecretLink(`localhost:5173/reply/${secretToken}`)
+        }
       }
-      setSourceState("inactive");
-      setDestState("inactive");
-      setMessage("");
       setCreating(false);
-      setReprimand(false);
     } else {
       setReprimand(true)
     }
-    // setCurrState("messageConfirmation");
+    setSubmitting(false);
   }
 
   useEffect(() => {
@@ -125,37 +165,14 @@ function Write() {
     { creating ? 
       <>
         <To
-          // setCurrState={setCurrState}
-          // currState={currState}
-
-          sourceState={sourceState}
-          setSourceState={setSourceState}
-
-          destState={destState}
-          setDestState={setDestState}
-
-          destinationPlaceName={destinationPlaceName}
-          setDestinationPlaceName={setDestinationPlaceName}
-          
-          setRecipientID={setRecipientID}
+          friendCode={friendCode}
+          setFriendCode={setFriendCode}
+          setDestIsExisting={setDestIsExisting}
         />
 
         <From 
-          // setCurrState={setCurrState}
-          // currState={currState}
-
-          sourceState={sourceState}
-          setSourceState={setSourceState}
-
-          destState={destState}
-          setDestState={setDestState}
-
-          sourcePlaceName={sourcePlaceName}
-          setSourcePlaceName={setSourcePlaceName}
-
-          setSenderID={setSenderID}
-
-          pins={pins}
+          setSenderPW={setSenderPW}
+          setSourceIsExisting={setSourceIsExisting}
         />
 
         <div>
@@ -192,7 +209,10 @@ function Write() {
         { reprimand ? 
           <p style={{ textAlign: "center" }}>Sorry, your message was found to be inappropriate, and could not be submitted.</p> : null
         }
-        
+        { submitting ? 
+          <p style={{ textAlign: "center" }}>Submitting message...</p> : null
+        }
+
         <div style={{display: "flex"}}>
 
           <button onClick={reset} style={{display: "inline", flex: "1", marginRight: "2px" }}>
@@ -209,23 +229,34 @@ function Write() {
       </> 
       :
       <>
-        <p style={{ textAlign: "center" }}>Thank you for submitting your note!</p>
-        <br/>
-        { isResponse ? null :
-        <>
-          <p style={{ textAlign: "center" }}>Want to let your friend write back? Send them the secret link below ;)
-            Make sure to get it now -- you won't be able to see it again!
-          </p>
-          <br/>
-        </>
+        {
+          resubmissionReprimand ? 
+          <>
+            <p style={{ textAlign: "center" }}>Sorry, you can't submit more than one note to the same person.</p>
+          </> :
+          <>
+            <p style={{ textAlign: "center" }}>Thank you for submitting your note!</p>
+            { isResponse ? null :
+            <>
+              <p style={{ textAlign: "center" }}>Want to let your friend write back? Send them the secret link below ;)
+              </p>
+              <br/>
+            </>
+            }
+          </>
         }
+        <br/>
         <div style={{display: "flex"}}>
 
-          <button onClick={copySecretLink} style={{display: "inline", flex: "1", marginRight: "2px" }}>
-            Get secret reply link
-          </button>
-          <button onClick={() => { setCreating(true); setIsResponse(false); }} 
-            style={{display: "inline", flex: "1", marginLeft: "2px" }}>
+          {
+            (isResponse || resubmissionReprimand) ?
+            null : 
+            <button onClick={copySecretLink} style={{display: "inline", flex: "1", marginRight: "2px" }}>
+              Get secret reply link
+            </button>
+          }
+          <button onClick={() => { setCreating(true); setIsResponse(false); reset(); }} 
+            style={{display: "inline", flex: "1", marginLeft: (isResponse || resubmissionReprimand) ? "0px" : "2px" }}>
             Write a new note
           </button>
         </div>

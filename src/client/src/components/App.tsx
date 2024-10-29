@@ -9,8 +9,8 @@ import PinConfirm from "components/popup/create/PinConfirm"
 import PinMenu from "components/popup/create/PinMenu"
 import MessageMenu from "components/popup/create/MessageMenu"
 import longdist from "assets/longdist_long.mp3";
-import { PinInPrivate, PinInPublic, getPinByPublicToken, getAllMyMessageThreads, 
-  MessageIn, InventoryMessageIn, getMessageThreadBySecret } from "api/api";
+import { PinInPrivate, getPinByPublicToken, getAllMyMessageThreads, 
+  MessageIn, canWriteResponse, getMessageThreadBySecret } from "api/api";
 // import { AppProvider } from "state/ContextProvider"
 import { useAppState } from "state/context"
 
@@ -33,8 +33,6 @@ function App() {
   const {
       stack,
       setStack,
-      pinLocation,
-      setPinLocation,
       spinLevel,
       setSpinLevel,
       soundLevel,
@@ -68,7 +66,8 @@ function App() {
       highlightedThread,
       setHighlightedThread,
       isResponse,
-      setIsResponse
+      setIsResponse,
+      setReplyPW,
   } = useAppState()
 
 
@@ -98,6 +97,7 @@ function App() {
     let myPins: PinInPrivate[] = [];
     if (myPinsString){
       myPins = (JSON.parse(myPinsString) as PinInPrivate[])
+      console.log(myPins)
       setPins(myPins)
       const pinIds = myPins.map(pin => pin.id)
       getAllNotes(pinIds)
@@ -124,17 +124,28 @@ function App() {
     }
 
     if (secret_reply_token) {
-      async function fetchThread() {
-        const thread: MessageIn =  await getMessageThreadBySecret(secret_reply_token as string)
-        setSenderID(thread.sender.id)
-        setRecipientID(thread.recipient.id)
-        setSourcePlaceName(thread.sender.place_name)
-        setDestinationPlaceName(thread.recipient.place_name)
-        setSourceState("selected")
-        setDestState("selected")
-        setIsResponse(true)
+      async function canReply() {
+        const legal = await canWriteResponse(secret_reply_token as string)
+        if (legal) {
+        async function fetchThread() {
+          const thread: MessageIn =  await getMessageThreadBySecret(secret_reply_token as string)
+          setSenderID(thread.sender.id)
+          setRecipientID(thread.recipient.id)
+          setSourcePlaceName(thread.sender.place_name)
+          setDestinationPlaceName(thread.recipient.place_name)
+          setSourceState("selected")
+          setDestState("selected")
+          setIsResponse(true)
+          setReplyPW(secret_reply_token as string)
+          setHighlightedThread(thread)
+          setThreadIsHighlighted(true)
+        }
+        fetchThread()
+      } else {
+        alert("Already used this link to reply!")
       }
-      fetchThread()
+    }
+    canReply()
     }
   }, []);
 

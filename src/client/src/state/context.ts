@@ -5,8 +5,10 @@ import { menuKind, coordinates, pinCreationState } from "components/App"
 export type AppState = {
   stack: menuKind[];
   setStack: (stack: menuKind[]) => void;
-  pinLocation: coordinates;
-  setPinLocation: (location: coordinates) => void;
+  sourceLocation: coordinates;
+  setSourceLocation: (location: coordinates) => void;
+  destLocation: coordinates;
+  setDestLocation: (location: coordinates) => void;
   spinLevel: number;
   setSpinLevel: (level: number) => void;
   soundLevel: number;
@@ -45,6 +47,8 @@ export type AppState = {
   setNumWorldNotes: (num: number) => void;
   randomNote: number;
   setRandomNote: (num: number) => void;
+  replyPW: string;
+  setReplyPW: (pw: string) => void;
 }
 
 const noop = () => {};
@@ -52,8 +56,10 @@ const noop = () => {};
 export const AppContext = createContext<AppState>({
   stack: [],
   setStack: noop,
-  pinLocation: { longitude: -200, latitude: -100 },
-  setPinLocation: noop,
+  sourceLocation: { latitude: -100, longitude: -200 },
+  setSourceLocation: noop,
+  destLocation: { latitude: -100, longitude: -200 },
+  setDestLocation: noop,
   spinLevel: 0,
   setSpinLevel: noop,
   soundLevel: 0,
@@ -92,6 +98,8 @@ export const AppContext = createContext<AppState>({
   setNumWorldNotes: noop,
   randomNote: -1,
   setRandomNote: noop,
+  replyPW: "",
+  setReplyPW: noop,
   }
 );
 
