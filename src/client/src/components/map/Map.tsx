@@ -135,8 +135,51 @@ function Map() {
   }, [highlightedPin, pinIsHighlighted]);
 
   useEffect(() => {
+    if (map.current && map.current.getLayer('temp-line')) {
+        map.current.removeLayer('temp-line');
+    }
+    
+    // Check if the source exists
+    if (map.current && map.current.getSource('temp-line')) {
+        map.current.removeSource('temp-line');
+    }
     if (!highlightedThread) return;
-    if (!threadIsHighlighted) {spinEnabledRef.current = true; if (!pinIsHighlighted) {spinGlobe();} return;}
+    if (!threadIsHighlighted) {
+      spinEnabledRef.current = true; 
+      if (!pinIsHighlighted) {
+        spinGlobe();
+      } 
+      return;}
+
+    const coords = [[ highlightedThread.sender.longitude,
+      highlightedThread.sender.latitude ] ,
+    [ highlightedThread.recipient.longitude,
+      highlightedThread.recipient.latitude ]]
+    // Add the GeoJSON source for the line
+    map.current!.addSource('temp-line', {
+        type: 'geojson',
+        data: {
+            type: 'Feature',
+            geometry: {
+                type: 'LineString',
+                coordinates: coords
+            },
+            properties: {
+            }
+        }
+    });
+
+    // Add the layer to visualize the line
+    map.current!.addLayer({
+        id: 'temp-line',
+        type: 'line',
+        source: 'temp-line',
+        paint: {
+            'line-color': smallClusterColor, // Line color
+            'line-width': 4        // Line width
+        }
+    });
+  
     const { lng, lat } = map.current!.getCenter()
     const {geometry} = center(points([[ highlightedThread.sender.longitude,
                                                highlightedThread.sender.latitude ] ,
@@ -145,10 +188,7 @@ function Map() {
     ))
     const [threadLong, threadLat] = geometry.coordinates
     const jumpDist = distance([lng, lat], [threadLong, threadLat])
-    const threadDist = distance([ highlightedThread.sender.longitude,
-      highlightedThread.sender.latitude ] ,
-    [ highlightedThread.recipient.longitude,
-      highlightedThread.recipient.latitude ])
+    const threadDist = distance(coords[0], coords[1])
     const zoom = (1 - threadDist/20004)**1.3 * 2.0 + 2
     map.current?.flyTo({
       center: [threadLong, threadLat],
