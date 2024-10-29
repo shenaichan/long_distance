@@ -7,9 +7,11 @@ import { createRelationshipAndMessage, createAndAddResponse, checkIfMessageIsSaf
  } from "api/api";
 import { useAppState } from "state/context"
 
+type WriteProps = {
+  writeEnable: boolean
+}
 
-
-function Write() {
+function Write({ writeEnable }: WriteProps) {
 
   const { sourcePlaceName, setSourcePlaceName, 
     destinationPlaceName, setDestinationPlaceName,
@@ -158,109 +160,113 @@ function Write() {
     return () => clearInterval(intervalId);
   }, []);
 
-
   return (
     <>
+    { writeEnable ? 
 
-    { creating ? 
-      <>
-        <To
-          friendCode={friendCode}
-          setFriendCode={setFriendCode}
-          setDestIsExisting={setDestIsExisting}
-        />
+      (creating ? 
+        <>
+          <To
+            friendCode={friendCode}
+            setFriendCode={setFriendCode}
+            setDestIsExisting={setDestIsExisting}
+          />
 
-        <From 
-          setSenderPW={setSenderPW}
-          setSourceIsExisting={setSourceIsExisting}
-        />
+          <From 
+            setSenderPW={setSenderPW}
+            setSourceIsExisting={setSourceIsExisting}
+          />
 
-        <div>
-          {
-            writing ? (
-              <div>
-                <textarea className={`window ${css.textEntryBox}`}
-                  ref={textEntryRef}
-                  style={{ width: "100%", resize: "none" }}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                ></textarea>
+          <div>
+            {
+              writing ? (
+                <div>
+                  <textarea className={`window ${css.textEntryBox}`}
+                    ref={textEntryRef}
+                    style={{ width: "100%", resize: "none" }}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  ></textarea>
 
-              </div>
-            ) : (
-              <div className={`window ${css.textEntryBox}`}
-                onClick={startWriting}
-                style={{ marginBottom: "5px" }}
-              >
+                </div>
+              ) : (
+                <div className={`window ${css.textEntryBox}`}
+                  onClick={startWriting}
+                  style={{ marginBottom: "5px" }}
+                >
 
-                <div className={css.typewriter}
-                  key={textIndex}>
-                  <p>
-                    {placeholderTexts[textIndex]}
-                  </p>
+                  <div className={css.typewriter}
+                    key={textIndex}>
+                    <p>
+                      {placeholderTexts[textIndex]}
+                    </p>
+                  </div>
+
                 </div>
 
-              </div>
+              )
+            }
+          </div>
 
-            )
+          { reprimand ? 
+            <p style={{ textAlign: "center" }}>Sorry, your message was found to be inappropriate, and could not be submitted.</p> : null
           }
-        </div>
+          { submitting ? 
+            <p style={{ textAlign: "center" }}>Submitting message...</p> : null
+          }
 
-        { reprimand ? 
-          <p style={{ textAlign: "center" }}>Sorry, your message was found to be inappropriate, and could not be submitted.</p> : null
-        }
-        { submitting ? 
-          <p style={{ textAlign: "center" }}>Submitting message...</p> : null
-        }
+          <div style={{display: "flex"}}>
 
-        <div style={{display: "flex"}}>
-
-          <button onClick={reset} style={{display: "inline", flex: "1", marginRight: "2px" }}>
-            Reset
-          </button>
-          <button onClick={submitMessage} disabled={ 
-              ! ( sourceState === "selected" && destState === "selected" && message.trim() ) 
-            }
-            style={{display: "inline", flex: "1", marginLeft: "2px" }}>
-            Submit!
-          </button>
-
-        </div>
-      </> 
-      :
-      <>
-        {
-          resubmissionReprimand ? 
-          <>
-            <p style={{ textAlign: "center" }}>Sorry, you can't submit more than one note to the same person.</p>
-          </> :
-          <>
-            <p style={{ textAlign: "center" }}>Thank you for submitting your note!</p>
-            { isResponse ? null :
-            <>
-              <p style={{ textAlign: "center" }}>Want to let your friend write back? Send them the secret link below ;)
-              </p>
-              <br/>
-            </>
-            }
-          </>
-        }
-        <br/>
-        <div style={{display: "flex"}}>
-
-          {
-            (isResponse || resubmissionReprimand) ?
-            null : 
-            <button onClick={copySecretLink} style={{display: "inline", flex: "1", marginRight: "2px" }}>
-              Get secret reply link
+            <button onClick={reset} style={{display: "inline", flex: "1", marginRight: "2px" }}>
+              Reset
             </button>
+            <button onClick={submitMessage} disabled={ 
+                ! ( sourceState === "selected" && destState === "selected" && message.trim() ) 
+              }
+              style={{display: "inline", flex: "1", marginLeft: "2px" }}>
+              Submit!
+            </button>
+
+          </div>
+        </> 
+        :
+        <>
+          {
+            resubmissionReprimand ? 
+            <>
+              <p style={{ textAlign: "center" }}>Sorry, you can't submit more than one note to the same person.</p>
+            </> :
+            <>
+              <p style={{ textAlign: "center" }}>Thank you for submitting your note!</p>
+              { isResponse ? null :
+              <>
+                <p style={{ textAlign: "center" }}>Want to let your friend write back? Send them the secret link below ;)
+                </p>
+                <br/>
+              </>
+              }
+            </>
           }
-          <button onClick={() => { setCreating(true); setIsResponse(false); reset(); }} 
-            style={{display: "inline", flex: "1", marginLeft: (isResponse || resubmissionReprimand) ? "0px" : "2px" }}>
-            Write a new note
-          </button>
-        </div>
-      </>
+          <br/>
+          <div style={{display: "flex"}}>
+
+            {
+              (isResponse || resubmissionReprimand) ?
+              null : 
+              <button onClick={copySecretLink} style={{display: "inline", flex: "1", marginRight: "2px" }}>
+                Get secret reply link
+              </button>
+            }
+            <button onClick={() => { setCreating(true); setIsResponse(false); reset(); }} 
+              style={{display: "inline", flex: "1", marginLeft: (isResponse || resubmissionReprimand) ? "0px" : "2px" }}>
+              Write a new note
+            </button>
+          </div>
+        </>) 
+      : 
+        <>
+          <p style={{ textAlign: "center"}}>Sorry, you've already written 100 notes, and can't write any more. Maybe look around instead?</p>
+        </>
     }
     </>
     

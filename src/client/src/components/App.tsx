@@ -14,7 +14,7 @@ import { PinInPrivate, getPinByPublicToken, getAllMyMessageThreads,
 // import { AppProvider } from "state/ContextProvider"
 import { useAppState } from "state/context"
 
-import { useState, useEffect, useRef, ReactNode, useContext } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
 
 export type popupProps = {title: string, content: ReactNode};
 export type menuKind = "info" | "pins" | "favorites" | "create" | "write" | "inventory";
@@ -28,30 +28,20 @@ export type pinCreationState =
   | "confirming"
   | "selected";
 
+const MAX_NUM_NOTES = 100;
+
 function App() {
 
   const {
       stack,
       setStack,
-      spinLevel,
-      setSpinLevel,
       soundLevel,
-      setSoundLevel,
-      placeName,
-      setPlaceName,
-      sourcePlaceName,
       setSourcePlaceName,
-      destinationPlaceName,
       setDestinationPlaceName,
-      senderID,
       setSenderID,
-      recipientID,
       setRecipientID,
-      pins,
       setPins,
-      sentNotes,
       setSentNotes,
-      receivedNotes,
       setReceivedNotes,
       highlightedPin,
       setHighlightedPin,
@@ -63,13 +53,12 @@ function App() {
       setPinIsHighlighted,
       threadIsHighlighted,
       setThreadIsHighlighted,
-      highlightedThread,
       setHighlightedThread,
-      isResponse,
       setIsResponse,
       setReplyPW,
   } = useAppState()
 
+  const [writeEnable, setWriteEnable] = useState<boolean>(true);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -89,6 +78,9 @@ function App() {
     const myNotes = await getAllMyMessageThreads(pinIds)
     console.log(myNotes)
     setSentNotes(myNotes[0])
+    if (myNotes[0].length >= MAX_NUM_NOTES) {
+      setWriteEnable(false)
+    }
     setReceivedNotes(myNotes[1])
   }
 
@@ -224,7 +216,9 @@ function App() {
         name="write"
         reStack={reStack}
         title="Write a note"
-        content={ <Write /> }
+        content={ <Write 
+          writeEnable={writeEnable}
+        /> }
         zIndex={stack.indexOf("write") + 1}
         top="20px"
         left="calc(100vw - 400px - 20px)"
