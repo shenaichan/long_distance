@@ -13,6 +13,8 @@ type WriteProps = {
 
 function Write({ writeEnable }: WriteProps) {
 
+  const MAX_NOTE_LENGTH = 280
+
   const { sourcePlaceName, setSourcePlaceName, 
     destinationPlaceName, setDestinationPlaceName,
     sourceLocation, destLocation,
@@ -186,8 +188,9 @@ function Write({ writeEnable }: WriteProps) {
                     style={{ width: "100%", resize: "none" }}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
+                    maxLength={MAX_NOTE_LENGTH}
                   ></textarea>
-
+                  <p style={{position: "absolute", top: "270px", right: "12px", fontSize: "14px"}}>{message.length}/{MAX_NOTE_LENGTH}</p>
                 </div>
               ) : (
                 <div className={`window ${css.textEntryBox}`}
