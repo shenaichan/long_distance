@@ -183,6 +183,7 @@ function Write({ writeEnable }: WriteProps) {
             {
               writing ? (
                 <div>
+                  <p style={{position: "absolute", top: "270px", right: "12px", fontSize: "14px"}}>{message.length}/{MAX_NOTE_LENGTH}</p>
                   <textarea className={`window ${css.textEntryBox}`}
                     ref={textEntryRef}
                     style={{ width: "100%", resize: "none" }}
@@ -190,7 +191,6 @@ function Write({ writeEnable }: WriteProps) {
                     onChange={(e) => setMessage(e.target.value)}
                     maxLength={MAX_NOTE_LENGTH}
                   ></textarea>
-                  <p style={{position: "absolute", top: "270px", right: "12px", fontSize: "14px"}}>{message.length}/{MAX_NOTE_LENGTH}</p>
                 </div>
               ) : (
                 <div className={`window ${css.textEntryBox}`}
