@@ -26,7 +26,7 @@ def check_message(modeladmin, request, queryset):
             print("sent email")
             
 class PinAdmin(admin.ModelAdmin):
-    list_display = ["id", "is_checked", "is_approved", "place_name"]
+    list_display = ["id", "is_checked", "is_approved", "place_name", "latitude", "longitude"]
     list_filter = ["is_checked", "is_approved"]
 
 class MessageAdmin(admin.ModelAdmin):

@@ -1,11 +1,12 @@
 from ninja import NinjaAPI, Schema
 from ninja.errors import HttpError
-from longdist.models import Pin, Message, Relationship
+from longdist.models import Pin, Message, Relationship, MapLoadLog, GeolocateLog
 from pprint import pprint
 from django.db import transaction
 from typing import List, Optional
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
+from datetime import datetime, UTC
 
 load_dotenv(find_dotenv())
 
@@ -73,9 +74,15 @@ class PinOutPublic(Schema):
     place_name:str
     public_share_token:str
 
-class MessageOut(Schema):
+class MessageOutPrivate(Schema):
     sender:PinOutPublic
     recipient:PinOutPrivate
+    message:str
+    response:Optional[str] = None
+
+class MessageOutPublic(Schema):
+    sender:PinOutPublic
+    recipient:PinOutPublic
     message:str
     response:Optional[str] = None
 
@@ -85,12 +92,67 @@ class InventoryMessageOut(Schema):
     content:str
 
 
+MAP_LOADS_ALLOWED = 45000
+GEOLOCATES_ALLOWED = 95000
+
 
 def print_queryset(queryset):
     for entry in queryset:
         pprint(entry)
         print("\n")
     return
+
+@api.get("check_if_map_load_allowed", response=bool)
+def check_if_map_load_allowed(request):
+    last_load = MapLoadLog.objects.last()
+    monthly_quota_used = last_load.monthly_quota_used 
+    last_load_time = last_load.timestamp
+
+    prev_year = last_load_time.year
+    prev_month = last_load_time.month
+
+    now = datetime.now(UTC)
+    curr_year = now.year
+    curr_month = now.month
+
+    if curr_year > prev_year or curr_month > prev_month:
+        monthly_quota_used = 0
+    else:
+        monthly_quota_used += 1
+
+    map_load_allowed = monthly_quota_used < MAP_LOADS_ALLOWED
+
+    if map_load_allowed:
+        MapLoadLog.objects.create(monthly_quota_used=monthly_quota_used)
+        return True
+    else:
+        return False
+    
+@api.get("check_if_geolocate_allowed", response=bool)
+def check_if_geolocate_allowed(request):
+    last_load = GeolocateLog.objects.last()
+    monthly_quota_used = last_load.monthly_quota_used 
+    last_load_time = last_load.timestamp
+
+    prev_year = last_load_time.year
+    prev_month = last_load_time.month
+
+    now = datetime.now(UTC)
+    curr_year = now.year
+    curr_month = now.month
+
+    if curr_year > prev_year or curr_month > prev_month:
+        monthly_quota_used = 0
+    else:
+        monthly_quota_used += 1
+
+    geolocate_allowed = monthly_quota_used < GEOLOCATES_ALLOWED
+    
+    if geolocate_allowed:
+        GeolocateLog.objects.create(monthly_quota_used=monthly_quota_used)
+        return True
+    else:
+        return False
 
 @api.get("check_if_message_is_safe", response=bool)
 def check_if_message_is_safe(request, content: str):
@@ -251,11 +313,11 @@ def get_relationships_finished(request, public_token: str):
     pin = Pin.objects.get(public_share_token=public_token)
     return pin.get_relationships_finished()
 
-@api.get("/get_message_thread", response=MessageOut)
+@api.get("/get_message_thread", response=MessageOutPublic)
 def get_message_thread(request, sender_id: int, recipient_id: int):
     thread_query = Relationship.objects.select_related("message").select_related("response").select_related("sender").select_related("recipient").get(sender=sender_id, recipient=recipient_id)
     
-    thread = MessageOut(sender=thread_query.sender, recipient=thread_query.recipient, message=thread_query.message.content, response=None)
+    thread = MessageOutPublic(sender=thread_query.sender, recipient=thread_query.recipient, message=thread_query.message.content, response=None)
     if (thread_query.response):
         thread.response = thread_query.response.content
     
@@ -270,11 +332,11 @@ def get_message_thread(request, sender_id: int, recipient_id: int):
     '''
     return thread
 
-@api.get("/get_message_thread_by_secret", response=MessageOut)
+@api.get("/get_message_thread_by_secret", response=MessageOutPrivate)
 def get_message_thread_by_secret(request, secret: str):
     thread_query = Relationship.objects.select_related("message").select_related("response").select_related("sender").select_related("recipient").get(private_allow_response_token=secret)
     
-    thread = MessageOut(sender=thread_query.sender, recipient=thread_query.recipient, message=thread_query.message.content, response=None)
+    thread = MessageOutPrivate(sender=thread_query.sender, recipient=thread_query.recipient, message=thread_query.message.content, response=None)
     if (thread_query.response):
         thread.response = thread_query.response.content
     

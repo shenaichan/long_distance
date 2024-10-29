@@ -42,9 +42,16 @@ export type PinInFriend = {
     private_allow_mail_token: string;
 }
 
-export type MessageIn = {
+export type MessageInPrivate = {
     sender:PinInPublic
     recipient:PinInPrivate
+    message:string
+    response:string | null
+}
+
+export type MessageInPublic = {
+    sender:PinInPublic
+    recipient:PinInPublic
     message:string
     response:string | null
 }
@@ -87,7 +94,7 @@ export async function getMessageThreadBySecret(secret: string) {
         })
     const messageThread = await messageThreadResponse.json()
     console.log(messageThread)
-    return messageThread as MessageIn
+    return messageThread as MessageInPrivate
 }
 
 export async function getSecretReplyLink(sender: number, senderPW: string, recipient: number) {
@@ -141,7 +148,7 @@ export async function checkIfRelationshipExists(sender: number, recipient: numbe
                 'Content-Type': 'application/json',
             }
         })
-    const relationshipExists= await relationshipExistsResponse.json()
+    const relationshipExists = await relationshipExistsResponse.json()
     console.log(relationshipExists)
     return relationshipExists as boolean
 }
@@ -157,7 +164,7 @@ export async function getMessageThread(sender_id: number, recipient_id: number) 
         })
     const messageThread = await messageThreadResponse.json()
     console.log(messageThread)
-    return messageThread as MessageIn
+    return messageThread as MessageInPublic
 }
 
 export async function getPinByFriendCode(friend_code: string) {

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import css from "components/popup/inventory/Inventory.module.css"
 import popupCss from "components/popup/Popup.module.css"
-import { PinInPrivate, PinInPublic, InventoryMessageIn, MessageIn, getMessageThread } from "api/api"
+import { PinInPrivate, PinInPublic, InventoryMessageIn, getMessageThread } from "api/api"
 // import { creationState } from "components/App"
 import { useAppState } from "state/context"
 

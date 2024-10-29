@@ -121,4 +121,10 @@ class Relationship(models.Model):
         self.save()
         return
     
+class MapLoadLog(models.Model):
+    monthly_quota_used = models.IntegerField(default=0)
+    timestamp = models.DateTimeField(default=timezone.now)
 
+class GeolocateLog(models.Model):
+    monthly_quota_used = models.IntegerField(default=0)
+    timestamp = models.DateTimeField(default=timezone.now)

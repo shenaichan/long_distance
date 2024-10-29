@@ -9,6 +9,7 @@ function PinMenu() {
     const { highlightedPin, setHighlightedPin, setHighlightedThread, setThreadIsHighlighted, setPinIsHighlighted } = useAppState()
     const [started, setStarted] = useState<PinInPublic[]>([]);
     const [finished, setFinished] = useState<PinInPublic[]>([]);
+    const [isPrivate, setIsPrivate] = useState<boolean>(false);
 
     const getThread = async (sender_id: number, recipient_id: number) => {
         const thread = await getMessageThread(sender_id, recipient_id)
@@ -16,12 +17,6 @@ function PinMenu() {
         setThreadIsHighlighted(true)
         setPinIsHighlighted(false)
     }
-
-    // function addNote() {
-    //     setCurrState("destinationMenu");
-    //     setSenderID(highlightedPin!.id);
-    //     setSourcePlaceName(highlightedPin!.place_name);
-    // }
 
     function getPrivateInboxLink() {
         if (!highlightedPin) return;
@@ -39,6 +34,14 @@ function PinMenu() {
 
     useEffect(() => {
         if (!highlightedPin) return;
+        console.log(highlightedPin)
+        if ("private_ownership_token" in highlightedPin) {
+            setIsPrivate(true)
+            console.log("private pin")
+        } else {
+            setIsPrivate(false)
+            console.log("public pin")
+        }
     
         const fetchRelationships = async () => {
             const started = await getRelationshipsStarted(highlightedPin.public_share_token);
@@ -53,7 +56,7 @@ function PinMenu() {
     return (
         <div>
             {
-                highlightedPin && "private_allow_mail_token" in highlightedPin ?
+                isPrivate ?
                 <div>
                     <div style={{display: "flex"}}>
                         <button className={css.fillButton} onClick={getPrivateInboxLink}>Get friend code</button>
