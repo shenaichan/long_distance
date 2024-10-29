@@ -243,9 +243,9 @@ function Write({ writeEnable }: WriteProps) {
               <p style={{ textAlign: "center" }}>Thank you for submitting your note!</p>
               { isResponse ? null :
               <>
+                <br/>
                 <p style={{ textAlign: "center" }}>Want to let your friend write back? Send them the secret link below ;)
                 </p>
-                <br/>
               </>
               }
             </>

@@ -13,6 +13,8 @@ import { PinInPrivate, getPinByPublicToken, getAllMyMessageThreads,
   MessageInPrivate, canWriteResponse, getMessageThreadBySecret } from "api/api";
 // import { AppProvider } from "state/ContextProvider"
 import { useAppState } from "state/context"
+import map_pin from "assets/map_pin.png";
+
 
 import { useState, useEffect, useRef, ReactNode } from "react";
 
@@ -177,6 +179,7 @@ function App() {
 
       {
         (sourceState === "confirming" || destState === "confirming") ?
+        <>
         <Popup
           title={ sourceState === "confirming" ? "Set your location here?" : "Set your friend's location here?"}
           content={<PinConfirm />}
@@ -184,6 +187,7 @@ function App() {
           top={"20px"}
           left={"calc(50vw - 200px)"}
         />
+        </>
         : null
       }
 

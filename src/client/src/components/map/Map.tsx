@@ -8,49 +8,11 @@ import { center } from "@turf/center"
 import { distance } from "@turf/distance"
 import { points } from "@turf/helpers"
 
-// function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-//   let earthsRadius = 6371
 
-//   const [ y1, y2, x1, x2 ]  = [lat1, lat2, lon1, lon2].map( deg => deg * Math.PI / 180 )
-//   const dy = y2 - y1
-//   const dx = x2 - x1
-//   const a = Math.sin(dy / 2)**2 + Math.cos(y1) * Math.cos(y2) * Math.sin(dx / 2)**2
-//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-//   const distance = earthsRadius * c
-
-//   return distance
-// }
-
-// function midpoint(lat1: number, lng1: number, lat2: number, lng2: number) {
-//   const toRadians = (degrees: number) => degrees * (Math.PI / 180);
-//   const toDegrees = (radians: number) => radians * (180 / Math.PI);
-
-//   lat1 = toRadians(lat1);
-//   lng1 = toRadians(lng1);
-//   lat2 = toRadians(lat2);
-//   lng2 = toRadians(lng2);
-
-//   const dLng = lng2 - lng1;
-
-//   const Bx = Math.cos(lat2) * Math.cos(dLng);
-//   const By = Math.cos(lat2) * Math.sin(dLng);
-
-//   const midLat = Math.atan2(
-//     Math.sin(lat1) + Math.sin(lat2),
-//     Math.sqrt((Math.cos(lat1) + Bx) ** 2 + By ** 2)
-//   );
-
-//   const midLng = lng1 + Math.atan2(By, Math.cos(lat1) + Bx);
-
-//   return [
-//     toDegrees(midLat),
-//     toDegrees(midLng)
-//   ];
-// }
 
 function Map() {
 
-  const { setSourceLocation, setDestLocation, spinLevel, setSpinLevel, setSourcePlaceName, setDestinationPlaceName,
+  const { setSourceLocation, setDestLocation, spinLevel, setSourcePlaceName, setDestinationPlaceName,
     sourceState, setSourceState, destState, setDestState,
     pinIsHighlighted, setPinIsHighlighted, highlightedPin, setHighlightedPin, 
     pins, highlightedThread, setHighlightedThread, threadIsHighlighted, setThreadIsHighlighted,
@@ -218,6 +180,15 @@ function Map() {
       map.current.touchZoomRotate.disableRotation();
     }
     else {
+      // Check if the layer exists
+      if (map.current.getLayer('temp-point')) {
+          map.current.removeLayer('temp-point');
+      }
+      
+      // Check if the source exists
+      if (map.current.getSource('temp-point')) {
+          map.current.removeSource('temp-point');
+      }
       if ( sourceState === "selecting" || destState === "selecting" ) {
         mapContainer.current.style.cursor = `url(${map_pin}) 16 32, auto`;
       }
@@ -407,7 +378,46 @@ function Map() {
         } else {
           setDestLocation({longitude: coordinates.lng, latitude: coordinates.lat});
         }
+
+            // Check if the layer exists
+        if (map.current.getLayer('temp-point')) {
+            map.current.removeLayer('temp-point');
+        }
         
+        // Check if the source exists
+        if (map.current.getSource('temp-point')) {
+            map.current.removeSource('temp-point');
+        }
+
+        map.current.addSource('temp-point', {
+          type: 'geojson',
+          data: {
+              type: 'FeatureCollection',
+              features: [
+                  {
+                      type: 'Feature',
+                      geometry: {
+                          type: 'Point',
+                          coordinates: [coordinates.lng, coordinates.lat]
+                      },
+                      properties: {}
+                  }
+              ]
+            }
+        });
+
+            // Add the layer to visualize the point
+        map.current.addLayer({
+            id: 'temp-point',
+            type: 'circle',
+            source: 'temp-point',
+            paint: {
+              'circle-color': smallClusterColor,
+              'circle-radius': 10,
+              'circle-stroke-width': 1,
+              'circle-stroke-color': '#fff'
+            }
+        });
         
         const { lng, lat } = map.current!.getCenter()
         const dist = distance([lng, lat], [coordinates.lng, coordinates.lat])
