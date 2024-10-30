@@ -16,6 +16,13 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+from dotenv import find_dotenv, load_dotenv
+load_dotenv(find_dotenv())
+
+
+import dj_database_url
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -45,6 +52,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -81,10 +89,15 @@ WSGI_APPLICATION = 'longdist.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Replace the SQLite DATABASES configuration with PostgreSQL:
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'notes_from_afar_db',
+        'USER': 'shenai_chan',
+        'PASSWORD': os.getenv("POSTGRES_PW"),
+        'HOST': 'localhost',
+        'PORT': '5432',  # Default PostgreSQL port
     }
 }
 
@@ -121,9 +134,21 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# This setting informs Django of the URI path from which your static files will be served to users
+# Here, they well be accessible at your-domain.onrender.com/static/... or yourcustomdomain.com/static/...
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static') 
+STATICFILES_DIRS = ( os.path.join(BASE_DIR, 'longdist', 'static'), ) 
+
+# This production code might break development mode, so we check whether we're in DEBUG mode
+if not DEBUG:
+    # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
+    # and renames the files with unique names for each version to support long-term caching
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

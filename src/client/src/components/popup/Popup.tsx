@@ -1,6 +1,5 @@
 import css from "components/popup/Popup.module.css";
 import { ReactNode } from 'react';
-import { pinCreationState } from "components/App";
 import { useAppState } from "state/context"
 
 type popupProps = {

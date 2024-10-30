@@ -12,9 +12,7 @@ import longdist from "assets/longdist_long.mp3";
 import { PinInPrivate, getPinByPublicToken, getAllMyMessageThreads, 
   MessageInPrivate, canWriteResponse, getMessageThreadBySecret, checkIfGeolocateAllowed, 
   getPinByPrivateToken } from "api/api";
-// import { AppProvider } from "state/ContextProvider"
 import { useAppState } from "state/context"
-import map_pin from "assets/map_pin.png";
 import { useNavigate } from 'react-router-dom';
 
 import { useState, useEffect, useRef, ReactNode } from "react";

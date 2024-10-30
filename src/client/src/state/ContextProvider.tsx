@@ -1,6 +1,6 @@
 import { AppContext } from "state/context"
 import { ReactNode, useState } from 'react'
-import { PinInPrivate, InventoryMessageIn, PinInPublic, MessageIn } from "api/api";
+import { PinInPrivate, InventoryMessageIn, PinInPublic, MessageInPrivate, MessageInPublic } from "api/api";
 import { menuKind, coordinates, pinCreationState } from "components/App"
 
 export function AppProvider( { children }: { children: ReactNode }) {
@@ -20,7 +20,7 @@ export function AppProvider( { children }: { children: ReactNode }) {
     const [ destState, setDestState ] = useState<pinCreationState>("inactive")
     const [ pinIsHighlighted, setPinIsHighlighted ] = useState<boolean>(false)
     const [ threadIsHighlighted, setThreadIsHighlighted ] = useState<boolean>(false)
-    const [ highlightedThread, setHighlightedThread ] = useState< MessageIn | null >(null)
+    const [ highlightedThread, setHighlightedThread ] = useState< MessageInPrivate | MessageInPublic | null >(null)
     const [ isResponse, setIsResponse ] = useState<boolean>(false)
     const [ numWorldNotes, setNumWorldNotes ] = useState<number>(0)
     const [ randomNote, setRandomNote ] = useState<number>(-1)

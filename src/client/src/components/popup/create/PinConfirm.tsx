@@ -1,7 +1,4 @@
-import { pinCreationState, coordinates } from "components/App";
-import { createPin, createApproveClaimPin } from "api/api";
 import css from "components/popup/create/PinMenu.module.css";
-import { PinInPrivate } from "api/api";
 import { useAppState } from "state/context"
 
 
@@ -9,8 +6,7 @@ import { useAppState } from "state/context"
 function PinConfirm() {
 
     const {placeName, setSourceState, setDestState, sourceState,
-        sourcePlaceName, destinationPlaceName, setSenderID, setRecipientID, 
-        pins, setPins, setHighlightedPin} = useAppState()
+        sourcePlaceName, destinationPlaceName } = useAppState()
     
     const isSource = sourceState === "confirming"
         

@@ -1,4 +1,4 @@
-import { PinInPrivate, InventoryMessageIn, PinInPublic, MessageIn } from "api/api";
+import { PinInPrivate, InventoryMessageIn, PinInPublic, MessageInPrivate, MessageInPublic } from "api/api";
 import { createContext, useContext } from "react";
 import { menuKind, coordinates, pinCreationState } from "components/App"
 
@@ -39,8 +39,8 @@ export type AppState = {
   setPinIsHighlighted: (pinState: boolean) => void;
   threadIsHighlighted: boolean;
   setThreadIsHighlighted: (threadState: boolean) => void;
-  highlightedThread: MessageIn | null;
-  setHighlightedThread: (thread: MessageIn | null) => void;
+  highlightedThread: MessageInPrivate | MessageInPublic | null;
+  setHighlightedThread: (thread: MessageInPrivate | MessageInPublic | null) => void;
   isResponse: boolean;
   setIsResponse: (isResponse: boolean) => void;
   numWorldNotes: number;

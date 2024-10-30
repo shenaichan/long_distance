@@ -36,7 +36,7 @@ function PinMenu() {
     function getPrivateEditorLink() {
         if (!highlightedPin) return;
         if ("private_ownership_token" in highlightedPin) {
-        navigator.clipboard.writeText(`localhost:5173/claim/${highlightedPin.private_ownership_token}`)
+        navigator.clipboard.writeText(`${window.location}claim/${highlightedPin.private_ownership_token}`)
             .then(() => {
                 alert('Editor link copied to clipboard!');
             })

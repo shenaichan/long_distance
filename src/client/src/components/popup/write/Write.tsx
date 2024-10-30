@@ -16,13 +16,13 @@ function Write({ writeEnable, geolocateEnable }: WriteProps) {
 
   const MAX_NOTE_LENGTH = 280
 
-  const { sourcePlaceName, setSourcePlaceName, 
-    destinationPlaceName, setDestinationPlaceName,
+  const { sourcePlaceName, 
+    destinationPlaceName, 
     sourceLocation, destLocation,
     sourceState, setSourceState,
     destState, setDestState,
     senderID, setSenderID,
-    recipientID, setRecipientID, pins, setPins,
+    recipientID, setRecipientID, pins,
     isResponse, setIsResponse, replyPW, highlightedThread } = useAppState()
 
   const textEntryRef = useRef<HTMLTextAreaElement>(null);
@@ -83,7 +83,7 @@ function Write({ writeEnable, geolocateEnable }: WriteProps) {
     if(isSafe){
       if (isResponse) {
         await createAndAddResponse({ sender: senderID, recipient: recipientID, replyPW: replyPW, message: message } );
-        addPinToStorage(highlightedThread?.recipient!)
+        addPinToStorage(highlightedThread?.recipient! as PinInPrivate)
       } else {
         let senderIDLocal = senderID;
         let senderPWLocal = senderPW;
@@ -111,7 +111,7 @@ function Write({ writeEnable, geolocateEnable }: WriteProps) {
           setResubmissionReprimand(true)
         } else {
           const secretToken = await createRelationshipAndMessage({ sender: senderIDLocal, senderPW: senderPWLocal, recipient: recipientIDLocal, recipientPW: recipientPWLocal, message: message });
-          setSecretLink(`localhost:5173/reply/${secretToken}`)
+          setSecretLink(`${window.location}reply/${secretToken}`)
         }
       }
       setCreating(false);

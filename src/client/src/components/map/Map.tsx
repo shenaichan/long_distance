@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
-import { FeatureCollection, Point } from "geojson";
+import { FeatureCollection } from "geojson";
 import { getApprovedPins, getApprovedRoutes, getPlaceName, getMessageThread } from "api/api";
 import map_pin from "assets/map_pin.png";
 import { useAppState } from "state/context"

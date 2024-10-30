@@ -22,6 +22,8 @@ function Info({ audioRef }: InfoProps) {
 
     const {spinLevel, setSpinLevel, soundLevel, setSoundLevel, numWorldNotes, setRandomNote } = useAppState()
 
+    console.log(audioRef, soundLevel, setSoundLevel) // pleasing the linter
+
     const [tab, setTab] = useState("About");
     const [numKM, setNumKM] = useState(0);
     const [dateTime, _] = useState(new Date().toLocaleString());
@@ -96,7 +98,7 @@ function Info({ audioRef }: InfoProps) {
             </div>
             <br />
 
-            <div className={`field-row ${css.slider}`}>
+            {/* <div className={`field-row ${css.slider}`}>
                 <label htmlFor="soundRange"><p>Sound:</p></label>
                 <input id="soundRange" 
                     type="range" 
@@ -106,7 +108,7 @@ function Info({ audioRef }: InfoProps) {
                     onChange={(e) => setSoundLevel(parseInt(e.target.value))}
                     onMouseDown={() => audioRef.current?.play()}
                 />
-            </div>
+            </div> */}
             <div className={`field-row ${css.slider}`}>
                 <label htmlFor="spinRange"><p>Spin:</p></label>
                 <input id="spinRange" 

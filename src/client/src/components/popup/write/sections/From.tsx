@@ -1,6 +1,4 @@
-import { pinCreationState } from "components/App"
 import { useState, useEffect } from "react"
-import { PinInPrivate } from "api/api"
 import css from "components/popup/Popup.module.css"
 import { useAppState } from "state/context"
 
@@ -11,7 +9,7 @@ type FromProps = {
 }
 
 function From({ setSenderPW, setSourceIsExisting, geolocateEnable }: FromProps) {
-  const { sourceState, setSourceState, destState, setDestState, sourcePlaceName, setSourcePlaceName, setSenderID, pins,
+  const { sourceState, setSourceState, destState, sourcePlaceName, setSourcePlaceName, setSenderID, pins,
     destinationPlaceName, isResponse
    } = useAppState()
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")

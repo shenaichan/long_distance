@@ -1,4 +1,3 @@
-import { pinCreationState } from "components/App"
 import { useState, useEffect } from "react"
 import { PinInPublic, getPinByFriendCode } from "api/api"
 import css from "components/popup/Popup.module.css"
@@ -12,7 +11,7 @@ type ToProps = {
 }
 
 function To({ friendCode, setFriendCode, setDestIsExisting, geolocateEnable }: ToProps) {
-  const { sourceState, setSourceState, destState, setDestState, destinationPlaceName, setDestinationPlaceName, setRecipientID,
+  const { sourceState, destState, setDestState, destinationPlaceName, setDestinationPlaceName, setRecipientID,
     isResponse, sourcePlaceName
   } = useAppState()
   const [pinEntryMode, setPinEntryMode] = useState("neither yet")

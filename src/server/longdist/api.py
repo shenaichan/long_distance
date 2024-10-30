@@ -257,7 +257,7 @@ def get_secret_reply_link(request, sender, senderPW, recipient):
             raise HttpError(400, "Invalid credentials")
         
 @api.get("/check_if_relationship_exists")
-def create_relationship_and_message(request, sender, recipient):
+def check_if_relationship_exists(request, sender, recipient):
     if (Relationship.objects.filter(sender=sender, recipient=recipient).exists() or 
         Relationship.objects.filter(recipient=sender, sender=recipient).exists()):
         return True

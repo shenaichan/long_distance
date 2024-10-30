@@ -22,7 +22,7 @@ function MessageMenu () {
             const sender = matches[0]
             async function getLink(sender: number, senderPW: string, recipient: number) {
                 const link = await getSecretReplyLink(sender, senderPW, recipient)
-                setSecretLink(`localhost:5173/reply/${link}`)
+                setSecretLink(`${window.location}reply/${link}`)
             }
             getLink(sender.id, sender.private_ownership_token, highlightedThread!.recipient.id)            
         }
