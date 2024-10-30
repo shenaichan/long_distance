@@ -8,9 +8,10 @@ type ToProps = {
   friendCode: string
   setFriendCode: (code: string) => void
   setDestIsExisting: (exists: boolean) => void
+  geolocateEnable: boolean
 }
 
-function To({ friendCode, setFriendCode, setDestIsExisting }: ToProps) {
+function To({ friendCode, setFriendCode, setDestIsExisting, geolocateEnable }: ToProps) {
   const { sourceState, setSourceState, destState, setDestState, destinationPlaceName, setDestinationPlaceName, setRecipientID,
     isResponse, sourcePlaceName
   } = useAppState()
@@ -55,14 +56,17 @@ function To({ friendCode, setFriendCode, setDestIsExisting }: ToProps) {
         {
           pinEntryMode === "neither yet" ? (
             <>
-              <button
-                onClick={() => { setDestState("selecting"); setPinEntryMode("map select"); }}
-                style={{ "flex": 1, "margin": "2px" }}>
-                Choose on map
-              </button>
+              {geolocateEnable ? 
+                <button
+                  onClick={() => { setDestState("selecting"); setPinEntryMode("map select"); }}
+                  style={{ "flex": 1, "margin": "2px" }}>
+                  Choose on map
+                </button>
+              :
+                null}
               <button
                 onClick={() => {setPinEntryMode("friend code input")}}
-                style={{ "flex": 1, "margin": "2px" }}>
+                style={{ "flex": 1, "margin": geolocateEnable ? "2px" : "0px" }}>
                 Enter friend code
               </button>
             </>

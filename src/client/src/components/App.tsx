@@ -10,7 +10,7 @@ import PinMenu from "components/popup/create/PinMenu"
 import MessageMenu from "components/popup/create/MessageMenu"
 import longdist from "assets/longdist_long.mp3";
 import { PinInPrivate, getPinByPublicToken, getAllMyMessageThreads, 
-  MessageInPrivate, canWriteResponse, getMessageThreadBySecret } from "api/api";
+  MessageInPrivate, canWriteResponse, getMessageThreadBySecret, checkIfGeolocateAllowed } from "api/api";
 // import { AppProvider } from "state/ContextProvider"
 import { useAppState } from "state/context"
 import map_pin from "assets/map_pin.png";
@@ -61,12 +61,11 @@ function App() {
   } = useAppState()
 
   const [writeEnable, setWriteEnable] = useState<boolean>(true);
+  const [geolocateEnable, setGeolocateEnable] = useState<boolean>(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const { public_share_token, secret_reply_token } = useParams();
-  console.log("PUBLIC_SHARE_TOKEN", public_share_token );
-  console.log("SECRET_REPLY_TOKEN", secret_reply_token );
 
   function reStack(menu: menuKind) {
     let newStack = [...stack]
@@ -87,6 +86,11 @@ function App() {
   }
 
   useEffect(() => {
+    async function canGeolocate() {
+      const geolocatePerms = await checkIfGeolocateAllowed()
+      setGeolocateEnable(geolocatePerms)
+    }
+    canGeolocate()
     const myPinsString = localStorage.getItem("pins");
     let myPins: PinInPrivate[] = [];
     if (myPinsString){
@@ -222,6 +226,7 @@ function App() {
         title="Write a note"
         content={ <Write 
           writeEnable={writeEnable}
+          geolocateEnable={geolocateEnable}
         /> }
         zIndex={stack.indexOf("write") + 1}
         top="20px"

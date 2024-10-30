@@ -68,6 +68,31 @@ const BASE_URL = "http://127.0.0.1:8000/api/"
 
 
 
+export async function checkIfMapLoadAllowed() {
+    const mapAllowedResponse = await fetch(
+        `${BASE_URL}check_if_map_load_allowed`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+    const mapAllowed = await mapAllowedResponse.json()
+    return mapAllowed as boolean
+}
+
+export async function checkIfGeolocateAllowed() {
+    const geolocateAllowedResponse = await fetch(
+        `${BASE_URL}check_if_geolocate_allowed`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+    const geolocateAllowed = await geolocateAllowedResponse.json()
+    return geolocateAllowed as boolean
+}
 
 export async function getAllMyMessageThreads(sender_ids: number[]) {
     const messagesResponse = await fetch(
@@ -323,6 +348,15 @@ export async function getApprovedRoutes() {
 }
 
 export async function getPlaceName(latitude: number, longitude: number) {
+    await fetch(
+        `${BASE_URL}add_geolocate`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }
+    )
     const accessToken = import.meta.env.VITE_MAPBOX_KEY;
     const placeResponse = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${accessToken}&limit=1`,

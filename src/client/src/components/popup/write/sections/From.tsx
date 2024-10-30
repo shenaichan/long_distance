@@ -7,9 +7,10 @@ import { useAppState } from "state/context"
 type FromProps = {
   setSenderPW: (pw: string) => void;
   setSourceIsExisting: (exists: boolean) => void;
+  geolocateEnable: boolean
 }
 
-function From({ setSenderPW, setSourceIsExisting }: FromProps) {
+function From({ setSenderPW, setSourceIsExisting, geolocateEnable }: FromProps) {
   const { sourceState, setSourceState, destState, setDestState, sourcePlaceName, setSourcePlaceName, setSenderID, pins,
     destinationPlaceName, isResponse
    } = useAppState()
@@ -48,17 +49,20 @@ function From({ setSenderPW, setSourceIsExisting }: FromProps) {
         {
           pinEntryMode === "neither yet" ? (
             <>
-              <button
-                onClick={() => { setSourceState("selecting"); setPinEntryMode("map select"); }}
-                style={{ "flex": 1, "margin": "2px" }}>
-                Choose on map
-              </button>
+              {geolocateEnable ?
+                <button
+                  onClick={() => { setSourceState("selecting"); setPinEntryMode("map select"); }}
+                  style={{ "flex": 1, "margin": "2px" }}>
+                  Choose on map
+                </button>
+              :
+                null}
               {
                 pins.length > 0 ?
 
                 <button
                   onClick={() => {setPinEntryMode("pin list")}}
-                  style={{ "flex": 1, "margin": "2px" }}>
+                  style={{ "flex": 1, "margin": geolocateEnable ? "2px" : "0px" }}>
                   Pick from your pins
                 </button> :
                 null

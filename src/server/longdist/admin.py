@@ -1,5 +1,5 @@
 from django.contrib import admin
-from longdist.models import Pin, Message, Relationship
+from longdist.models import Pin, Message, Relationship, MapLoadLog, GeolocateLog
 from django.utils import timezone
 from datetime import datetime, UTC
 from longdist.notifications import send_email
@@ -37,6 +37,14 @@ class MessageAdmin(admin.ModelAdmin):
 class RelationshipAdmin(admin.ModelAdmin):
     list_display = ["id", "sender_id", "recipient", "message", "response"]
 
+class MapLoadLogAdmin(admin.ModelAdmin):
+    list_display = ["monthly_quota_used", "timestamp"]
+
+class GeolocateLogAdmin(admin.ModelAdmin):
+    list_display = ["monthly_quota_used", "timestamp"]
+
 admin.site.register(Pin, PinAdmin)
 admin.site.register(Message, MessageAdmin)
 admin.site.register(Relationship, RelationshipAdmin)
+admin.site.register(MapLoadLog, MapLoadLogAdmin)
+admin.site.register(GeolocateLog, GeolocateLogAdmin)

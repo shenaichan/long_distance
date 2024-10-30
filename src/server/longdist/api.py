@@ -102,57 +102,70 @@ def print_queryset(queryset):
         print("\n")
     return
 
-@api.get("check_if_map_load_allowed", response=bool)
+@api.post("check_if_map_load_allowed", response=bool)
 def check_if_map_load_allowed(request):
-    last_load = MapLoadLog.objects.last()
-    monthly_quota_used = last_load.monthly_quota_used 
-    last_load_time = last_load.timestamp
-
-    prev_year = last_load_time.year
-    prev_month = last_load_time.month
-
-    now = datetime.now(UTC)
-    curr_year = now.year
-    curr_month = now.month
-
-    if curr_year > prev_year or curr_month > prev_month:
-        monthly_quota_used = 0
-    else:
-        monthly_quota_used += 1
-
-    map_load_allowed = monthly_quota_used < MAP_LOADS_ALLOWED
-
-    if map_load_allowed:
-        MapLoadLog.objects.create(monthly_quota_used=monthly_quota_used)
+    if not MapLoadLog.objects.exists():
+        MapLoadLog.objects.create(monthly_quota_used=1)
         return True
     else:
-        return False
+        last_load = MapLoadLog.objects.last()
+        monthly_quota_used = last_load.monthly_quota_used 
+        last_load_time = last_load.timestamp
+
+        prev_year = last_load_time.year
+        prev_month = last_load_time.month
+
+        now = datetime.now(UTC)
+        curr_year = now.year
+        curr_month = now.month
+
+        if curr_year > prev_year or curr_month > prev_month:
+            monthly_quota_used = 0
+        else:
+            monthly_quota_used += 1
+
+        map_load_allowed = monthly_quota_used < MAP_LOADS_ALLOWED
+
+        if map_load_allowed:
+            MapLoadLog.objects.create(monthly_quota_used=monthly_quota_used)
+            return True
+        else:
+            return False
     
 @api.get("check_if_geolocate_allowed", response=bool)
 def check_if_geolocate_allowed(request):
-    last_load = GeolocateLog.objects.last()
-    monthly_quota_used = last_load.monthly_quota_used 
-    last_load_time = last_load.timestamp
-
-    prev_year = last_load_time.year
-    prev_month = last_load_time.month
-
-    now = datetime.now(UTC)
-    curr_year = now.year
-    curr_month = now.month
-
-    if curr_year > prev_year or curr_month > prev_month:
-        monthly_quota_used = 0
-    else:
-        monthly_quota_used += 1
-
-    geolocate_allowed = monthly_quota_used < GEOLOCATES_ALLOWED
-    
-    if geolocate_allowed:
-        GeolocateLog.objects.create(monthly_quota_used=monthly_quota_used)
+    if not GeolocateLog.objects.exists():
+        GeolocateLog.objects.create(monthly_quota_used=0)
         return True
     else:
-        return False
+        last_load = GeolocateLog.objects.last()
+        monthly_quota_used = last_load.monthly_quota_used 
+        last_load_time = last_load.timestamp
+
+        prev_year = last_load_time.year
+        prev_month = last_load_time.month
+
+        now = datetime.now(UTC)
+        curr_year = now.year
+        curr_month = now.month
+
+        if curr_year > prev_year or curr_month > prev_month:
+            monthly_quota_used = 0
+            GeolocateLog.objects.create(monthly_quota_used=monthly_quota_used)
+
+        geolocate_allowed = monthly_quota_used < GEOLOCATES_ALLOWED
+        
+        if geolocate_allowed:
+            return True
+        else:
+            return False
+
+@api.post("add_geolocate")
+def add_geolocate(request):
+    last_load = GeolocateLog.objects.last()
+    monthly_quota_used = last_load.monthly_quota_used 
+    GeolocateLog.objects.create(monthly_quota_used=monthly_quota_used + 1)
+    return
 
 @api.get("check_if_message_is_safe", response=bool)
 def check_if_message_is_safe(request, content: str):

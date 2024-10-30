@@ -9,9 +9,10 @@ import { useAppState } from "state/context"
 
 type WriteProps = {
   writeEnable: boolean
+  geolocateEnable: boolean
 }
 
-function Write({ writeEnable }: WriteProps) {
+function Write({ writeEnable, geolocateEnable }: WriteProps) {
 
   const MAX_NOTE_LENGTH = 280
 
@@ -164,7 +165,7 @@ function Write({ writeEnable }: WriteProps) {
 
   return (
     <>
-    { writeEnable ? 
+    {writeEnable ? 
 
       (creating ? 
         <>
@@ -172,11 +173,13 @@ function Write({ writeEnable }: WriteProps) {
             friendCode={friendCode}
             setFriendCode={setFriendCode}
             setDestIsExisting={setDestIsExisting}
+            geolocateEnable={geolocateEnable}
           />
 
           <From 
             setSenderPW={setSenderPW}
             setSourceIsExisting={setSourceIsExisting}
+            geolocateEnable={geolocateEnable}
           />
 
           <div>
