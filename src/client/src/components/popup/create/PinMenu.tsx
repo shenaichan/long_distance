@@ -1,5 +1,6 @@
 // import { creationState } from "components/App";
 import css from "components/popup/create/PinMenu.module.css";
+import popupCss from "components/popup/Popup.module.css"
 import { PinInPublic, getRelationshipsStarted, getRelationshipsFinished, getMessageThread } from "api/api";
 import { useEffect, useState } from "react";
 import { useAppState } from "state/context"
@@ -68,18 +69,27 @@ function PinMenu() {
  
             <div>
                 <p style={{fontWeight: "bold"}}>Friends</p>
-                <ul>
-                    {started.map(pin => (
-                        // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
-                        <li key={pin.id} onClick={() => {if (!highlightedPin) return;
-                            getThread(highlightedPin.id, pin.id);}} style={{ cursor: "pointer" }}>{pin.place_name}</li>
-                    ))}
-                    {finished.map(pin => (
-                        // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
-                        <li key={pin.id} onClick={() => {if (!highlightedPin) return;
-                            getThread(pin.id, highlightedPin.id);}} style={{ cursor: "pointer" }}>{pin.place_name}</li>
-                    ))}
-                </ul>
+
+                <div className={`window ${css.info}`}>
+                    <div className="window-body">
+                        <ul style={{paddingLeft: "15px"}}>
+                            {started.map(pin => (
+                            // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
+                            <li key={pin.id} onClick={() => {if (!highlightedPin) return;
+                                getThread(highlightedPin.id, pin.id);}} style={{ cursor: "pointer" }}>
+                                <p className={popupCss.truncated}>{pin.place_name}</p>
+                            </li>
+                        ))}
+                        {finished.map(pin => (
+                            // <li key={pin.id} onClick={() => setHighlightedPin(pin)}>{pin.place_name}</li>
+                            <li key={pin.id} onClick={() => {if (!highlightedPin) return;
+                                getThread(pin.id, highlightedPin.id);}} style={{ cursor: "pointer" }}>
+                                <p className={popupCss.truncated}>{pin.place_name}</p>
+                            </li>
+                        ))}
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     )
