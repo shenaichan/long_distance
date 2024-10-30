@@ -187,6 +187,10 @@ def get_pin_by_friend_code(request, friend_code: str):
 def get_pin_by_public_token(request, public_token: str):
     return Pin.objects.get(public_share_token=public_token)
 
+@api.get("get_pin_by_private_token", response=PinOutPrivate)
+def get_pin_by_private_token(request, private_token: str):
+    return Pin.objects.get(private_ownership_token=private_token)
+
 @api.get("get_num_km", response=float)
 def get_num_km(request):
     relationships = Relationship.objects.filter(is_approved=True)

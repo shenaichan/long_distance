@@ -10,7 +10,8 @@ import PinMenu from "components/popup/create/PinMenu"
 import MessageMenu from "components/popup/create/MessageMenu"
 import longdist from "assets/longdist_long.mp3";
 import { PinInPrivate, getPinByPublicToken, getAllMyMessageThreads, 
-  MessageInPrivate, canWriteResponse, getMessageThreadBySecret, checkIfGeolocateAllowed } from "api/api";
+  MessageInPrivate, canWriteResponse, getMessageThreadBySecret, checkIfGeolocateAllowed, 
+  getPinByPrivateToken } from "api/api";
 // import { AppProvider } from "state/ContextProvider"
 import { useAppState } from "state/context"
 import map_pin from "assets/map_pin.png";
@@ -42,6 +43,7 @@ function App() {
       setDestinationPlaceName,
       setSenderID,
       setRecipientID,
+      pins,
       setPins,
       setSentNotes,
       setReceivedNotes,
@@ -62,10 +64,11 @@ function App() {
 
   const [writeEnable, setWriteEnable] = useState<boolean>(true);
   const [geolocateEnable, setGeolocateEnable] = useState<boolean>(false);
+  const [pinClaimed, setPinClaimed] = useState<boolean>(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const { public_share_token, secret_reply_token } = useParams();
+  const { public_share_token, secret_reply_token, secret_ownership_token } = useParams();
 
   function reStack(menu: menuKind) {
     let newStack = [...stack]
@@ -75,7 +78,8 @@ function App() {
     setStack(newStack);
   }
 
-  const getAllNotes = async (pinIds: number[]) => {
+  const getAllNotes = async (myPins: PinInPrivate[]) => {
+    const pinIds = myPins.map(pin => pin.id)
     const myNotes = await getAllMyMessageThreads(pinIds)
     console.log(myNotes)
     setSentNotes(myNotes[0])
@@ -84,6 +88,31 @@ function App() {
     }
     setReceivedNotes(myNotes[1])
   }
+
+  useEffect(() => {
+    if (!secret_ownership_token) {
+      setPinClaimed(true);
+      return;
+    }
+    async function getClaimedPin() {
+      const claimedPin = await getPinByPrivateToken(secret_ownership_token as string)
+      const myPinsString = localStorage.getItem("pins")
+      if (!myPinsString) {
+        getAllNotes([claimedPin])
+        setPins([claimedPin])
+        setPinClaimed(true)
+      } else if (pins.length > 0 && pins.map(myPin => myPin.id === claimedPin.id).length === 0) {
+        const newPins = [...pins, claimedPin]
+        getAllNotes(newPins)
+        setPins(newPins)
+        setPinClaimed(true)
+      }
+      
+    }
+    if (!pinClaimed) {
+      getClaimedPin()
+    }
+  }, [pins])
 
   useEffect(() => {
     async function canGeolocate() {
@@ -97,8 +126,7 @@ function App() {
       myPins = (JSON.parse(myPinsString) as PinInPrivate[])
       console.log(myPins)
       setPins(myPins)
-      const pinIds = myPins.map(pin => pin.id)
-      getAllNotes(pinIds)
+      getAllNotes(myPins)
     }
 
     if (public_share_token) {

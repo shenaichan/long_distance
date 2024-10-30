@@ -33,6 +33,20 @@ function PinMenu() {
         }
     }
 
+    function getPrivateEditorLink() {
+        if (!highlightedPin) return;
+        if ("private_ownership_token" in highlightedPin) {
+        navigator.clipboard.writeText(`localhost:5173/claim/${highlightedPin.private_ownership_token}`)
+            .then(() => {
+                alert('Editor link copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy the link. Please try again.');
+            });
+        }
+    }
+
     useEffect(() => {
         if (!highlightedPin) return;
         console.log(highlightedPin)
@@ -61,7 +75,7 @@ function PinMenu() {
                 <div>
                     <div style={{display: "flex"}}>
                         <button className={css.fillButton} onClick={getPrivateInboxLink}>Get friend code</button>
-                        <button className={css.fillButton}>Get editor link</button>
+                        <button className={css.fillButton} onClick={getPrivateEditorLink}>Get editor link</button>
                     </div>
                 </div>
                 : null

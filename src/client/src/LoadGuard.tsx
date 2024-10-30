@@ -18,6 +18,10 @@ const router = createBrowserRouter([
     {
       path: "/reply/:secret_reply_token",
       element: <App />
+    },
+    {
+      path: "/claim/:secret_ownership_token",
+      element: <App />
     }
 ])
 

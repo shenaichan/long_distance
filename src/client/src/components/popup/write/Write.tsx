@@ -73,7 +73,7 @@ function Write({ writeEnable, geolocateEnable }: WriteProps) {
 
   function addPinToStorage(newPin: PinInPrivate) {
     const updatedPins = [...pins, newPin];
-    setPins(updatedPins);
+    // setPins(updatedPins);
     localStorage.setItem("pins", JSON.stringify(updatedPins));
   };
 
@@ -243,7 +243,7 @@ function Write({ writeEnable, geolocateEnable }: WriteProps) {
               <p style={{ textAlign: "center" }}>Sorry, you can't submit more than one note to the same person.</p>
             </> :
             <>
-              <p style={{ textAlign: "center" }}>Thank you for submitting your note!</p>
+              <p style={{ textAlign: "center" }}>Thank you for submitting your note! Feel free to refresh the page to see it out in the world.</p>
               { isResponse ? null :
               <>
                 <br/>

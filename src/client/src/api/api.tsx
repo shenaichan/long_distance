@@ -218,6 +218,19 @@ export async function getPinByPublicToken(public_token: string) {
     return pin as PinInPublic
 }
 
+export async function getPinByPrivateToken(private_token: string) {
+    const pinResponse = await fetch(
+        `${BASE_URL}get_pin_by_private_token?private_token=${private_token}`, 
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+    const pin = await pinResponse.json()
+    return pin as PinInPrivate
+}
+
 export async function getRelationshipsStarted(public_token: string) {
     const relationshipsStartedResponse = await fetch(
         `${BASE_URL}get_relationships_started?public_token=${public_token}`, 
