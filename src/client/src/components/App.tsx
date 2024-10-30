@@ -15,7 +15,7 @@ import { PinInPrivate, getPinByPublicToken, getAllMyMessageThreads,
 // import { AppProvider } from "state/ContextProvider"
 import { useAppState } from "state/context"
 import map_pin from "assets/map_pin.png";
-
+import { useNavigate } from 'react-router-dom';
 
 import { useState, useEffect, useRef, ReactNode } from "react";
 
@@ -34,6 +34,8 @@ export type pinCreationState =
 const MAX_NUM_NOTES = 100;
 
 function App() {
+
+  const navigate = useNavigate()
 
   const {
       stack,
@@ -153,26 +155,27 @@ function App() {
       async function canReply() {
         const legal = await canWriteResponse(secret_reply_token as string)
         if (legal) {
-        async function fetchThread() {
-          const thread: MessageInPrivate =  await getMessageThreadBySecret(secret_reply_token as string)
-          setSenderID(thread.sender.id)
-          setRecipientID(thread.recipient.id)
-          setSourcePlaceName(thread.sender.place_name)
-          setDestinationPlaceName(thread.recipient.place_name)
-          setSourceState("selected")
-          setDestState("selected")
-          setIsResponse(true)
-          setReplyPW(secret_reply_token as string)
-          setHighlightedThread(thread)
-          setThreadIsHighlighted(true)
+          async function fetchThread() {
+            const thread: MessageInPrivate =  await getMessageThreadBySecret(secret_reply_token as string)
+            setSenderID(thread.sender.id)
+            setRecipientID(thread.recipient.id)
+            setSourcePlaceName(thread.sender.place_name)
+            setDestinationPlaceName(thread.recipient.place_name)
+            setSourceState("selected")
+            setDestState("selected")
+            setIsResponse(true)
+            setReplyPW(secret_reply_token as string)
+            setHighlightedThread(thread)
+            setThreadIsHighlighted(true)
+          }
+          fetchThread()
+        } else {
+          alert("Already used this link to reply!")
         }
-        fetchThread()
-      } else {
-        alert("Already used this link to reply!")
       }
-    }
     canReply()
     }
+    navigate("/")
   }, []);
 
   // useEffect(() => {
