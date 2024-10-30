@@ -30,11 +30,12 @@ import dj_database_url
 SECRET_KEY = 'django-insecure-8k3z#q9sd9xxq@h3(+fn+f-e(h#k20^2y$z+2$==)dl6jhf^ny'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["long-distance.onrender.com", "0.0.0.0", "127.0.0.1"]
+ALLOWED_HOSTS = ["notes-from-afar.onrender.com", "0.0.0.0", "127.0.0.1"]
 
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+POSTGRES_URL = os.getenv("POSTGRES_URL")
 
 # Application definition
 
@@ -91,14 +92,10 @@ WSGI_APPLICATION = 'longdist.wsgi.application'
 
 # Replace the SQLite DATABASES configuration with PostgreSQL:
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'notes_from_afar_db',
-        'USER': 'shenai_chan',
-        'PASSWORD': os.getenv("POSTGRES_PW"),
-        'HOST': 'localhost',
-        'PORT': '5432',  # Default PostgreSQL port
-    }
+    'default': dj_database_url.config(
+        default=POSTGRES_URL,
+        conn_max_age=600    
+    )
 }
 
 
