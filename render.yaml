@@ -9,8 +9,8 @@ services:
     plan: free
     name: notes_from_afar
     runtime: python
-    buildCommand: "./build.sh"
-    startCommand: "python -m gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker"    envVars:
+    buildCommand: "cd src/server && ./build.sh"
+    startCommand: "cd src/server && python -m gunicorn mysite.asgi:application -k uvicorn.workers.UvicornWorker"    envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: notes_from_afar_db
