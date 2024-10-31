@@ -64,7 +64,7 @@ export type InventoryMessageIn = {
 
 
 
-const BASE_URL = `${window.location}api/`
+const BASE_URL = `${import.meta.env.VITE_API_URL}api/`
 console.log(BASE_URL)
 
 

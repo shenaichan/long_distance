@@ -30,7 +30,10 @@ import dj_database_url
 SECRET_KEY = 'django-insecure-8k3z#q9sd9xxq@h3(+fn+f-e(h#k20^2y$z+2$==)dl6jhf^ny'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+
+if os.getenv("SERVER_MODE") == "PRODUCTION":
+    DEBUG = False
 
 ALLOWED_HOSTS = ["notes-from-afar.onrender.com", "0.0.0.0", "127.0.0.1"]
 
@@ -98,6 +101,14 @@ DATABASES = {
     )
 }
 
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -136,7 +147,7 @@ USE_TZ = True
 # This setting informs Django of the URI path from which your static files will be served to users
 # Here, they well be accessible at your-domain.onrender.com/static/... or yourcustomdomain.com/static/...
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static') 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
 STATICFILES_DIRS = ( os.path.join(BASE_DIR, 'longdist', 'static'), ) 
 
 # This production code might break development mode, so we check whether we're in DEBUG mode

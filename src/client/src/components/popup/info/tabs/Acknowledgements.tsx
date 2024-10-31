@@ -12,7 +12,7 @@ function Acknowledgements() {
             </p>
             <br />
             <p>
-                The site was inspired by QueeringtheMap.com, a "community generated 
+                The site was inspired by <a href="https://www.queeringthemap.com/">QueeringtheMap.com</a>, a "community generated 
                 counter-mapping platform for digitally archiving LGBTQ2IA+ experience in 
                 relation to physical space". Their vision and mission provided a rock-solid
                 foundation upon which my own ideas flourished, and for that, I am deeply thankful.
