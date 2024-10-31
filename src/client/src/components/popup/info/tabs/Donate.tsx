@@ -8,9 +8,8 @@ function Donate() {
             </p>
             <br />
             <p>
-                I have a ko-fi where you can throw a few dollars 
-                my way if you'd like to donate to the site's continued existence. 
-                Forever grateful to all the lovely individuals who have supported the site so far!
+                I (will eventually) have a ko-fi where you can throw a few dollars 
+                my way if you'd like to donate to the site's continued existence!
             </p>
             <br />
             <p>
@@ -20,15 +19,15 @@ function Donate() {
             </p>
             <br />
             <p>
-                GazaFunds.com provides a collection of GoFundMes for people seeking
+                <a href="https://gazafunds.com/">GazaFunds.com</a> provides a collection of GoFundMes for people seeking
                 evacuation or money for food or shelter. 
             </p>
             <br />
             <p>
-                Connecting Humanity connects people in Gaza with donated eSIMs. These eSIMs
+                <a href="https://connecting-humanity.org/">Connecting Humanity</a> connects people in Gaza with donated eSIMs. These eSIMs
                 allow them to access the internet and connect with their loved ones. You can either
-                purchase an eSIM directly by following Connecting Humanity's instructions, or donate
-                money to Crips for eSIMs for Gaza, who
+                purchase an eSIM directly by following <a href ="https://connecting-humanity.org/donate/">Connecting Humanity's instructions</a>, or donate
+                money to <a href ="https://disabilityvisibilityproject.com/2023/12/25/crips-for-esims-for-gaza/">Crips for eSIMs for Gaza</a>, who
                 will use your donation to purchase eSIMs.
             </p>
         </div>

@@ -7,12 +7,13 @@ from typing import List, Optional
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
 from datetime import datetime, UTC
+from longdist.settings import DEBUG
 
 load_dotenv(find_dotenv())
 
 client = OpenAI()
 
-api = NinjaAPI()
+api = NinjaAPI(openapi_url=DEBUG and "/openapi.json" or "")
 
 class Geometry(Schema):
     type: str

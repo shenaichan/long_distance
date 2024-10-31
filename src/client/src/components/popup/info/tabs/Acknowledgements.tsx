@@ -2,12 +2,17 @@ function Acknowledgements() {
     return (
         <div>
             <p>
-                My deepest gratitude to all at the Recurse Center for housing and 
+                My deepest gratitude to all at the <a href="https://www.recurse.com/">Recurse Center</a> for housing and 
                 nurturing me and this project. Thank you to everyone who listened 
                 to my ideas, pointed me in the right direction, and helped me through 
-                frustrating bugs, including, but certainly not limited to: Ian Fisher, 
-                Rhys Hiltner, Sharp Hall, Margot Kriery, Aurora Nou, Justin Bennett, 
-                Lucy McPhail, Julian Ordaz, Jeremy Kaplan, and many others. 
+                frustrating bugs, including, but certainly not limited to: 
+                Ubani Balogun, Justin Bennett, Miriam Budayr, Jesse Chen, 
+                Ian Fisher, Daniel Friedman, Ryan Goldstein, Sharp Hall, 
+                Eric Hayes, Rhys Hiltner, Jeremy Kaplan, River Dillon Keefer, 
+                Margot Kriery, Lucy McPhail, Liam McCracken, Aurora Nou, 
+                Julian Ordaz, Konarak Ratnakar, Nolen Royalty, 
+                Sam Straus, Michael Suguitan, Kenneth Sylvain, Christina Tran,
+                and many others. 
                 Making this was a great endeavor, and I'm happy to call it my brainchild, but it truly does take a village. 
             </p>
             <br />
@@ -26,7 +31,7 @@ function Acknowledgements() {
             </p>
             <br />
             <p>
-                And thank you to Caroline Pastrano. 
+                And thank you to Caroline Pastrano, for making me who I am today. 
                 In Gabrielle Zevin's <em>Tomorrow, and Tomorrow, and Tomorrow</em>, 
                 she writes, 
                 "To design a game is to imagine the person who will eventually play it."
