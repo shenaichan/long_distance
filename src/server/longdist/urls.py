@@ -23,6 +23,8 @@ from . import views
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', views.index, name='index'),  # Route to serve React app
+    path('reply/<str:reply_id>/', views.reply, name='reply'),
+    path('claim/<str:claim_id>/', views.claim, name='claim'),
     path('api/', api.urls),
     path('admin/', admin.site.urls)
 ]
