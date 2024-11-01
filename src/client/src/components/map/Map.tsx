@@ -28,7 +28,7 @@ function Map() {
   const sourceStateRef = useRef(sourceState);
   const destStateRef = useRef(destState);
   const pinIsHighlightedRef = useRef(pinIsHighlighted);
-  const maxZoom = 17;
+  const maxZoom = 16;
   // Above zoom level 5, do not rotate.
   const maxSpinZoom = 5;
   // Rotate at intermediate speeds between zoom levels 3 and 5.
@@ -128,9 +128,9 @@ function Map() {
     if (!isNaN(highlightedPin.longitude) && !isNaN(highlightedPin.latitude) ) {
       map.current?.flyTo({
         center: [highlightedPin.longitude, highlightedPin.latitude],
-        zoom: 14,
+        zoom: maxZoom,
         essential: true,
-        duration: 1500 + (14 - map.current.getZoom())**1.2 * 250 * dist/2000
+        duration: 1500 + (maxZoom - map.current.getZoom())**1.2 * 250 * dist**0.85/1000
       });
     }
     // }
@@ -198,7 +198,7 @@ function Map() {
         center: [threadLong, threadLat],
         zoom: zoom,
         essential: true,
-        duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 * jumpDist/1000 
+        duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 * jumpDist**0.85/750 
       });
     }
     spinEnabledRef.current = false;
@@ -499,7 +499,7 @@ function Map() {
         }
         
       } else {
-        const features = map.current.queryRenderedFeatures(e.point, { layers: ['clusters','routes-hitbox','unclustered-point'] });
+        const features = map.current.queryRenderedFeatures(e.point, { layers: ['clusters', 'routes-hitbox','unclustered-point'] });
         if (features.length) {
           const layer = features[0].layer!.id
           console.log(layer)
