@@ -125,12 +125,14 @@ function Map() {
     const { lng, lat } = map.current!.getCenter()
     const dist = distance([lng, lat], [highlightedPin.longitude, highlightedPin.latitude])
     console.log(dist)
-    map.current?.flyTo({
-      center: [highlightedPin.longitude, highlightedPin.latitude],
-      zoom: 14,
-      essential: true,
-      duration: 1500 + (14 - map.current.getZoom())**1.2 * 250 * dist/2000
-    });
+    if (!isNaN(highlightedPin.longitude) && !isNaN(highlightedPin.latitude) ) {
+      map.current?.flyTo({
+        center: [highlightedPin.longitude, highlightedPin.latitude],
+        zoom: 14,
+        essential: true,
+        duration: 1500 + (14 - map.current.getZoom())**1.2 * 250 * dist/2000
+      });
+    }
     // }
   }, [highlightedPin, pinIsHighlighted]);
 
@@ -465,12 +467,14 @@ function Map() {
         const { lng, lat } = map.current!.getCenter()
         const dist = distance([lng, lat], [coordinates.lng, coordinates.lat])
         console.log(dist)
-        map.current?.flyTo({
-          center: [coordinates.lng, coordinates.lat],
-          zoom: maxZoom,
-          essential: true,
-          duration: 1500 + (maxZoom - map.current.getZoom())**1.2 * 250 + dist
-        });
+        if (!isNaN(coordinates.lng) && !isNaN(coordinates.lat) ) {
+          map.current?.flyTo({
+            center: [coordinates.lng, coordinates.lat],
+            zoom: maxZoom,
+            essential: true,
+            duration: 1500 + (maxZoom - map.current.getZoom())**1.2 * 250 + dist
+          });
+        }
 
         async function getName(lat: number, lng: number, isSource: boolean) {
           const name = await getPlaceName(lat, lng)
