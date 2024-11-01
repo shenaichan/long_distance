@@ -17,8 +17,8 @@ cd server && python3 manage.py collectstatic
 
 echo "Done! Remember to replace the filepaths in base.html with the filepaths in index.html <3"
 
-echo "Then go to server/ and run this command:"
+echo "Then run this command:"
 
-echo "python3 -m gunicorn longdist.asgi:application -k uvicorn.workers.UvicornWorker"
+echo "cd server && python3 -m gunicorn longdist.asgi:application -k uvicorn.workers.UvicornWorker"
 
 echo "If you're deploying, don't forget to change the api url in vite's .env.production to the right one. Figure out a better way to do this later..."

@@ -187,15 +187,18 @@ function Map() {
                                                highlightedThread.recipient.latitude ]]
     ))
     const [threadLong, threadLat] = geometry.coordinates
+    console.log(geometry)
     const jumpDist = distance([lng, lat], [threadLong, threadLat])
     const threadDist = distance(coords[0], coords[1])
     const zoom = (1 - threadDist/20004)**1.3 * 2.0 + 2
-    map.current?.flyTo({
-      center: [threadLong, threadLat],
-      zoom: zoom,
-      essential: true,
-      duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 * jumpDist/1000 
-    });
+    if (!isNaN(threadLong) && !isNaN(threadLat) ) {
+      map.current?.flyTo({
+        center: [threadLong, threadLat],
+        zoom: zoom,
+        essential: true,
+        duration: 1500 + Math.abs(zoom - map.current.getZoom())**1.2 * 50 * jumpDist/1000 
+      });
+    }
     spinEnabledRef.current = false;
     // }
   }, [highlightedThread, threadIsHighlighted]);
