@@ -16,6 +16,7 @@ function MessageMenu () {
     }, [])
 
     useEffect(() => {
+        setSecretLink("");
         const sender = highlightedThread?.sender
         const matches = pins.filter(myPin => myPin.id === sender!.id)
         if (matches.length > 0) {
