@@ -25,14 +25,14 @@ Notes From Afar is a site where you can leave anonymous messages about your long
 
 
 ## Table of Contents
-- [Features](#Features)
-- [High-Level Design Considerations](#High-Level%20Design%20Considerations)
-- [UI/UX](#UI/UX)
-- [Frontend Architecture](#Frontend%20Architecture)
-- [Backend Architecture](#Backend%20Architecture)
-- [Database](#Database)
-- [Acknowledgements](#Acknowledgements)
-- [License](#License)
+- [Features](#features)
+- [High-Level Design Considerations](#high-level-design-considerations)
+- [UI/UX](#ui-ux)
+- [Frontend Architecture](#frontend-architecture)
+- [Backend Architecture](#backend-architecture)
+- [Database Design](#database-design)
+- [Acknowledgements](#acknowledgements)
+- [License](#license)
 
 
 ## Features
@@ -50,7 +50,7 @@ Notes From Afar is a site where you can leave anonymous messages about your long
 ## Backend Architecture
 
 
-## Database
+## Database Design
 
 
 ## Acknowledgements
