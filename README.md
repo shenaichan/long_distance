@@ -2,10 +2,13 @@
 <h2 align="center"><i>Notes From Afar</i></h2>
 
 <p align="center">
+
   <a href="https://opensource.org/licenses/MIT">
-    <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge"
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">
   </a>
-    <img alt="Version 1.0.0" src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge"
+
+  <img alt="Version 1.0.0" src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge">
+  
 </p>
 
 
