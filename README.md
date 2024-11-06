@@ -5,9 +5,7 @@
   <a href="https://opensource.org/licenses/MIT">
     <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge"
   </a>
-  <a>
     <img alt="Version 1.0.0" src="https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge"
-  </a>
 </p>
 
 
@@ -58,7 +56,7 @@ These features arose from a couple rather "basic" requirements with complicated 
 
 
 ## High-Level Design Considerations
-NFA was greatly inspired by [Queering the Map](), a "community generated counter-mapping platform for digitally archiving LGBTQ2IA+ experience in relation to physical space". On QTM, users can drop geospatially situated notes about their queer experiences. I love this concept -- an anonymous, communally-constructed digital archive. I love how the site offers so much and asks for so little in return. And I love how frictionless and open it is. 
+NFA was greatly inspired by [Queering the Map](https://www.queeringthemap.com/), a "community generated counter-mapping platform for digitally archiving LGBTQ2IA+ experience in relation to physical space". On QTM, users can drop geospatially situated notes about their queer experiences. I love this concept -- an anonymous, communally-constructed digital archive. I love how the site offers so much and asks for so little in return. And I love how frictionless and open it is. 
 
 More and more we see platforms that are walled gardens, content teased and then locked behind the prerequisite of account creation. And then once you make an account, you're bombarded by a slurry of push notifs, shiny sounds and images, and other interactions designed specifically to pull you in and hold you there, for hours. 
 
@@ -74,7 +72,7 @@ Using the design language of Windows '98, I aim to elicit nostalgia for an earli
 
 
 ## UI/UX Testing and Iteration
-Notes From Afar underwent various [UI redesigns](), ultimately landing on a retro, "windows over a globe" structure, with one window for information, one for writing a message, and one for "things this browser owns". I was pretty inspired by game UIs (see: "inventory").
+Notes From Afar underwent various [UI redesigns](https://www.figma.com/slides/0uwWmWN9idMXtDOhtBDvtH/Notes-From-Afar-Redesign-Highlights?node-id=1-537&t=pvZ8pXcMriVE6IDN-1), ultimately landing on a retro, "windows over a globe" structure, with one window for information, one for writing a message, and one for "things this browser owns". I was pretty inspired by game UIs (see: "inventory").
 
 NFA's message creation UX also evolved over time. Most notably, at one point, it consisted of a very linear, opinionated flow. That is, you had to make a source pin --> confirm that source pin --> see all the options in that pin's menu --> choose to write a new note --> choose whether to write to an existing pin or make a new one --> choose a destination location if applicable --> confirm that destination pin --> write a message --> close the menu. A lot of important context was getting lost ("wait, so where did I put the original pin?"), and unnecessary context was introduced (all the options for the first pin). 
 
@@ -85,30 +83,30 @@ I'm pleased with how the final message creation UX ended up -- all the context n
 
 ## Frontend Architecture
 There are only a few *major* components in my app:
-- [The map](), which renders a MapboxGL globe object with data visualization layers on top for pins and relationships between the pins. It also assigns event handlers for various interaction events, like clicks, drags, and scrolls.
-- [The menus]():
-  - [Info](), the information menu on the left side of the screen, which also contains some controls for the map
-  - [Write](), the message writing interface
-  - [Inventory](), the collection of pins and messages that browser "owns"
-- [The popups]():
-  - [Pin](), the popup that shows a given pin's friends, as well as special links if the browser owns that pin
-  - [Message](), the popup that shows a message between two pins, and the response if a response exists
+- [The map](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/map/Map.tsx), which renders a MapboxGL globe object with data visualization layers on top for pins and relationships between the pins. It also assigns event handlers for various interaction events, like clicks, drags, and scrolls.
+- [The menus](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/popup/Menu.tsx):
+  - [Info](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/popup/info/Info.tsx), the information menu on the left side of the screen, which also contains some controls for the map
+  - [Write](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/popup/write/Write.tsx), the message writing interface
+  - [Inventory](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/popup/inventory/Inventory.tsx), the collection of pins and messages that browser "owns"
+- [The popups](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/popup/Popup.tsx):
+  - [Pin](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/popup/create/PinMenu.tsx), the popup that shows a given pin's friends, as well as special links if the browser owns that pin
+  - [Message](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/popup/create/MessageMenu.tsx), the popup that shows a message between two pins, and the response if a response exists
 
-In terms of state management, several variables (namely, those required by 2-3+ major components and their sub-components) are encapsulated in a [useContext]() hook. 
+In terms of state management, several variables (namely, those required by 2-3+ major components and their sub-components) are encapsulated in a [useContext](https://github.com/shenaichan/long_distance/blob/main/src/client/src/state/ContextProvider.tsx) hook. 
 
-I originally created many of these variables via useState in [App](), and explicitly passed them down to individual children components, but ultimately this became rather unwieldy, as these variables were eventually required in a great number of nested components. I realized I wanted a cleaner solution than prop-drilling up and down several layers of the component tree, and thus, the useContext was born.
+I originally created many of these variables via useState in [App](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/App.tsx), and explicitly passed them down to individual children components, but ultimately this became rather unwieldy, as these variables were eventually required in a great number of nested components. I realized I wanted a cleaner solution than prop-drilling up and down several layers of the component tree, and thus, the useContext was born.
 
-Some of my components still manage state locally -- for example, [Write]() maintains several state hooks for managing the state of the message and pin creation. I had to make a great number of judgement calls to decide how to scope each of my state variables.
+Some of my components still manage state locally -- for example, [Write](https://github.com/shenaichan/long_distance/blob/main/src/client/src/components/popup/write/Write.tsx) maintains several state hooks for managing the state of the message and pin creation. I had to make a great number of judgement calls to decide how to scope each of my state variables.
 
 
 ## Backend Architecture
-My Django backend is essentially just a REST API for my frontend. It is entirely specified in [api.py](). I define schemas for data coming in and going out, and for each endpoint, I make a query to my database that fulfills the interface exposed to the client. My frontend calls my backend in [api.tsx](), and has sister-schemas specified (i.e., "MessageIn" on the backend is "MessageOut" on the frontend). 
+My Django backend is essentially just a REST API for my frontend. It is entirely specified in [api.py](https://github.com/shenaichan/long_distance/blob/main/src/server/longdist/api.py). I define schemas for data coming in and going out, and for each endpoint, I make a query to my database that fulfills the interface exposed to the client. My frontend calls my backend in [api.tsx](https://github.com/shenaichan/long_distance/blob/main/src/client/src/api/api.tsx), and has sister-schemas specified (i.e., "MessageIn" on the backend is "MessageOut" on the frontend). 
 
 I enjoyed being able to type my data well both on the frontend (using TypeScript) and the backend (using Django Ninja). This helped me match up data forms over the network -- a lot of bugs got caught immediately on entrance or exit from a given API endpoint.
 
 
 ## Database Design
-I used the Django ORM to define my tables in a database-agnostic manner. As specified in [models.py](), I have five tables:
+I used the Django ORM to define my tables in a database-agnostic manner. As specified in [models.py](https://github.com/shenaichan/long_distance/blob/main/src/server/longdist/models.py), I have five tables:
 - Pin, which stores all the relevant data for a given source or destination location
 - Message, which stores primarily the contents of a message or response
 - Relationship, which associates messages with source/destination pins
@@ -141,6 +139,6 @@ Making this was a great endeavor, and I'm happy to call it my brainchild, but it
 ## License
 Notes From Afar is licensed under the MIT License Copyright (c) 2024.
 
-See the [LICENSE]() for information on the history of this software, terms & conditions for usage, and a DISCLAIMER OF ALL WARRANTIES.
+See the [LICENSE](https://github.com/shenaichan/long_distance/blob/main/LICENSE) for information on the history of this software, terms & conditions for usage, and a DISCLAIMER OF ALL WARRANTIES.
 
 All trademarks referenced herein are property of their respective holders.
